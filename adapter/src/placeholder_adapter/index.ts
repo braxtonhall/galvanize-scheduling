@@ -1,8 +1,40 @@
 import IAPIAdapter from "../IAPIAdapter";
 import IAPIResponse from "../IAPIResponse";
+import {
+	ICandidate,
+	IGetSchedulesOptions,
+	IHiringManager,
+	IHumanResource,
+	IInterviewer,
+	IRoom,
+	ISchedule
+} from "../interfaces";
 
 const adapter: IAPIAdapter = {
+	submitAvailability: autoFail,
+	createCandidate: autoFail,
+	sendAvailabilityEmail: autoFail,
+	getSchedules: autoFail,
+	confirmSchedule: autoFail,
+	getInterviewers: autoFail,
+
+	// hr
+	loginHumanResource: autoFail,
+	addRoom: autoFail,
+	removeRoom: autoFail,
+	addHiringManager: autoFail,
+	removeHiringManager: autoFail,
+	addHumanResource: autoFail,
+	removeHumanResource: autoFail,
+
+	// shared
+	createInterviewer: autoFail,
+	deleteInterviewer: autoFail,
+
+	// meta
+	authenticateToken: autoFail,
 	health: autoFail,
+	logout: autoFail,
 	urls: {},
 	fullURLs: {},
 };

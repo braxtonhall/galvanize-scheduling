@@ -4,6 +4,7 @@ import {urls, fullURLs} from "./urls";
 import health from "./health";
 
 const adapter: IAPIAdapter = {
+	...placeholderAdapter,
 	health,
 	urls,
 	fullURLs,

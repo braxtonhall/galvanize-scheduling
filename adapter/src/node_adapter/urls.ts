@@ -1,6 +1,7 @@
 const urls: {[key: string]: string} = new function() {
 	// "/"
 	this.HEALTH = "/health";
+
 } as {[key: string]: string};
 
 let fullURLs: {[key: string]: string} = {};
