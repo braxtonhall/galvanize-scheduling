@@ -7,9 +7,8 @@ export default interface IAPIAdapter {
 
 	// admin
 
-
 	// meta
 	health: () => Promise<IAPIResponse>;
 	urls: {[key: string]: string};
-	fullUrls: {[key: string]: string};
+	fullURLs: {[key: string]: string};
 }

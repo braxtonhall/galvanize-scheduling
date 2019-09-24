@@ -5,12 +5,10 @@
     "moduleResolution": "node",
     "module": "commonjs",
     "declaration": true,
-    "lib": ["es7", "dom"],
-    "types": ["node"],
+    "lib": ["es2017", "es2015", "dom"],
     "allowSyntheticDefaultImports": true,
     "target": "es6",
-    "esModuleInterop": true,
-    "skipLibCheck": true
+    "esModuleInterop": true
   },
   "include": [
     "src"
