@@ -2,22 +2,22 @@ steps:
   # build the container images
   # backend
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/galvanize-scheduling/backend-$BRANCH_NAME', '--file', './Dockerfile_backend', '.']
+    args: ['build', '-t', 'gcr.io/galvanize-scheduling-253922/backend-$BRANCH_NAME', '--file', './Dockerfile_backend', '.']
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/galvanize-scheduling/backend-$BRANCH_NAME']
+    args: ['push', 'gcr.io/galvanize-scheduling-253922/backend-$BRANCH_NAME']
   # admin portal
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/galvanize-scheduling/frontend-$BRANCH_NAME', '--file', './Dockerfile_frontend', '.']
+    args: ['build', '-t', 'gcr.io/galvanize-scheduling-253922/frontend-$BRANCH_NAME', '--file', './Dockerfile_frontend', '.']
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/galvanize-scheduling/frontend-$BRANCH_NAME']
+    args: ['push', 'gcr.io/galvanize-scheduling-253922/frontend-$BRANCH_NAME']
 
   # Deploy container image to Cloud Run
   # backend
   - name: 'gcr.io/cloud-builders/gcloud'
-    args: ['beta', 'run', 'deploy', 'backend-$BRANCH_NAME', '--image', 'gcr.io/galvanize-scheduling/backend-$BRANCH_NAME:latest', '--region', 'us-central1', '--platform', 'managed']
+    args: ['beta', 'run', 'deploy', 'backend-$BRANCH_NAME', '--image', 'gcr.io/galvanize-scheduling-253922/backend-$BRANCH_NAME:latest', '--region', 'us-central1', '--platform', 'managed']
   # admin portal
   - name: 'gcr.io/cloud-builders/gcloud'
-    args: ['beta', 'run', 'deploy', 'frontend-$BRANCH_NAME', '--image', 'gcr.io/galvanize-scheduling/frontend-$BRANCH_NAME:latest', '--region', 'us-central1', '--platform', 'managed']
+    args: ['beta', 'run', 'deploy', 'frontend-$BRANCH_NAME', '--image', 'gcr.io/galvanize-scheduling-253922/frontend-$BRANCH_NAME:latest', '--region', 'us-central1', '--platform', 'managed']
 images:
-  - gcr.io/galvanize-scheduling/backend-$BRANCH_NAME:latest
-  - gcr.io/galvanize-scheduling/frontend-$BRANCH_NAME:latest
+  - gcr.io/galvanize-scheduling-253922/backend-$BRANCH_NAME:latest
+  - gcr.io/galvanize-scheduling-253922/frontend-$BRANCH_NAME:latest
