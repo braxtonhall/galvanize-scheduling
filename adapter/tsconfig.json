@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "outDir": "dist",
+    "sourceMap": true,
+    "moduleResolution": "node",
+    "module": "commonjs",
+    "declaration": true,
+    "lib": ["es7", "dom"],
+    "types": ["node"],
+    "allowSyntheticDefaultImports": true,
+    "target": "es6",
+    "esModuleInterop": true,
+    "skipLibCheck": true
+  },
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "node_modules",
+    "build",
+    "dist"
+  ]
+}

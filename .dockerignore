@@ -1,0 +1,12 @@
+**/.idea
+**/node_modules
+**/dist
+**/README.md
+**/npm-debug.log
+**/*.iml
+**/.github
+**/.git
+**/.gitignore
+**/.gitattributes
+**/.DS_Store
+**/test

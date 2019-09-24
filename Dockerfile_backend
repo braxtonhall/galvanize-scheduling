@@ -1,0 +1,29 @@
+FROM node:10.16.3-alpine
+
+# libraries
+# adapter
+WORKDIR /usr/src/adapter
+COPY ./adapter/package*.json ./
+RUN npm install --only=production
+
+# backend
+WORKDIR /usr/src/backend
+COPY ./backend/package*.json ./
+RUN npm remove adapter
+RUN npm install --only=production
+
+# compiling
+# adapter
+WORKDIR /usr/src/adapter
+COPY ./adapter ./
+RUN npm run build
+
+# backend
+WORKDIR /usr/src/backend
+RUN npm install --save ../adapter
+COPY ./backend ./
+RUN npm run build
+
+EXPOSE 8080
+
+CMD ["npm", "run", "start"]

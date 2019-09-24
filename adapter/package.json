@@ -1,0 +1,35 @@
+{
+  "name": "adapter",
+  "version": "1.0.0",
+  "description": "adapter",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "rm -rf dist/ && tsc",
+    "test": "npm run build && ts-mocha ./test/**/* --timeout 10000"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Metroxe/galvanize-scheduling.git"
+  },
+  "author": "",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/Metroxe/galvanize-scheduling/issues"
+  },
+  "homepage": "https://github.com/Metroxe/galvanize-scheduling#readme",
+  "devDependencies": {
+    "@types/chai": "^4.2.3",
+    "@types/expect": "^1.20.4",
+    "@types/mocha": "^5.2.7",
+    "chai": "^4.2.0",
+    "expect": "^24.9.0",
+    "mocha": "^6.2.0",
+    "ts-mocha": "^6.0.0",
+    "ts-node": "^8.4.1"
+  },
+  "dependencies": {
+    "@types/node": "^12.7.7",
+    "axios": "^0.19.0",
+    "typescript": "^3.6.3"
+  }
+}
