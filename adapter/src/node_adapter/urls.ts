@@ -9,7 +9,7 @@ let fullURLs: {[key: string]: string} = {};
 // const masterURL = "http://localhost:8080";
 // const localURL = "http://localhost:8080";
 let base: string = process.env.REACT_APP_SERVER_ADDRESS;
-console.log(`<T> ${});
+console.log(`<T> ${Date.now().toLocaleString()}:`, base);
 
 function generateFullURLS() {
 	fullURLs = {};
