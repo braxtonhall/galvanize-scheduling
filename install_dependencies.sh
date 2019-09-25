@@ -10,3 +10,10 @@ rm -rf ./node_modules/adapter
 npm remove adapter
 npm install ../adapter --save
 npm install
+
+# frontend
+cd ../frontend || exit
+rm -rf ./node_modules/adapter
+npm remove adapter
+npm install ../adapter --save
+npm install
