@@ -3,6 +3,21 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "docker-compose build"
+    "build": "docker-compose build",
+    "watch": "docker-compose up",
+    "detatch": "docker-compose up -d",
+    "stop": "docker-compose down",
+    "restart": "docker-compose build && docker-compose up -d",
+
+    "build-frontend": "docker-compose build frontend",
+    "detatch-frontend": "docker-compose up -d frontend",
+    "stop-frontend": "docker-compose down frontend",
+    "restart-frontend": "docker-compose build frontend && docker-compose up -d frontend",
+
+    "build-backend": "docker-compose build backend",
+    "watch-backend": "docker-compose up backend",
+    "detatch-backend": "docker-compose up -d backend",
+    "stop-backend": "docker-compose down backend",
+    "restart-backend": "docker-compose build backend && docker-compose up -d backend"
   }
 }
