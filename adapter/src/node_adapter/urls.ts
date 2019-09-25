@@ -6,7 +6,6 @@ const urls: {[key: string]: string} = new function() {
 
 let fullURLs: {[key: string]: string} = {};
 let base: string = process.env.REACT_APP_SERVER_ADDRESS;
-console.log(`<T> ${Date.now().toLocaleString()}:`, base);
 
 function generateFullURLS() {
 	fullURLs = {};

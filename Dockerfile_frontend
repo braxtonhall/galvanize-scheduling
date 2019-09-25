@@ -25,7 +25,9 @@ RUN npm run build
 WORKDIR /usr/src/frontend
 RUN npm install --save ../adapter
 COPY ./frontend ./
-RUN REACT_APP_SERVER_ADDRESS=${SERVER_ADDRESS} PUBLIC_URL=${PUBLIC_ADDRESS} npm run build
+RUN REACT_APP_SERVER_ADDRESS=${SERVER_ADDRESS} \
+    PUBLIC_URL=${PUBLIC_ADDRESS} \
+    npm run build
 
 EXPOSE 8080
 
