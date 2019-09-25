@@ -1,14 +1,43 @@
 import IAPIResponse from "./IAPIResponse"
+import {
+	IAvailability,
+	ICandidate,
+	IGetSchedulesOptions,
+	IHiringManager,
+	IHumanResource,
+	IInterviewer,
+	IRoom,
+	ISchedule
+} from "./interfaces";
 
 export default interface IAPIAdapter {
-	// interviewer
+	// candidate
+	submitAvailability(token: string, availability: IAvailability): Promise<IAPIResponse>
 
-	// interviewee
+	// hiring manager
+	createCandidate(token: string, candidate: ICandidate): Promise<IAPIResponse<ICandidate>>;
+	sendAvailabilityEmail(token: string, candidate: ICandidate): Promise<IAPIResponse<ICandidate>>;
+	getSchedules(token: string, options: IGetSchedulesOptions): Promise<IAPIResponse<ISchedule[]>>;
+	confirmSchedule(token: string, schedule: ISchedule): Promise<IAPIResponse>;
+	getInterviewers(token: string): Promise<IAPIResponse<IInterviewer[]>>;
 
-	// admin
+	// hr
+	loginHumanResource(username: string, password: string): Promise<IAPIResponse<string>>;
+	addRoom(token: string, room: IRoom): Promise<IAPIResponse>;
+	removeRoom(token: string, id: string): Promise<IAPIResponse>;
+	addHiringManager(token: string, hiringManager: IHiringManager): Promise<IAPIResponse>;
+	removeHiringManager(token: string, id: string): Promise<IAPIResponse>;
+	addHumanResource(token: string, hr: IHumanResource): Promise<IAPIResponse>;
+	removeHumanResource(token: string, id: string): Promise<IAPIResponse>;
+
+	// shared
+	createInterviewer(token: string, interviewer: IInterviewer): Promise<IAPIResponse<IInterviewer>>
+	deleteInterviewer(token: string, interviewer: IInterviewer): Promise<IAPIResponse>
 
 	// meta
-	health: () => Promise<IAPIResponse>;
+	authenticateToken(token: string): Promise<IAPIResponse<boolean>>;
+	health(): Promise<IAPIResponse>;
+	logout(token: string): Promise<IAPIResponse>;
 	urls: {[key: string]: string};
 	fullURLs: {[key: string]: string};
 }
