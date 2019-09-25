@@ -1,5 +1,8 @@
 FROM node:10.16.3-alpine
 
+ARG SERVER_ADDRESS
+ARG PUBLIC_ADDRESS
+
 # libraries
 # adapter
 WORKDIR /usr/src/adapter
@@ -22,7 +25,7 @@ RUN npm run build
 WORKDIR /usr/src/frontend
 RUN npm install --save ../adapter
 COPY ./frontend ./
-RUN npm run build
+RUN REACT_APP_SERVER_ADDRESS=${SERVER_ADDRESS} PUBLIC_URL=${PUBLIC_ADDRESS} npm run build
 
 EXPOSE 8080
 
