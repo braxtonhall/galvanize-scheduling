@@ -19,6 +19,7 @@ const adapter: IAPIAdapter = {
 	getSchedules: autoFail,
 	confirmSchedule: autoFail,
 	getInterviewers: autoFail,
+	getCandidates: autoFail,
 
 	// hr
 	loginHumanResource: autoFail,
@@ -30,6 +31,7 @@ const adapter: IAPIAdapter = {
 	removeHumanResource: autoFail,
 
 	// shared
+	getRooms: autoFail,
 	createInterviewer: autoFail,
 	deleteInterviewer: autoFail,
 

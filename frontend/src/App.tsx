@@ -4,6 +4,7 @@ import Header from "./component/Header";
 import Login from './container/login';
 import AuthenticatedRoute from "./component/AuthenticatedRoute";
 import ErrorModal from "./component/ErrorModal";
+import CandidateList from "./component/CandidateList";
 
 
 const App: React.FC = () => {
@@ -13,6 +14,7 @@ const App: React.FC = () => {
 			<Header/>
 			<ErrorModal/>
 			<AuthenticatedRoute exact path="/" component={Header} />
+			<Route exact path="/create-candidate" component={CandidateList} />
 			<Route exact path="/login" component={Login} />
 		</Router>
 	);
