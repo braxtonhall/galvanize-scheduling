@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 import {
 	Collapse,
 	Navbar,
@@ -8,33 +8,37 @@ import {
 	NavItem,
 	NavLink,
 } from 'reactstrap';
-import {Link} from "react-router-dom";
+import adapter from "../services/Adapter";
+import Context from '../services/Context';
 
 const Header: React.FC = () => {
-
+	const {token, updateContext} = useContext(Context);
 	const [isOpen, updateIsOpen] = useState(false);
 
 	function toggle() {
 		updateIsOpen(!isOpen);
 	}
 
+	async function logout() {
+		if (token) {
+			await adapter.logout(token);
+			updateContext({token: undefined});
+		}
+	}
+
 	return (
 		<div>
 			<Navbar color="light" light expand="md">
-				<NavbarBrand href="/">Galvanize Interview Scheduling</NavbarBrand>
+				<NavbarBrand>Galvanize Interview Scheduling</NavbarBrand>
 				<NavbarToggler onClick={toggle} />
 				<Collapse isOpen={isOpen} navbar>
 					<Nav className="ml-auto" navbar>
-						<NavItem>
-							<Link to="/">
-								<NavLink>Human Resources</NavLink>
-							</Link>
-						</NavItem>
-						<NavItem>
-							<Link to="/">
-								<NavLink>Hiring Managers</NavLink>
-							</Link>
-						</NavItem>
+						{
+							token &&
+							<NavItem>
+								<NavLink onClick={logout}>Logout</NavLink>
+							</NavItem>
+						}
 					</Nav>
 				</Collapse>
 			</Navbar>
