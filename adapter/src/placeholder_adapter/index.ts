@@ -12,6 +12,8 @@ import {
 
 const adapter: IAPIAdapter = {
 	submitAvailability: autoFail,
+
+	loginHiringManager: autoFail,
 	createCandidate: autoFail,
 	sendAvailabilityEmail: autoFail,
 	getSchedules: autoFail,
@@ -32,6 +34,7 @@ const adapter: IAPIAdapter = {
 	deleteInterviewer: autoFail,
 
 	// meta
+	determineTokenType: autoFail,
 	authenticateToken: autoFail,
 	health: autoFail,
 	logout: autoFail,

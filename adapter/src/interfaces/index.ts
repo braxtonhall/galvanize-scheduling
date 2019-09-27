@@ -24,9 +24,16 @@ export interface ISchedule {
 }
 
 export interface IAvailability {
-	
+
 }
 
 export interface IGetSchedulesOptions {
-	
+
+}
+
+export enum Role {
+	UNKNOWN,
+	CANDIDATE,
+	HIRING_MANAGER,
+	HUMAN_RESOURCE,
 }
