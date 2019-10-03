@@ -75,7 +75,7 @@ const Header: React.FC = () => {
 							</NavItem>
 						}
 						{
-							([interfaces.Role.HIRING_MANAGER].includes(role)) &&
+							([interfaces.Role.HUMAN_RESOURCE].includes(role)) &&
 							<NavItem>
 								<Link to="/human_resources">
 									<NavLink>Human Resources</NavLink>
