@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from "react";
-import {Container, Row, Col, Card, Button, CardBody} from "reactstrap";
+import {Container, Row, Col, Card, Button, CardBody, CardHeader} from "reactstrap";
 import CandidateForm from "../component/CandidateForm";
 import CandidateList from "../component/CandidateList";
 import {interfaces} from "adapter";
@@ -102,7 +102,8 @@ const CandidateMenu: React.FC = () => {
 		<Container className="pb-4">
 			<Row>
 				<Col md={6} sm={12}>
-					<Card className="mt-4 align-items-center d-flex">
+					<Card className="mt-4">
+						<CardHeader>Actions</CardHeader>
 						<CardBody>
 							<Button className="m-2" onClick={refreshCandidates} color="primary">Refresh</Button>
 							<Button className="m-2" onClick={newCandidate} color="primary">New Candidate</Button>

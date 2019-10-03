@@ -7,7 +7,7 @@ import {
 	IHumanResource,
 	IInterviewer,
 	IRoom,
-	ISchedule
+	ISchedule, Role
 } from "../interfaces";
 import fakeCandidates from "./fakeCandidates";
 
@@ -39,7 +39,7 @@ const adapter: IAPIAdapter = {
 	deleteInterviewer: autoFail,
 
 	// meta
-	determineTokenType: autoFail,
+	determineTokenType: async () => ({success: true, data: Role.HUMAN_RESOURCE}),
 	authenticateToken: autoFail,
 	health: autoFail,
 	logout: autoFail,

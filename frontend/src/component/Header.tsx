@@ -1,4 +1,4 @@
-import React, {useState, useContext} from 'react';
+import React, {useState, useContext, useEffect} from 'react';
 import {
 	Collapse,
 	Navbar,
@@ -11,10 +11,23 @@ import {
 import adapter from "../services/Adapter";
 import Context from '../services/Context';
 import {Link} from "react-router-dom";
+import {interfaces} from "adapter";
 
 const Header: React.FC = () => {
 	const {token, updateContext} = useContext(Context);
 	const [isOpen, updateIsOpen] = useState(false);
+	const [role, updateRole] = useState<interfaces.Role>();
+
+	useEffect(() => {
+		adapter.determineTokenType(token)
+			.then(({success, data}) => {
+				if (success && token) {
+					updateRole(data);
+				} else {
+					updateRole(undefined);
+				}
+			});
+	}, [token]);
 
 	function toggle() {
 		updateIsOpen(!isOpen);
@@ -27,6 +40,8 @@ const Header: React.FC = () => {
 		}
 	}
 
+	console.log(role, [interfaces.Role.HUMAN_RESOURCE, interfaces.Role.HIRING_MANAGER]);
+
 	return (
 		<div>
 			<Navbar color="light" light expand="md">
@@ -35,10 +50,35 @@ const Header: React.FC = () => {
 				<Collapse isOpen={isOpen} navbar>
 					<Nav className="ml-auto" navbar>
 						{
-							token &&
+							([interfaces.Role.HUMAN_RESOURCE, interfaces.Role.HIRING_MANAGER].includes(role)) &&
 							<NavItem>
 								<Link to="/candidates">
 									<NavLink>Candidates</NavLink>
+								</Link>
+							</NavItem>
+						}
+
+						{
+							([interfaces.Role.HUMAN_RESOURCE, interfaces.Role.HIRING_MANAGER].includes(role)) &&
+							<NavItem>
+								<Link to="/scheduling">
+									<NavLink>Scheduling</NavLink>
+								</Link>
+							</NavItem>
+						}
+						{
+							([interfaces.Role.HUMAN_RESOURCE, interfaces.Role.HIRING_MANAGER].includes(role)) &&
+							<NavItem>
+								<Link to="/interviewers">
+									<NavLink>Interviewers</NavLink>
+								</Link>
+							</NavItem>
+						}
+						{
+							([interfaces.Role.HIRING_MANAGER].includes(role)) &&
+							<NavItem>
+								<Link to="/human_resources">
+									<NavLink>Human Resources</NavLink>
 								</Link>
 							</NavItem>
 						}

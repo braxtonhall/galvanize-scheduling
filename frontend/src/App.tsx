@@ -5,6 +5,7 @@ import Login from './container/login';
 import AuthenticatedRoute from "./component/AuthenticatedRoute";
 import ErrorModal from "./component/ErrorModal";
 import CandidateMenu from "./container/CandidateMenu";
+import Scheduling from "./container/Scheduling";
 
 
 const App: React.FC = () => {
@@ -14,6 +15,7 @@ const App: React.FC = () => {
 			<Header/>
 			<ErrorModal/>
 			<AuthenticatedRoute exact path="/candidates" component={CandidateMenu} />
+			<AuthenticatedRoute exact path="/scheduling" component={Scheduling} />
 			<Route exact path="/login" component={Login} />
 		</Router>
 	);
