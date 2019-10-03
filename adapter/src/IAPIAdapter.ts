@@ -20,6 +20,8 @@ export default interface IAPIAdapter {
 	sendAvailabilityEmail(token: string, candidate: ICandidate): Promise<IAPIResponse<ICandidate>>;
 	getSchedules(token: string, options: IGetSchedulesOptions): Promise<IAPIResponse<ISchedule[]>>;
 	confirmSchedule(token: string, schedule: ISchedule): Promise<IAPIResponse>;
+	deleteCandidate(token: string, candidate: ICandidate): Promise<IAPIResponse>;
+	updateCandidate(token: string, candidate: ICandidate): Promise<IAPIResponse>;
 
 	// hr
 	loginHumanResource(username: string, password: string): Promise<IAPIResponse<string>>;

@@ -15,12 +15,12 @@ interface IProps {
 
 const CandidateForm: React.FC<IProps> = (props: IProps) => {
 
-	const {candidate, onChange, buttons, title, description} = props;
+	const {candidate, buttons, title, description} = props;
 	const {id, email, phoneNumber, firstName, lastName, position, notes} = candidate;
 
 	function createOnChange(key: keyof ICandidate): ChangeEventHandler<HTMLInputElement> {
 		return (e) => {
-			onChange({...candidate, [key]: e.target.value});
+			props.onChange({...candidate, [key]: e.target.value});
 		}
 	}
 
@@ -32,7 +32,7 @@ const CandidateForm: React.FC<IProps> = (props: IProps) => {
 		<Card className="mt-4">
 			{title && <CardHeader>{title}</CardHeader>}
 			<CardBody>
-				{description && <CardSubtitle>{description}</CardSubtitle>}
+				{description && <CardSubtitle className="mb-4">{description}</CardSubtitle>}
 				{
 					id &&
 					<React.Fragment>

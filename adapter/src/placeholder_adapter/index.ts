@@ -21,6 +21,8 @@ const adapter: IAPIAdapter = {
 	confirmSchedule: autoFail,
 	getInterviewers: autoFail,
 	getCandidates: async () => ({success: true, data: fakeCandidates}),
+	deleteCandidate: autoPass,
+	updateCandidate:autoPass,
 
 	// hr
 	loginHumanResource: async () => ({success: true, data: "test_token"}),
@@ -48,6 +50,10 @@ const adapter: IAPIAdapter = {
 // will fit any function on the API adapter that is async
 async function autoFail(...args: any[]): Promise<IAPIResponse<any>> {
 	return {success: false, error: "This is the placeholder adapter, any function will fail."}
+}
+
+async function autoPass(...args: any[]): Promise<IAPIResponse<any>> {
+	return {success: true}
 }
 
 export default adapter;
