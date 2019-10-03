@@ -30,7 +30,7 @@ const CandidateMenu: React.FC = () => {
 	}
 
 	function selectCandidate(candidate: ICandidate): void {
-		updateSelectedCandidate(candidate);
+		updateSelectedCandidate({...candidate});
 	}
 
 
@@ -45,7 +45,9 @@ const CandidateMenu: React.FC = () => {
 					/>
 				</Col>
 				<Col md={12}>
-					<CandidateForm/>
+					<CandidateForm
+						candidate={selectedCandidate}
+					/>
 				</Col>
 			</Row>
 		</Container>

@@ -33,8 +33,13 @@ const CandidateForm: React.FC<IProps> = (props: IProps) => {
 			{title && <CardHeader>{title}</CardHeader>}
 			<CardBody>
 				{description && <CardSubtitle>{description}</CardSubtitle>}
-				<Label className="mt-2">ID</Label>
-				<Input type="text" placeholder="enter email" contentEditable={false} value={id}/>
+				{
+					id &&
+					<React.Fragment>
+						<Label className="mt-2">ID</Label>
+						< Input type="text" placeholder="enter email" disabled={true} value={id}/>
+					</React.Fragment>
+				}
 				<Label className="mt-2">Email</Label>
 				<Input type="email" placeholder="enter email" onChange={createOnChange("email")} value={email}/>
 				<Label className="mt-2">First Name</Label>

@@ -15,16 +15,24 @@ interface IProps {
 const CandidateList: React.FC<IProps> = (props: IProps) => {
 
 	const {candidates, actions, selected} = props;
+	console.log(selected);
 
 	function makeRow(candidate: ICandidate, index: number): JSX.Element {
 		const {id, email, phoneNumber, firstName, lastName, position} = candidate;
 
 		function makeButtons({text, onClick}: {text: string, onClick: (candidate: ICandidate) => (void | Promise<void>)}) {
-			return (<Button onClick={onClick as any} size="sm">{text}</Button>)
+
+			function onClickWrapper() {
+				onClick(candidate);
+			}
+
+			return (<Button onClick={onClickWrapper} size="sm">{text}</Button>)
 		}
 
+		const isSelected = selected ? selected.id === id : false;
+
 		return (
-			<tr className={selected ? selected.id === id ? "bg-light" : "" : ""}>
+			<tr className={isSelected && "bg-light"}>
 				<th scope="row">{id}</th>
 				<td>{email}</td>
 				<td>{phoneNumber}</td>
