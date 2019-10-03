@@ -9,20 +9,21 @@ import {
 	IRoom,
 	ISchedule
 } from "../interfaces";
+import fakeCandidates from "./fakeCandidates";
 
 const adapter: IAPIAdapter = {
 	submitAvailability: autoFail,
 
-	loginHiringManager: autoFail,
+	loginHiringManager: async () => ({success: true, data: "test_token"}),
 	createCandidate: autoFail,
 	sendAvailabilityEmail: autoFail,
 	getSchedules: autoFail,
 	confirmSchedule: autoFail,
 	getInterviewers: autoFail,
-	getCandidates: autoFail,
+	getCandidates: async () => ({success: true, data: fakeCandidates}),
 
 	// hr
-	loginHumanResource: autoFail,
+	loginHumanResource: async () => ({success: true, data: "test_token"}),
 	addRoom: autoFail,
 	removeRoom: autoFail,
 	addHiringManager: autoFail,

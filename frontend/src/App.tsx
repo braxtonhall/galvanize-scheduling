@@ -4,7 +4,7 @@ import Header from "./component/Header";
 import Login from './container/login';
 import AuthenticatedRoute from "./component/AuthenticatedRoute";
 import ErrorModal from "./component/ErrorModal";
-import CandidateList from "./component/CandidateList";
+import CandidateMenu from "./container/CandidateMenu";
 
 
 const App: React.FC = () => {
@@ -14,7 +14,7 @@ const App: React.FC = () => {
 			<Header/>
 			<ErrorModal/>
 			<AuthenticatedRoute exact path="/" component={Header} />
-			<Route exact path="/create-candidate" component={CandidateList} />
+			<Route exact path="/candidates" component={CandidateMenu} />
 			<Route exact path="/login" component={Login} />
 		</Router>
 	);

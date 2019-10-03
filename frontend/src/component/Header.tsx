@@ -29,7 +29,7 @@ const Header: React.FC = () => {
 	return (
 		<div>
 			<Navbar color="light" light expand="md">
-				<NavbarBrand>Galvanize Interview Scheduling</NavbarBrand>
+				<NavbarBrand><img src="/galvanize-logo.svg"/></NavbarBrand>
 				<NavbarToggler onClick={toggle} />
 				<Collapse isOpen={isOpen} navbar>
 					<Nav className="ml-auto" navbar>
