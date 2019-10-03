@@ -1,15 +1,30 @@
 import React, {ChangeEventHandler, useState, useContext} from 'react';
-import {Card, CardSubtitle, CardBody, Input, Button, Container, Row, Col, CardHeader} from "reactstrap"
+import {
+	Card,
+	CardSubtitle,
+	CardBody,
+	Input,
+	Button,
+	Container,
+	Row,
+	Col,
+	CardHeader,
+	Label,
+	FormGroup
+} from "reactstrap"
 import adapter from "../services/Adapter";
 import Context from '../services/Context';
 import {interfaces} from "adapter";
+import createOnChange from "../services/createOnChange";
 
 const Login: React.FC = () => {
 	const {updateContext} = useContext(Context);
+
 	const [password, updatePassword] = useState("");
 	const [email, updateEmail] = useState("");
-	const onChangePassword: ChangeEventHandler<HTMLInputElement> = e => updatePassword(e.target.value)
-	const onChangeEmail: ChangeEventHandler<HTMLInputElement> = e => updateEmail(e.target.value)
+
+	const onChangePassword = createOnChange(updatePassword);
+	const onChangeEmail = createOnChange(updateEmail);
 
 	async function login() {
 		// attempt login human resource
@@ -36,9 +51,11 @@ const Login: React.FC = () => {
 					<Card className="mt-4">
 						<CardHeader>Login</CardHeader>
 						<CardBody>
-							<CardSubtitle>Please input your email and password that is used by your offical Galvanize email address.</CardSubtitle>
-							<Input className="mt-4" type="email" placeholder="enter email" onChange={onChangeEmail} value={email}/>
-							<Input className="mt-1" type="password" placeholder="enter password" onChange={onChangePassword} value={password}/>
+							<CardSubtitle>Please input your email and password that is used by your official Galvanize email address.</CardSubtitle>
+							<Label className="mt-4">Email</Label>
+							<Input type="email" placeholder="enter email" onChange={onChangeEmail} value={email}/>
+							<Label className="mt-2">Password</Label>
+							<Input type="password" placeholder="enter password" onChange={onChangePassword} value={password}/>
 							<Button className="mt-4" color="primary" onClick={login}>Login</Button>
 						</CardBody>
 					</Card>
@@ -46,6 +63,6 @@ const Login: React.FC = () => {
 			</Row>
 		</Container>
 	)
-}
+};
 
 export default Login;

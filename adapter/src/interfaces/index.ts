@@ -12,6 +12,12 @@ export interface IRoom {
 
 export interface ICandidate {
 	id?: string,
+	email: string,
+	phoneNumber: string,
+	firstName: string,
+	lastName: string,
+	position: string,
+	notes: string,
 }
 
 export interface IInterviewer {

@@ -9,19 +9,23 @@ import {
 	IRoom,
 	ISchedule
 } from "../interfaces";
+import fakeCandidates from "./fakeCandidates";
 
 const adapter: IAPIAdapter = {
 	submitAvailability: autoFail,
 
-	loginHiringManager: autoFail,
+	loginHiringManager: async () => ({success: true, data: "test_token"}),
 	createCandidate: autoFail,
 	sendAvailabilityEmail: autoFail,
 	getSchedules: autoFail,
 	confirmSchedule: autoFail,
 	getInterviewers: autoFail,
+	getCandidates: async () => ({success: true, data: fakeCandidates}),
+	deleteCandidate: autoPass,
+	updateCandidate:autoPass,
 
 	// hr
-	loginHumanResource: autoFail,
+	loginHumanResource: async () => ({success: true, data: "test_token"}),
 	addRoom: autoFail,
 	removeRoom: autoFail,
 	addHiringManager: autoFail,
@@ -30,6 +34,7 @@ const adapter: IAPIAdapter = {
 	removeHumanResource: autoFail,
 
 	// shared
+	getRooms: autoFail,
 	createInterviewer: autoFail,
 	deleteInterviewer: autoFail,
 
@@ -45,6 +50,10 @@ const adapter: IAPIAdapter = {
 // will fit any function on the API adapter that is async
 async function autoFail(...args: any[]): Promise<IAPIResponse<any>> {
 	return {success: false, error: "This is the placeholder adapter, any function will fail."}
+}
+
+async function autoPass(...args: any[]): Promise<IAPIResponse<any>> {
+	return {success: true}
 }
 
 export default adapter;
