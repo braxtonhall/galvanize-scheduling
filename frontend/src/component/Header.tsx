@@ -37,14 +37,16 @@ const Header: React.FC = () => {
 						{
 							token &&
 							<NavItem>
-								<NavLink onClick={logout}>Logout</NavLink>
+								<Link to="/candidates">
+									<NavLink>Candidates</NavLink>
+								</Link>
 							</NavItem>
 						}
 						{
 							token &&
 							<NavItem>
-								<Link to="/candidates">
-									<NavLink>Candidates</NavLink>
+								<Link to="/login">
+									<NavLink onClick={logout}>Logout</NavLink>
 								</Link>
 							</NavItem>
 						}

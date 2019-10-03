@@ -14,7 +14,6 @@ const CandidateMenu: React.FC = () => {
 	const [selectedCandidate, updateSelectedCandidate] = useState<ICandidate>();
 	const [title, updateTitle] = useState<string>();
 	const [description, updateDescription] = useState<string>();
-	const [onChange, updateOnChange] = useState<(candidate: ICandidate) => void>();
 	const [buttons, updateButtons] = useState<Array<{text: string, onClick: () => (void | Promise<void>)}>>();
 	const actions: Array<{text: string, color: string, onClick: (candidate: ICandidate) => (void | Promise<void>)}> = [
 		{text: "Select", onClick: selectCandidate, color: "primary"},
@@ -27,14 +26,12 @@ const CandidateMenu: React.FC = () => {
 		updateTitle("Edit Candidate");
 		updateDescription("You may edit all the details of a candidate and save them.");
 		updateSelectedCandidate({...candidate});
-		updateOnChange(undefined);
 		updateButtons([{text: "Update", onClick: updateCandidate}])
 	}
 
 	function newCandidate(): void {
 		updateTitle("Create New Candidate");
 		updateDescription("Enter all the details of a new candidate and save them.");
-		updateOnChange(() => (onChangeSelected));
 		updateSelectedCandidate({
 			email: "",
 			phoneNumber: "",
@@ -67,7 +64,6 @@ const CandidateMenu: React.FC = () => {
 	async function refreshCandidates(): Promise<void> {
 		const {success, data, error} = await adapter.getCandidates(token);
 		updateSelectedCandidate(undefined);
-		updateOnChange(undefined);
 		updateTitle(undefined);
 		updateDescription(undefined);
 		updateButtons(undefined);
@@ -127,7 +123,7 @@ const CandidateMenu: React.FC = () => {
 							candidate={selectedCandidate}
 							title={title}
 							description={description}
-							onChange={onChange}
+							onChange={onChangeSelected}
 							buttons={buttons}
 						/>
 					</Col>

@@ -16,8 +16,9 @@ import adapter from "../services/Adapter";
 import Context from '../services/Context';
 import {interfaces} from "adapter";
 import createOnChange from "../services/createOnChange";
+import { RouteComponentProps } from 'react-router';
 
-const Login: React.FC = () => {
+const Login: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
 	const {updateContext} = useContext(Context);
 
 	const [password, updatePassword] = useState("");
@@ -31,6 +32,7 @@ const Login: React.FC = () => {
 		let res = await adapter.loginHumanResource(email, password);
 		if (res.success) {
 			updateContext({token: res.data, tokenType: interfaces.Role.HUMAN_RESOURCE});
+			props.history.push("/candidates");
 			return;
 		}
 
@@ -38,6 +40,7 @@ const Login: React.FC = () => {
 		res = await adapter.loginHiringManager(email, password);
 		if (res.success) {
 			updateContext({token: res.data, tokenType: interfaces.Role.HIRING_MANAGER});
+			props.history.push("/candidates");
 			return;
 		}
 

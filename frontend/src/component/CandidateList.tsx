@@ -46,22 +46,24 @@ const CandidateList: React.FC<IProps> = (props: IProps) => {
 		<Card className="mt-4">
 			<CardHeader>Candidates List</CardHeader>
 			<CardBody>
-				<Table hover>
-					<thead>
-						<tr>
-							<th>ID</th>
-							<th>Email</th>
-							<th>Phone Number</th>
-							<th>First Name</th>
-							<th>Last Name</th>
-							<th>Position</th>
-							<th/>
-						</tr>
-					</thead>
-					<tbody>
-					{candidates.map(makeRow)}
-					</tbody>
-				</Table>
+				<div className="table-responsive">
+					<Table hover>
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>Email</th>
+								<th>Phone Number</th>
+								<th>First Name</th>
+								<th>Last Name</th>
+								<th>Position</th>
+								<th/>
+							</tr>
+						</thead>
+						<tbody>
+						{candidates.map(makeRow)}
+						</tbody>
+					</Table>
+				</div>
 			</CardBody>
 		</Card>
 	)

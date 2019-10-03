@@ -13,8 +13,7 @@ const App: React.FC = () => {
 		<Router>
 			<Header/>
 			<ErrorModal/>
-			<AuthenticatedRoute exact path="/" component={Header} />
-			<Route exact path="/candidates" component={CandidateMenu} />
+			<AuthenticatedRoute exact path="/candidates" component={CandidateMenu} />
 			<Route exact path="/login" component={Login} />
 		</Router>
 	);

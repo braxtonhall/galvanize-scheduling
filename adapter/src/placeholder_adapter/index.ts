@@ -21,8 +21,8 @@ const adapter: IAPIAdapter = {
 	confirmSchedule: autoFail,
 	getInterviewers: autoFail,
 	getCandidates: async () => ({success: true, data: fakeCandidates}),
-	deleteCandidate: autoPass,
-	updateCandidate:autoPass,
+	deleteCandidate: autoFail,
+	updateCandidate:autoFail,
 
 	// hr
 	loginHumanResource: async () => ({success: true, data: "test_token"}),
