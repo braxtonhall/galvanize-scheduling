@@ -17,7 +17,7 @@ const App: React.FC = () => {
 			<AuthenticatedRoute exact path="/candidates" component={CandidateMenu} />
 			<AuthenticatedRoute exact path="/scheduling" component={Scheduling} />
 			<Route exact path="/login" component={Login} />
-			<Route component={() => (<Redirect to="/login"/>)} />
+			{/*<Route component={() => (<Redirect to="/login"/>)} />*/}
 		</Router>
 	);
 };
