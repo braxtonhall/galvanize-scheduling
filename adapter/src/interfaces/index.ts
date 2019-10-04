@@ -1,3 +1,5 @@
+import {Moment} from "moment";
+
 export interface IHiringManager {
 	id?: string,
 }
@@ -8,6 +10,7 @@ export interface IHumanResource {
 
 export interface IRoom {
 	id?: string,
+	name: string,
 }
 
 export interface ICandidate {
@@ -22,11 +25,20 @@ export interface ICandidate {
 
 export interface IInterviewer {
 	id?: string,
+	firstName: string,
+	lastName: string,
 }
 
 export interface ISchedule {
 	candidate: ICandidate
-	// TODO
+	meetings: IMeeting[]
+}
+
+export interface IMeeting {
+	interviewers: IInterviewer[],
+	startTime: Moment,
+	endTime: Moment,
+	room: IRoom
 }
 
 export interface IAvailability {
