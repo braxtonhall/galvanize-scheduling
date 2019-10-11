@@ -7,19 +7,26 @@ import {
 	IHumanResource,
 	IInterviewer,
 	IRoom,
-	ISchedule
+	ISchedule, Role
 } from "../interfaces";
+import fakeCandidates from "./fakeCandidates";
+import fakeInterviewers, {fakeSchedules} from "./fakeInterviewers";
 
 const adapter: IAPIAdapter = {
 	submitAvailability: autoFail,
+
+	loginHiringManager: async () => ({success: true, data: "test_token_hm"}),
 	createCandidate: autoFail,
 	sendAvailabilityEmail: autoFail,
-	getSchedules: autoFail,
+	getSchedules: async () => ({success: true, data: fakeSchedules}),
 	confirmSchedule: autoFail,
-	getInterviewers: autoFail,
+	getInterviewers: async () => ({success: true, data: fakeInterviewers}),
+	getCandidates: async () => ({success: true, data: fakeCandidates}),
+	deleteCandidate: autoFail,
+	updateCandidate:autoFail,
 
 	// hr
-	loginHumanResource: autoFail,
+	loginHumanResource: async () => ({success: true, data: "test_token_hr"}),
 	addRoom: autoFail,
 	removeRoom: autoFail,
 	addHiringManager: autoFail,
@@ -28,10 +35,12 @@ const adapter: IAPIAdapter = {
 	removeHumanResource: autoFail,
 
 	// shared
+	getRooms: autoFail,
 	createInterviewer: autoFail,
 	deleteInterviewer: autoFail,
 
 	// meta
+	determineTokenType: async () => ({success: true, data: Role.HUMAN_RESOURCE}),
 	authenticateToken: autoFail,
 	health: autoFail,
 	logout: autoFail,
@@ -42,6 +51,10 @@ const adapter: IAPIAdapter = {
 // will fit any function on the API adapter that is async
 async function autoFail(...args: any[]): Promise<IAPIResponse<any>> {
 	return {success: false, error: "This is the placeholder adapter, any function will fail."}
+}
+
+async function autoPass(...args: any[]): Promise<IAPIResponse<any>> {
+	return {success: true}
 }
 
 export default adapter;
