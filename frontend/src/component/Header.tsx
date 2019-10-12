@@ -43,52 +43,32 @@ const Header: React.FC = () => {
 		<div>
 			<Navbar color="light" light expand="md">
 				<NavbarBrand><img alt="galvanize logo" src="/galvanize-logo.svg"/></NavbarBrand>
-				<NavbarToggler onClick={toggle} />
-				<Collapse isOpen={isOpen} navbar>
-					<Nav className="ml-auto" navbar>
-						{
-							([interfaces.Role.HUMAN_RESOURCE, interfaces.Role.HIRING_MANAGER].includes(role)) &&
-							<NavItem>
-								<Link className="nav-link" to="/candidates">
-									Candidates
-								</Link>
-							</NavItem>
-						}
+				{
+					token &&
+					<React.Fragment>
+						<NavbarToggler onClick={toggle}/>
+						<Collapse isOpen={isOpen} navbar>
+							<Nav className="ml-auto" navbar>
 
-						{
-							([interfaces.Role.HUMAN_RESOURCE, interfaces.Role.HIRING_MANAGER].includes(role)) &&
-							<NavItem>
-								<Link className="nav-link" to="/scheduling">
-									Scheduling
-								</Link>
-							</NavItem>
-						}
-						{
-							([interfaces.Role.HUMAN_RESOURCE, interfaces.Role.HIRING_MANAGER].includes(role)) &&
-							<NavItem>
-								<Link className="nav-link" to="/interviewers">
-									Interviewers
-								</Link>
-							</NavItem>
-						}
-						{
-							([interfaces.Role.HUMAN_RESOURCE].includes(role)) &&
-							<NavItem>
-								<Link className="nav-link" to="/human_resources">
-									Human Resources
-								</Link>
-							</NavItem>
-						}
-						{
-							token &&
-							<NavItem>
-								<Link className="nav-link" to="/login" onClick={logout}>
-									Logout
-								</Link>
-							</NavItem>
-						}
-					</Nav>
-				</Collapse>
+								<NavItem>
+									<Link className="nav-link" to="/candidates">
+										Candidates
+									</Link>
+								</NavItem>
+								<NavItem>
+									<Link className="nav-link" to="/scheduling">
+										Scheduling
+									</Link>
+								</NavItem>
+								<NavItem>
+									<Link className="nav-link" to="/login" onClick={logout}>
+										Logout
+									</Link>
+								</NavItem>
+							</Nav>
+						</Collapse>
+					</React.Fragment>
+				}
 			</Navbar>
 		</div>
 	)

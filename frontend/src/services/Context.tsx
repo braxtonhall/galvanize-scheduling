@@ -4,7 +4,6 @@ import {interfaces} from "adapter";
 
 export interface IContext {
 	token?: string,
-	tokenType?: interfaces.Role,
 	error?: string,
 	updateContext: (context: Partial<IContext>) => void
 }

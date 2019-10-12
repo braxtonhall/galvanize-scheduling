@@ -17,7 +17,7 @@ const CandidateMenu: React.FC = () => {
 	const [buttons, updateButtons] = useState<Array<{text: string, onClick: () => (void | Promise<void>)}>>();
 	const actions: Array<{text: string, color: string, onClick: (candidate: ICandidate) => (void | Promise<void>)}> = [
 		{text: "Select", onClick: selectCandidate, color: "primary"},
-		{text: "Send Availability Email", onClick: sendAvailabilityEmail, color: "primary"},
+		{text: "Send Availability", onClick: sendAvailabilityEmail, color: "secondary"},
 		{text: "Delete", onClick: deleteCandidate, color: "danger"},
 	];
 

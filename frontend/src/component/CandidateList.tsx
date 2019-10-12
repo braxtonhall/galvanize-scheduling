@@ -1,5 +1,5 @@
 import React from "react";
-import {Table} from 'reactstrap';
+import {ButtonGroup, Table} from 'reactstrap';
 import {Button, Card, CardBody, CardHeader} from "reactstrap";
 import {interfaces} from "adapter";
 
@@ -24,7 +24,7 @@ const CandidateList: React.FC<IProps> = (props: IProps) => {
 				onClick(candidate);
 			}
 
-			return (<Button className="mr-2" onClick={onClickWrapper} size="sm" color={color} key={"candidate_button_"+k}>{text}</Button>)
+			return (<Button onClick={onClickWrapper} size="sm" color={color} key={"candidate_button_"+k}>{text}</Button>)
 		}
 
 		const isSelected = selected ? selected.id === id : false;
@@ -37,7 +37,11 @@ const CandidateList: React.FC<IProps> = (props: IProps) => {
 				<td>{firstName}</td>
 				<td>{lastName}</td>
 				<td>{position}</td>
-				<td>{actions.map(makeButtons)}</td>
+				<td>
+					<ButtonGroup>
+					{actions.map(makeButtons)}
+					</ButtonGroup>
+				</td>
 			</tr>
 		)
 	}
