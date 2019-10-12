@@ -1,4 +1,4 @@
-import React, {ChangeEventHandler, useState, useContext} from 'react';
+import React, {useState, useContext} from 'react';
 import {
 	Card,
 	CardSubtitle,
@@ -10,11 +10,9 @@ import {
 	Col,
 	CardHeader,
 	Label,
-	FormGroup
 } from "reactstrap"
 import adapter from "../services/Adapter";
 import Context from '../services/Context';
-import {interfaces} from "adapter";
 import createOnChange from "../services/createOnChange";
 import { RouteComponentProps } from 'react-router';
 
@@ -28,18 +26,9 @@ const Login: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
 	const onChangeEmail = createOnChange(updateEmail);
 
 	async function login() {
-		// attempt login human resource
-		let res = await adapter.loginHumanResource(email, password);
+		let res = await adapter.login(email, password);
 		if (res.success) {
-			updateContext({token: res.data, tokenType: interfaces.Role.HUMAN_RESOURCE});
-			props.history.push("/candidates");
-			return;
-		}
-
-		// login hiring manager
-		res = await adapter.loginHiringManager(email, password);
-		if (res.success) {
-			updateContext({token: res.data, tokenType: interfaces.Role.HIRING_MANAGER});
+			updateContext({token: res.data});
 			props.history.push("/candidates");
 			return;
 		}

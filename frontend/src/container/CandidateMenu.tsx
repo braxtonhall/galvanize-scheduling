@@ -17,6 +17,7 @@ const CandidateMenu: React.FC = () => {
 	const [buttons, updateButtons] = useState<Array<{text: string, onClick: () => (void | Promise<void>)}>>();
 	const actions: Array<{text: string, color: string, onClick: (candidate: ICandidate) => (void | Promise<void>)}> = [
 		{text: "Select", onClick: selectCandidate, color: "primary"},
+		{text: "Send Availability", onClick: sendAvailabilityEmail, color: "secondary"},
 		{text: "Delete", onClick: deleteCandidate, color: "danger"},
 	];
 
@@ -27,6 +28,15 @@ const CandidateMenu: React.FC = () => {
 		updateDescription("You may edit all the details of a candidate and save them.");
 		updateSelectedCandidate({...candidate});
 		updateButtons([{text: "Update", onClick: updateCandidate}])
+	}
+
+	async function sendAvailabilityEmail(candidate: ICandidate): Promise<void> {
+		const {success, error} = await adapter.sendAvailabilityEmail(token, candidate);
+		if (!success && error) {
+			updateContext({error});
+		} else if (!success) {
+			updateContext({error: "There was an error sending the availability email."})
+		}
 	}
 
 	function newCandidate(): void {

@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from "react";
-import {Button, Card, CardBody, CardHeader, Col, Container, Row} from "reactstrap";
+import {Col, Container, Row} from "reactstrap";
 import CandidateList from "../component/CandidateList";
 import adapter from "../services/Adapter";
 import Context from "../services/Context";

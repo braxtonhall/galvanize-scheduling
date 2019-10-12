@@ -1,21 +1,17 @@
 import IAPIAdapter from "../IAPIAdapter";
 import IAPIResponse from "../IAPIResponse";
 import {
-	ICandidate,
-	IGetSchedulesOptions,
-	IHiringManager,
-	IHumanResource,
-	IInterviewer,
-	IRoom,
-	ISchedule, Role
+	Role
 } from "../interfaces";
 import fakeCandidates from "./fakeCandidates";
 import fakeInterviewers, {fakeSchedules} from "./fakeInterviewers";
 
 const adapter: IAPIAdapter = {
 	submitAvailability: autoFail,
+	isValidCandidateID: async () => ({success: true, data: true}),
+	getCandidateByID: async () => ({success: true, data: fakeCandidates[0]}),
 
-	loginHiringManager: async () => ({success: true, data: "test_token_hm"}),
+	login: async () => ({success: true, data: "fake_token"}),
 	createCandidate: autoFail,
 	sendAvailabilityEmail: autoFail,
 	getSchedules: async () => ({success: true, data: fakeSchedules}),
@@ -24,20 +20,6 @@ const adapter: IAPIAdapter = {
 	getCandidates: async () => ({success: true, data: fakeCandidates}),
 	deleteCandidate: autoFail,
 	updateCandidate:autoFail,
-
-	// hr
-	loginHumanResource: async () => ({success: true, data: "test_token_hr"}),
-	addRoom: autoFail,
-	removeRoom: autoFail,
-	addHiringManager: autoFail,
-	removeHiringManager: autoFail,
-	addHumanResource: autoFail,
-	removeHumanResource: autoFail,
-
-	// shared
-	getRooms: autoFail,
-	createInterviewer: autoFail,
-	deleteInterviewer: autoFail,
 
 	// meta
 	determineTokenType: async () => ({success: true, data: Role.HUMAN_RESOURCE}),

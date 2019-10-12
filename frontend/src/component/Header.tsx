@@ -6,7 +6,6 @@ import {
 	NavbarBrand,
 	Nav,
 	NavItem,
-	NavLink,
 } from 'reactstrap';
 import adapter from "../services/Adapter";
 import Context from '../services/Context';
@@ -40,58 +39,36 @@ const Header: React.FC = () => {
 		}
 	}
 
-	console.log(role, [interfaces.Role.HUMAN_RESOURCE, interfaces.Role.HIRING_MANAGER]);
-
 	return (
 		<div>
 			<Navbar color="light" light expand="md">
-				<NavbarBrand><img src="/galvanize-logo.svg"/></NavbarBrand>
-				<NavbarToggler onClick={toggle} />
-				<Collapse isOpen={isOpen} navbar>
-					<Nav className="ml-auto" navbar>
-						{
-							([interfaces.Role.HUMAN_RESOURCE, interfaces.Role.HIRING_MANAGER].includes(role)) &&
-							<NavItem>
-								<Link to="/candidates">
-									<NavLink>Candidates</NavLink>
-								</Link>
-							</NavItem>
-						}
+				<NavbarBrand><img alt="galvanize logo" src="/galvanize-logo.svg"/></NavbarBrand>
+				{
+					token &&
+					<React.Fragment>
+						<NavbarToggler onClick={toggle}/>
+						<Collapse isOpen={isOpen} navbar>
+							<Nav className="ml-auto" navbar>
 
-						{
-							([interfaces.Role.HUMAN_RESOURCE, interfaces.Role.HIRING_MANAGER].includes(role)) &&
-							<NavItem>
-								<Link to="/scheduling">
-									<NavLink>Scheduling</NavLink>
-								</Link>
-							</NavItem>
-						}
-						{
-							([interfaces.Role.HUMAN_RESOURCE, interfaces.Role.HIRING_MANAGER].includes(role)) &&
-							<NavItem>
-								<Link to="/interviewers">
-									<NavLink>Interviewers</NavLink>
-								</Link>
-							</NavItem>
-						}
-						{
-							([interfaces.Role.HUMAN_RESOURCE].includes(role)) &&
-							<NavItem>
-								<Link to="/human_resources">
-									<NavLink>Human Resources</NavLink>
-								</Link>
-							</NavItem>
-						}
-						{
-							token &&
-							<NavItem>
-								<Link to="/login">
-									<NavLink onClick={logout}>Logout</NavLink>
-								</Link>
-							</NavItem>
-						}
-					</Nav>
-				</Collapse>
+								<NavItem>
+									<Link className="nav-link" to="/candidates">
+										Candidates
+									</Link>
+								</NavItem>
+								<NavItem>
+									<Link className="nav-link" to="/scheduling">
+										Scheduling
+									</Link>
+								</NavItem>
+								<NavItem>
+									<Link className="nav-link" to="/login" onClick={logout}>
+										Logout
+									</Link>
+								</NavItem>
+							</Nav>
+						</Collapse>
+					</React.Fragment>
+				}
 			</Navbar>
 		</div>
 	)
