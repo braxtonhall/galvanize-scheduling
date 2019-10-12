@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Route, Redirect, Switch } from "react-router-dom";
 import Header from "./component/Header";
 import Login from './container/Login';
@@ -6,12 +6,9 @@ import AuthenticatedRoute from "./component/AuthenticatedRoute";
 import ErrorModal from "./component/ErrorModal";
 import CandidateMenu from "./container/CandidateMenu";
 import Scheduling from "./container/Scheduling";
-import Context from "./services/Context";
 import CandidateAvailability from "./container/CandidateAvailability";
 
 const App: React.FC = () => {
-	const {token} = useContext(Context);
-
 	return (
 		<Router>
 			<Header/>
