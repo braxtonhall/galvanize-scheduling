@@ -1,5 +1,5 @@
 import React, {useContext} from 'react';
-import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
+import { BrowserRouter as Router, Route, Redirect, Switch } from "react-router-dom";
 import Header from "./component/Header";
 import Login from './container/Login';
 import AuthenticatedRoute from "./component/AuthenticatedRoute";
@@ -16,11 +16,13 @@ const App: React.FC = () => {
 		<Router>
 			<Header/>
 			<ErrorModal/>
-			<AuthenticatedRoute exact path="/candidates" component={CandidateMenu} />
-			<AuthenticatedRoute exact path="/scheduling" component={Scheduling} />
-			<Route exact path="/login" component={Login} />
-			<Route exact path="/submit_availability/:candidateID" component={CandidateAvailability} />
-			{!token && <Route component={() => (<Redirect to="/login"/>)} />}
+			<Switch>
+				<AuthenticatedRoute exact path="/candidates" component={CandidateMenu} />
+				<AuthenticatedRoute exact path="/scheduling" component={Scheduling} />
+				<Route exact path="/login" component={Login} />
+				<Route exact path="/submit_availability/:candidateID" component={CandidateAvailability} />
+				<Redirect to="/login"/>
+			</Switch>
 		</Router>
 	);
 };
