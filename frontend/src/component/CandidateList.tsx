@@ -18,19 +18,19 @@ const CandidateList: React.FC<IProps> = (props: IProps) => {
 	function makeRow(candidate: ICandidate, index: number): JSX.Element {
 		const {id, email, phoneNumber, firstName, lastName, position} = candidate;
 
-		function makeButtons({text, onClick, color}: {text: string, color: string, onClick: (candidate: ICandidate) => (void | Promise<void>)}) {
+		function makeButtons({text, onClick, color}: {text: string, color: string, onClick: (candidate: ICandidate) => (void | Promise<void>)}, k: number) {
 
 			function onClickWrapper() {
 				onClick(candidate);
 			}
 
-			return (<Button className="mr-2" onClick={onClickWrapper} size="sm" color={color}>{text}</Button>)
+			return (<Button className="mr-2" onClick={onClickWrapper} size="sm" color={color} key={"candidate_button_"+k}>{text}</Button>)
 		}
 
 		const isSelected = selected ? selected.id === id : false;
 
 		return (
-			<tr className={isSelected && "bg-light"}>
+			<tr className={isSelected ? "bg-light" : ""} key={"row_"+index}>
 				<th scope="row">{id}</th>
 				<td>{email}</td>
 				<td>{phoneNumber}</td>

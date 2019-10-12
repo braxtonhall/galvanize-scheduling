@@ -12,7 +12,7 @@ import {
 
 export default interface IAPIAdapter {
 	// candidate
-	submitAvailability(token: string, availability: IAvailability): Promise<IAPIResponse>
+	submitAvailability(candidateID: string, availability: IAvailability): Promise<IAPIResponse>
 
 	// hiring manager
 	loginHiringManager(username: string, password: string): Promise<IAPIResponse<string>>;

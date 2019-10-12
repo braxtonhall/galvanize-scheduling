@@ -1,4 +1,4 @@
-import React, {ChangeEventHandler, useState, useContext} from 'react';
+import React, {useState, useContext} from 'react';
 import {
 	Card,
 	CardSubtitle,
@@ -10,7 +10,6 @@ import {
 	Col,
 	CardHeader,
 	Label,
-	FormGroup
 } from "reactstrap"
 import adapter from "../services/Adapter";
 import Context from '../services/Context';

@@ -1,6 +1,5 @@
-import React, {ChangeEventHandler, useContext, useState} from "react";
-import {Button, Card, CardBody, CardHeader, CardSubtitle, Col, Container, Input, Label, Row} from "reactstrap";
-import createOnChange from "../services/createOnChange";
+import React, {ChangeEventHandler} from "react";
+import {Button, Card, CardBody, CardHeader, CardSubtitle, Input, Label} from "reactstrap";
 import {interfaces} from "adapter";
 
 type ICandidate = interfaces.ICandidate;
@@ -24,8 +23,8 @@ const CandidateForm: React.FC<IProps> = (props: IProps) => {
 		}
 	}
 
-	function createButton({text, onClick}: {text: string, onClick: () => (void | Promise<void>)}): JSX.Element {
-		return (<Button className="mt-4" color="primary" onClick={onClick}>{text}</Button>)
+	function createButton({text, onClick}: {text: string, onClick: () => (void | Promise<void>)}, k: number): JSX.Element {
+		return (<Button className="mt-4" color="primary" onClick={onClick} key={"candidate_form_button_" + k}>{text}</Button>)
 	}
 
 	return (

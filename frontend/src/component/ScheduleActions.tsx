@@ -21,12 +21,12 @@ const ScheduleActions: React.FC<IProps> = (props) => {
 	const {candidate, meetings} = schedule;
 	const {email, phoneNumber, firstName, lastName, position} = candidate;
 
-	function createButton({text, onClick}: IButton): JSX.Element {
+	function createButton({text, onClick}: IButton, k: number): JSX.Element {
 		function onClickWrapper(): void {
 			onClick(schedule);
 		}
 
-		return <Button className="mr-3" onClick={onClickWrapper} color="primary">{text}</Button>
+		return <Button className="mr-3" onClick={onClickWrapper} color="primary" key={"schedule_actions_button_"+k}>{text}</Button>
 	}
 
 	return (
