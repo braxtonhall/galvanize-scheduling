@@ -7,6 +7,7 @@ import {interfaces} from "adapter";
 import InterviewSelection from "../component/InterviewSelection";
 import {InterviewSelectionValue} from "../component/InterviewSelection";
 import ScheduleView from "../component/ScheduleView";
+import ScheduleActions from "../component/ScheduleActions";
 type ICandidate = interfaces.ICandidate;
 type ISchedule = interfaces.ISchedule;
 
@@ -80,7 +81,7 @@ const Scheduling: React.FC = () => {
 					/>
 				</Col>
 				{ selectedCandidate &&
-					<Col md={8} sm={12}>
+					<Col md={12}>
 						<InterviewSelection
 							value={interviewerValue}
 							onChange={updateInterviewerValue}
@@ -89,10 +90,19 @@ const Scheduling: React.FC = () => {
 				}
 				{
 					schedules &&
-					<Col md={4} sm={12}>
+					<Col md={12}>
 						<ScheduleView
 							schedules={schedules}
 							onSelect={updateSelectedSchedule}
+						/>
+					</Col>
+				}
+				{
+					selectedSchedule &&
+					<Col md={12}>
+						<ScheduleActions
+							schedule={selectedSchedule}
+							actions={[{text: "Schedule & Send Emails", onClick: () => {}}]}
 						/>
 					</Col>
 				}
