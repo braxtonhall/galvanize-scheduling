@@ -22,7 +22,6 @@ const adapter: IAPIAdapter = {
 	updateCandidate:autoFail,
 
 	// meta
-	determineTokenType: async () => ({success: true, data: Role.HUMAN_RESOURCE}),
 	authenticateToken: autoFail,
 	health: autoFail,
 	logout: autoFail,

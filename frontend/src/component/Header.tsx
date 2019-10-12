@@ -10,23 +10,10 @@ import {
 import adapter from "../services/Adapter";
 import Context from '../services/Context';
 import {Link} from "react-router-dom";
-import {interfaces} from "adapter";
 
 const Header: React.FC = () => {
 	const {token, updateContext} = useContext(Context);
 	const [isOpen, updateIsOpen] = useState(false);
-	const [role, updateRole] = useState<interfaces.Role>();
-
-	useEffect(() => {
-		adapter.determineTokenType(token)
-			.then(({success, data}) => {
-				if (success && token) {
-					updateRole(data);
-				} else {
-					updateRole(undefined);
-				}
-			});
-	}, [token]);
 
 	function toggle() {
 		updateIsOpen(!isOpen);

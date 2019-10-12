@@ -15,6 +15,7 @@ import adapter from "../services/Adapter";
 import Context from '../services/Context';
 import createOnChange from "../services/createOnChange";
 import { RouteComponentProps } from 'react-router';
+import {Simulate} from "react-dom/test-utils";
 
 const Login: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
 	const {updateContext} = useContext(Context);
@@ -26,9 +27,15 @@ const Login: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
 	const onChangeEmail = createOnChange(updateEmail);
 
 	async function login() {
-		let res = await adapter.login(email, password);
-		if (res.success) {
-			updateContext({token: res.data});
+		const {success, data, error} = await adapter.login(email, password);
+
+		if (error) {
+			updateContext({error});
+			return;
+		}
+
+		if (success) {
+			updateContext({token: data});
 			props.history.push("/candidates");
 			return;
 		}

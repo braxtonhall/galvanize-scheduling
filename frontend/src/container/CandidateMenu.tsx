@@ -14,7 +14,7 @@ const CandidateMenu: React.FC = () => {
 	const [selectedCandidate, updateSelectedCandidate] = useState<ICandidate>();
 	const [title, updateTitle] = useState<string>();
 	const [description, updateDescription] = useState<string>();
-	const [buttons, updateButtons] = useState<Array<{text: string, onClick: () => (void | Promise<void>)}>>();
+	const [buttons, updateButtons] = useState<Array<{text: string, onClick: (candidate: ICandidate) => (void | Promise<void>)}>>();
 	const actions: Array<{text: string, color: string, onClick: (candidate: ICandidate) => (void | Promise<void>)}> = [
 		{text: "Select", onClick: selectCandidate, color: "primary"},
 		{text: "Send Availability", onClick: sendAvailabilityEmail, color: "secondary"},
@@ -86,8 +86,9 @@ const CandidateMenu: React.FC = () => {
 		}
 	}
 
-	async function createNewCandidate(): Promise<void> {
-		const {success, error} = await adapter.createCandidate(token, selectedCandidate);
+	async function createNewCandidate(candidate: ICandidate): Promise<void> {
+		console.log(JSON.stringify(candidate), "hey");
+		const {success, error} = await adapter.createCandidate(token, candidate);
 		if (success) {
 			await refreshCandidates()
 		} else if (error) {
@@ -97,8 +98,8 @@ const CandidateMenu: React.FC = () => {
 		}
 	}
 
-	async function updateCandidate(): Promise<void> {
-		const {success, error} = await adapter.updateCandidate(token, selectedCandidate);
+	async function updateCandidate(candidate: ICandidate): Promise<void> {
+		const {success, error} = await adapter.updateCandidate(token, candidate);
 		if (success) {
 			await refreshCandidates()
 		} else if (error) {

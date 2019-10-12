@@ -10,6 +10,7 @@ import ScheduleView from "../component/ScheduleView";
 import ScheduleActions from "../component/ScheduleActions";
 type ICandidate = interfaces.ICandidate;
 type ISchedule = interfaces.ISchedule;
+type IInterviewer = interfaces.IInterviewer;
 
 const Scheduling: React.FC = () => {
 
@@ -38,12 +39,12 @@ const Scheduling: React.FC = () => {
 	async function refreshInterviewers(): Promise<void> {
 		const {success, data, error} = await adapter.getInterviewers(token);
 		if (success) {
-			const value: InterviewSelectionValue = data.map(i => {
+			const value: InterviewSelectionValue = data.map((i: IInterviewer) => {
 				return {
 					interviewer: i,
 					minutes: 0,
 					preference: undefined,
-				}
+				} as any
 			});
 			updateInterviewerValue(value);
 		} else if (error) {

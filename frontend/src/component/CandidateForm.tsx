@@ -9,7 +9,7 @@ interface IProps {
 	description?: string
 	candidate?: ICandidate;
 	onChange?: (candidate: ICandidate) => void;
-	buttons?: Array<{text: string, onClick: () => (void | Promise<void>)}>
+	buttons?: Array<{text: string, onClick: (candidate: ICandidate) => (void | Promise<void>)}>
 }
 
 const CandidateForm: React.FC<IProps> = (props: IProps) => {
@@ -23,8 +23,13 @@ const CandidateForm: React.FC<IProps> = (props: IProps) => {
 		}
 	}
 
-	function createButton({text, onClick}: {text: string, onClick: () => (void | Promise<void>)}, k: number): JSX.Element {
-		return (<Button className="mt-4" color="primary" onClick={onClick} key={"candidate_form_button_" + k}>{text}</Button>)
+	function createButton({text, onClick}: {text: string, onClick: (candidate: ICandidate) => (void | Promise<void>)}, k: number): JSX.Element {
+
+		function onClickWrapper() {
+			onClick(candidate)
+		}
+
+		return (<Button className="mt-4" color="primary" onClick={onClickWrapper} key={"candidate_form_button_" + k}>{text}</Button>)
 	}
 
 	return (

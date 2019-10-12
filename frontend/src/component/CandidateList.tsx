@@ -31,8 +31,7 @@ const CandidateList: React.FC<IProps> = (props: IProps) => {
 
 		return (
 			<tr className={isSelected ? "bg-light" : ""} key={"row_"+index}>
-				<th scope="row">{id}</th>
-				<td>{email}</td>
+				<th scope="row">{email}</th>
 				<td>{phoneNumber}</td>
 				<td>{firstName}</td>
 				<td>{lastName}</td>
@@ -54,7 +53,6 @@ const CandidateList: React.FC<IProps> = (props: IProps) => {
 					<Table hover>
 						<thead>
 							<tr>
-								<th>ID</th>
 								<th>Email</th>
 								<th>Phone Number</th>
 								<th>First Name</th>
