@@ -4,7 +4,7 @@ import {ICandidate, IGetSchedulesOptions, IInterviewer, ISchedule} from "../inte
 import {Moment} from "moment";
 import cloneDeep from "lodash/cloneDeep";
 import fakeCandidates from "../placeholder_adapter/fakeCandidates";
-import fakeInterviewers from "../placeholder_adapter/fakeInterviewers";
+import fakeInterviewers, {fakeSchedules} from "../placeholder_adapter/fakeInterviewers";
 import fakeUsers from "./fakeUsers";
 import random from "lodash/random";
 
@@ -80,7 +80,7 @@ const adapter: IAPIAdapter = {
 		if (!checkToken(token)) {
 			return {success: false, error: tokenErrorMessage}
 		}
-		return {success: false};
+		return {success: true, data: fakeSchedules};
 	},
 	async health(): Promise<IAPIResponse<boolean>> {
 		await wait();
@@ -97,7 +97,7 @@ const adapter: IAPIAdapter = {
 			tokens.set(token, true);
 			return {success: true, data: token};
 		} else {
-			return {success: false, error: "This version of the software is using mock data, and example user is test@galvanize.com with password test123"}
+			return {success: false, error: "This version of the software is using mock data, and example user is 'peter@galvanize.com' with password 'i<3peter'"}
 		}
 	},
 	async logout(token: string): Promise<IAPIResponse> {
@@ -138,8 +138,13 @@ const adapter: IAPIAdapter = {
 
 const tokenErrorMessage = "This user is no longer authenticated, please login again";
 
+// i do this to make development quicker, but show loading in the demo
 function wait(): Promise<void> {
-	return new Promise(r => setTimeout(r, random(100, 2000)));
+	if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
+		return new Promise(r => r());
+	} else {
+		return new Promise(r => setTimeout(r, random(100, 1000)));
+	}
 }
 
 function checkToken(token: string): boolean {
