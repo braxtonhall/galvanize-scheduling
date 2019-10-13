@@ -21,6 +21,7 @@ export interface ICandidate {
 	lastName: string,
 	position: string,
 	notes: string,
+	availability?: IAvailability,
 }
 
 export interface IInterviewer {

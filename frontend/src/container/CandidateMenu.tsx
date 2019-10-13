@@ -5,19 +5,20 @@ import CandidateList from "../component/CandidateList";
 import {interfaces} from "adapter";
 import Context from "../services/Context";
 import adapter from "../services/Adapter";
+import {ToastsContainer, ToastsStore, ToastsContainerPosition} from 'react-toasts';
 
 type ICandidate = interfaces.ICandidate;
 
 const CandidateMenu: React.FC = () => {
-	const {token, updateContext} = useContext(Context);
+	const {token, updateContext, startLoadingProcess, endLoadingProcess} = useContext(Context);
 	const [candidates, updateCandidates] = useState<ICandidate[]>([]);
 	const [selectedCandidate, updateSelectedCandidate] = useState<ICandidate>();
 	const [title, updateTitle] = useState<string>();
 	const [description, updateDescription] = useState<string>();
-	const [buttons, updateButtons] = useState<Array<{text: string, onClick: () => (void | Promise<void>)}>>();
+	const [buttons, updateButtons] = useState<Array<{text: string, onClick: (candidate: ICandidate) => (void | Promise<void>)}>>();
 	const actions: Array<{text: string, color: string, onClick: (candidate: ICandidate) => (void | Promise<void>)}> = [
 		{text: "Select", onClick: selectCandidate, color: "primary"},
-		{text: "Send Availability", onClick: sendAvailabilityEmail, color: "secondary"},
+		{text: "Send Availability", onClick: sendAvailabilityEmail, color: "primary"},
 		{text: "Delete", onClick: deleteCandidate, color: "danger"},
 	];
 
@@ -31,11 +32,15 @@ const CandidateMenu: React.FC = () => {
 	}
 
 	async function sendAvailabilityEmail(candidate: ICandidate): Promise<void> {
+		startLoadingProcess();
 		const {success, error} = await adapter.sendAvailabilityEmail(token, candidate);
 		if (!success && error) {
-			updateContext({error});
+			endLoadingProcess({error});
 		} else if (!success) {
-			updateContext({error: "There was an error sending the availability email."})
+			endLoadingProcess({error: "There was an error sending the availability email."})
+		} else {
+			ToastsStore.success(`The url for the candidates availability is '/submit_schedule/${candidate.id}'. An email has been sent to the candidate.`);
+			endLoadingProcess();
 		}
 	}
 
@@ -61,6 +66,7 @@ const CandidateMenu: React.FC = () => {
 
 	// API calls
 	async function deleteCandidate(candidate: ICandidate): Promise<void> {
+		startLoadingProcess();
 		const {success, error} = await adapter.deleteCandidate(token, candidate);
 		if (success) {
 			await refreshCandidates()
@@ -69,9 +75,11 @@ const CandidateMenu: React.FC = () => {
 		} else {
 			updateContext({error: "There was an error deleting the candidate."})
 		}
+		endLoadingProcess();
 	}
 
 	async function refreshCandidates(): Promise<void> {
+		startLoadingProcess();
 		const {success, data, error} = await adapter.getCandidates(token);
 		updateSelectedCandidate(undefined);
 		updateTitle(undefined);
@@ -84,10 +92,12 @@ const CandidateMenu: React.FC = () => {
 		} else {
 			updateContext({error: "There was an error getting the candidates, please try again."})
 		}
+		endLoadingProcess();
 	}
 
-	async function createNewCandidate(): Promise<void> {
-		const {success, error} = await adapter.createCandidate(token, selectedCandidate);
+	async function createNewCandidate(candidate: ICandidate): Promise<void> {
+		startLoadingProcess();
+		const {success, error} = await adapter.createCandidate(token, candidate);
 		if (success) {
 			await refreshCandidates()
 		} else if (error) {
@@ -95,10 +105,12 @@ const CandidateMenu: React.FC = () => {
 		} else {
 			updateContext({error: "There was an error creating the candidate."})
 		}
+		endLoadingProcess();
 	}
 
-	async function updateCandidate(): Promise<void> {
-		const {success, error} = await adapter.updateCandidate(token, selectedCandidate);
+	async function updateCandidate(candidate: ICandidate): Promise<void> {
+		startLoadingProcess();
+		const {success, error} = await adapter.updateCandidate(token, candidate);
 		if (success) {
 			await refreshCandidates()
 		} else if (error) {
@@ -106,6 +118,7 @@ const CandidateMenu: React.FC = () => {
 		} else {
 			updateContext({error: "There was an error updating the candidate."})
 		}
+		endLoadingProcess();
 	}
 
 	return (
@@ -140,6 +153,7 @@ const CandidateMenu: React.FC = () => {
 					</Col>
 				}
 			</Row>
+			<ToastsContainer position={ToastsContainerPosition.BOTTOM_RIGHT} store={ToastsStore}/>
 		</Container>
 	)
 };

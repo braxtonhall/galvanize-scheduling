@@ -3,7 +3,7 @@ import {
 	IAvailability,
 	ICandidate,
 	IGetSchedulesOptions,
-	IInterviewer, Role,
+	IInterviewer,
 	ISchedule
 } from "./interfaces";
 
@@ -16,7 +16,7 @@ export default interface IAPIAdapter {
 	// staff
 	login(username: string, password: string): Promise<IAPIResponse<string>>;
 	createCandidate(token: string, candidate: ICandidate): Promise<IAPIResponse<ICandidate>>;
-	sendAvailabilityEmail(token: string, candidate: ICandidate): Promise<IAPIResponse<ICandidate>>;
+	sendAvailabilityEmail(token: string, candidate: ICandidate): Promise<IAPIResponse>;
 	getSchedules(token: string, options: IGetSchedulesOptions): Promise<IAPIResponse<ISchedule[]>>;
 	confirmSchedule(token: string, schedule: ISchedule): Promise<IAPIResponse>;
 	getCandidates(token: string): Promise<IAPIResponse<ICandidate[]>>;
@@ -25,9 +25,8 @@ export default interface IAPIAdapter {
 	getInterviewers(token: string): Promise<IAPIResponse<IInterviewer[]>>;
 
 	// meta
-	determineTokenType(token: string): Promise<IAPIResponse<Role>>
 	authenticateToken(token: string): Promise<IAPIResponse<boolean>>;
-	health(): Promise<IAPIResponse>;
+	health(): Promise<IAPIResponse<boolean>>;
 	logout(token: string): Promise<IAPIResponse>;
 	urls: {[key: string]: string};
 	fullURLs: {[key: string]: string};

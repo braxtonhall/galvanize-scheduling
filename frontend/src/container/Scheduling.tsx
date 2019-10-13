@@ -10,10 +10,11 @@ import ScheduleView from "../component/ScheduleView";
 import ScheduleActions from "../component/ScheduleActions";
 type ICandidate = interfaces.ICandidate;
 type ISchedule = interfaces.ISchedule;
+type IInterviewer = interfaces.IInterviewer;
 
 const Scheduling: React.FC = () => {
 
-	const {token, updateContext} = useContext(Context);
+	const {token, updateContext, startLoadingProcess, endLoadingProcess} = useContext(Context);
 	const [candidates, updateCandidates] = useState<ICandidate[]>([]);
 	const [interviewerValue, updateInterviewerValue] = useState<InterviewSelectionValue>();
 	const [selectedCandidate, updateSelectedCandidate] = useState<ICandidate>();
@@ -22,48 +23,53 @@ const Scheduling: React.FC = () => {
 
 	useEffect(() => {refreshCandidates().then()}, []);
 	useEffect(() => {selectedCandidate && refreshInterviewers().then()}, [JSON.stringify(selectedCandidate)]);
-	useEffect(() => {interviewerValue && refreshSchedules().then()}, [JSON.stringify(interviewerValue)]);
 
 	async function refreshCandidates(): Promise<void> {
+		startLoadingProcess();
 		const {success, data, error} = await adapter.getCandidates(token);
 		if (success) {
 			updateCandidates(data);
+			endLoadingProcess();
 		} else if (error) {
-			updateContext({error});
+			endLoadingProcess({error});
 		} else {
-			updateContext({error: "There was an error getting the candidates, please try again."})
+			endLoadingProcess({error: "There was an error getting the candidates, please try again."})
 		}
 	}
 
 	async function refreshInterviewers(): Promise<void> {
+		startLoadingProcess();
 		const {success, data, error} = await adapter.getInterviewers(token);
 		if (success) {
-			const value: InterviewSelectionValue = data.map(i => {
+			const value: InterviewSelectionValue = data.map((i: IInterviewer) => {
 				return {
 					interviewer: i,
 					minutes: 0,
 					preference: undefined,
-				}
+				} as any
 			});
 			updateInterviewerValue(value);
+			endLoadingProcess()
 		} else if (error) {
-			updateContext({error});
+			endLoadingProcess({error});
 		} else {
-			updateContext({error: "There was an error getting the interviewers, please try again."})
+			endLoadingProcess({error: "There was an error getting the interviewers, please try again."})
 		}
 	}
 
-	async function refreshSchedules(): Promise<void> {
+	async function refreshSchedules(v: InterviewSelectionValue): Promise<void> {
 		// TODO: Fill out input for getSchedules()
+		startLoadingProcess();
 		const {success, data, error} = await adapter.getSchedules(token, {});
+		console.log(success, data, error);
 		if (success) {
 			updateSchedules(data);
+			endLoadingProcess();
 		} else if (error) {
-			updateContext({error});
+			endLoadingProcess({error});
 		} else {
-			updateContext({error: "There was an error getting the schedules, please try again."})
+			endLoadingProcess({error: "There was an error getting the schedules, please try again."})
 		}
-
 	}
 
 	function selectCandidate(candidate: ICandidate) {
@@ -85,6 +91,7 @@ const Scheduling: React.FC = () => {
 						<InterviewSelection
 							value={interviewerValue}
 							onChange={updateInterviewerValue}
+							actions={[{text: "Generate Schedules", onClick: refreshSchedules}]}
 						/>
 					</Col>
 				}
@@ -102,7 +109,7 @@ const Scheduling: React.FC = () => {
 					<Col md={12}>
 						<ScheduleActions
 							schedule={selectedSchedule}
-							actions={[{text: "Schedule & Send Emails", onClick: () => {}}]}
+							actions={[{text: "Schedule & Send Emails", onClick: () => {alert("feature not yet available.")}}]}
 						/>
 					</Col>
 				}
