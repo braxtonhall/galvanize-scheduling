@@ -13,7 +13,7 @@ type ICandidate = interfaces.ICandidate;
 type IAvailability = interfaces.IAvailability;
 
 const CandidateAvailability: React.FC = (props) => {
-	const {updateContext} = useContext(Context);
+	const {updateContext, startLoadingProcess, endLoadingProcess} = useContext(Context);
 	const {candidateID} = useParams();
 	const [candidate, updateCandidate] = useState<ICandidate>();
 	const [availability, updateAvailability] = useState<IAvailability>([]);
@@ -24,12 +24,14 @@ const CandidateAvailability: React.FC = (props) => {
 			updateContext({error: "this link is invalid, please request a new one from Galvanize."})
 			return;
 		}
+		startLoadingProcess();
 		(async () => {
 			const {success, data} = await adapter.getCandidateByID(candidateID);
 			if (!success) {
-				updateContext({error: "The candidate this link associated with does not exist."});
+				endLoadingProcess({error: "The candidate this link associated with does not exist."});
 				return;
 			}
+			endLoadingProcess();
 			updateCandidate(data);
 		})();
 	}, [candidateID]);
@@ -42,12 +44,14 @@ const CandidateAvailability: React.FC = (props) => {
 	}
 
 	async function submitAvailability(): Promise<void> {
+		startLoadingProcess();
 		const {success} = await adapter.submitAvailability(candidateID, availability);
 		if (!success) {
-			updateContext({error: "There was an error submitting your availability."});
+			endLoadingProcess({error: "There was an error submitting your availability."});
 			return;
 		}
 		updateSubmitted(true);
+		endLoadingProcess();
 	}
 
 	return (
@@ -71,7 +75,7 @@ const CandidateAvailability: React.FC = (props) => {
 								<Button className="mt-3" onClick={submitAvailability} color="primary">Submit
 									Availability</Button>
 							</React.Fragment> :
-							<CardText>Thank you for submitted your availability, you may now close this page.</CardText>
+							<CardText>Thank you for submitting your availability, you may now close this page.</CardText>
 						}
 					</CardBody>
 				</Card>
