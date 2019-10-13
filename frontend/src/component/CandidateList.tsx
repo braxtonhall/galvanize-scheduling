@@ -7,7 +7,7 @@ type ICandidate = interfaces.ICandidate;
 
 interface IProps {
 	candidates?: ICandidate[],
-	actions?: Array<{text: string, color: string, onClick: (candidate: ICandidate) => (void | Promise<void>)}>
+	actions?: Array<{ text: string, color: string, onClick: (candidate: ICandidate) => (void | Promise<void>) }>
 	selected?: ICandidate,
 }
 
@@ -18,28 +18,28 @@ const CandidateList: React.FC<IProps> = (props: IProps) => {
 	function makeRow(candidate: ICandidate, index: number): JSX.Element {
 		const {id, email, phoneNumber, firstName, lastName, position} = candidate;
 
-		function makeButtons({text, onClick, color}: {text: string, color: string, onClick: (candidate: ICandidate) => (void | Promise<void>)}, k: number) {
+		function makeButtons({text, onClick, color}: { text: string, color: string, onClick: (candidate: ICandidate) => (void | Promise<void>) }, k: number) {
 
 			function onClickWrapper() {
 				onClick(candidate);
 			}
 
-			return (<Button onClick={onClickWrapper} size="sm" color={color} key={"candidate_button_"+k}>{text}</Button>)
+			return (
+				<Button onClick={onClickWrapper} size="sm" color={color} key={"candidate_button_" + k}>{text}</Button>)
 		}
 
 		const isSelected = selected ? selected.id === id : false;
 
 		return (
-			<tr className={isSelected ? "bg-light" : ""} key={"row_"+index}>
-				<th scope="row">{id}</th>
-				<td>{email}</td>
-				<td>{phoneNumber}</td>
-				<td>{firstName}</td>
-				<td>{lastName}</td>
-				<td>{position}</td>
+			<tr className={"text-nowrap " + (isSelected ? "bg-light" : "")} key={"row_" + index}>
+				<th scope="row">{emptyEntry(email)}</th>
+				<td>{emptyEntry(phoneNumber)}</td>
+				<td>{emptyEntry(firstName)}</td>
+				<td>{emptyEntry(lastName)}</td>
+				<td>{emptyEntry(position)}</td>
 				<td>
 					<ButtonGroup>
-					{actions.map(makeButtons)}
+						{actions.map(makeButtons)}
 					</ButtonGroup>
 				</td>
 			</tr>
@@ -53,15 +53,14 @@ const CandidateList: React.FC<IProps> = (props: IProps) => {
 				<div className="table-responsive">
 					<Table hover>
 						<thead>
-							<tr>
-								<th>ID</th>
-								<th>Email</th>
-								<th>Phone Number</th>
-								<th>First Name</th>
-								<th>Last Name</th>
-								<th>Position</th>
-								<th/>
-							</tr>
+						<tr>
+							<th>Email</th>
+							<th>Phone Number</th>
+							<th>First Name</th>
+							<th>Last Name</th>
+							<th>Position</th>
+							<th>Actions</th>
+						</tr>
 						</thead>
 						<tbody>
 						{candidates.map(makeRow)}
@@ -72,6 +71,14 @@ const CandidateList: React.FC<IProps> = (props: IProps) => {
 		</Card>
 	)
 };
+
+function emptyEntry(i: string): string {
+	if (i === undefined || i === null || typeof i !== "string" || i.length < 1) {
+		return "N/A";
+	}
+
+	return i;
+}
 
 CandidateList.defaultProps = {
 	candidates: [],

@@ -1,6 +1,6 @@
 import {interfaces} from "adapter";
 import React, {ChangeEventHandler} from "react";
-import {Card, CardBody, CardHeader, Input, Table} from "reactstrap";
+import {Button, ButtonGroup, Card, CardBody, CardHeader, Input, Table} from "reactstrap";
 import cloneDeep from "lodash/cloneDeep"
 
 type IInterviewer = interfaces.IInterviewer;
@@ -14,6 +14,7 @@ export type InterviewSelectionValue = Array<{
 interface IProps {
 	value?: InterviewSelectionValue,
 	onChange?: (v: InterviewSelectionValue) => void,
+	actions?: Array<{text: string, onClick: (v: InterviewSelectionValue) => void | Promise<void>}>
 }
 
 const allowedMinutes = [0, 15, 30, 45, 60, 75, 90, 105, 120];
@@ -25,7 +26,7 @@ const minuteOptions = (
 
 const InterviewSelection: React.FC<IProps> = (props: IProps) => {
 
-	const {value, onChange} = props;
+	const {value, onChange, actions} = props;
 
 	function makeRow(v: { interviewer: IInterviewer, minutes: number, preference?: IInterviewer, }, index: number) {
 		const {interviewer, minutes, preference} = v;
@@ -76,6 +77,14 @@ const InterviewSelection: React.FC<IProps> = (props: IProps) => {
 		)
 	}
 
+	function makeButton({text, onClick}: {text: string, onClick: (v: InterviewSelectionValue) => void | Promise<void>}, index: number) {
+		function onClickWrapper() {
+			onClick(value);
+		}
+
+		return (<Button key={"interview_selection_button_" + index} onClick={onClickWrapper} color="primary">{text}</Button>)
+	}
+
 	return (
 		<Card className="mt-4">
 			<CardHeader>Interviewers</CardHeader>
@@ -96,6 +105,12 @@ const InterviewSelection: React.FC<IProps> = (props: IProps) => {
 						</tbody>
 					</Table>
 				</div>
+				{
+					actions.length > 0 &&
+					<ButtonGroup>
+						{actions.map(makeButton)}
+					</ButtonGroup>
+				}
 			</CardBody>
 		</Card>
 	)
@@ -104,6 +119,7 @@ const InterviewSelection: React.FC<IProps> = (props: IProps) => {
 InterviewSelection.defaultProps = {
 	value: [],
 	onChange: () => {},
+	actions: [],
 };
 
 export default InterviewSelection;
