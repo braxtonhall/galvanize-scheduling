@@ -12,7 +12,7 @@ import Context from '../services/Context';
 import {Link} from "react-router-dom";
 
 const Header: React.FC = () => {
-	const {token, updateContext} = useContext(Context);
+	const {token, updateContext, operationsLoading} = useContext(Context);
 	const [isOpen, updateIsOpen] = useState(false);
 
 	function toggle() {
@@ -30,13 +30,13 @@ const Header: React.FC = () => {
 		<div>
 			<Navbar color="light" light expand="md">
 				<NavbarBrand><img alt="galvanize logo" src="/galvanize-logo.svg"/></NavbarBrand>
+				{process.env.NODE_ENV === 'development' && <NavItem>Operations Loading: {operationsLoading}</NavItem> }
 				{
 					token &&
 					<React.Fragment>
 						<NavbarToggler onClick={toggle}/>
 						<Collapse isOpen={isOpen} navbar>
 							<Nav className="ml-auto" navbar>
-
 								<NavItem>
 									<Link className="nav-link" to="/candidates">
 										Candidates

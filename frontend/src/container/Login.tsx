@@ -15,32 +15,38 @@ import adapter from "../services/Adapter";
 import Context from '../services/Context';
 import createOnChange from "../services/createOnChange";
 import { RouteComponentProps } from 'react-router';
-import {Simulate} from "react-dom/test-utils";
+import { Redirect } from 'react-router-dom';
 
 const Login: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
-	const {updateContext} = useContext(Context);
+	const {updateContext, startLoadingProcess, endLoadingProcess} = useContext(Context);
 
 	const [password, updatePassword] = useState("");
 	const [email, updateEmail] = useState("");
+	const [redirect, updateRedirect] = useState(false);
 
 	const onChangePassword = createOnChange(updatePassword);
 	const onChangeEmail = createOnChange(updateEmail);
 
+	if (redirect) {
+		return <Redirect to="/candidates"/>
+	}
+
 	async function login() {
+		startLoadingProcess();
 		const {success, data, error} = await adapter.login(email, password);
 
 		if (error) {
-			updateContext({error});
+			endLoadingProcess({error});
 			return;
 		}
 
 		if (success) {
-			updateContext({token: data});
-			props.history.push("/candidates");
+			endLoadingProcess({token: data});
+			updateRedirect(true);
 			return;
 		}
 
-		updateContext({error: "There was an error logging in. Your username/password may not be valid."})
+		endLoadingProcess({error: "There was an error logging in. Your username/password may not be valid."});
 	}
 
 	return (
