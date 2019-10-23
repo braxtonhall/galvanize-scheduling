@@ -15,13 +15,13 @@ export interface IRoom {
 
 export interface ICandidate {
 	id?: string,
-	email: string,
-	phoneNumber: string,
-	firstName: string,
-	lastName: string,
-	position: string,
-	notes: string,
-	availability?: IAvailability,
+	email?: string,
+	phoneNumber?: string,
+	firstName?: string,
+	lastName?: string,
+	position?: string,
+	notes?: string,
+	availability?: IAvailability
 }
 
 export interface IInterviewer {
