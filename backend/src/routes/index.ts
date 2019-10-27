@@ -1,1 +1,2 @@
 import "./health";
+import "./AdminRoutes";

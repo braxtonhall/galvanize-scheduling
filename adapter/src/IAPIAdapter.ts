@@ -25,7 +25,8 @@ export default interface IAPIAdapter {
 	getInterviewers(token: string): Promise<IAPIResponse<IInterviewer[]>>;
 
 	// meta
-	authenticateToken(token: string): Promise<IAPIResponse<boolean>>;
+	checkToken(token: string): Promise<IAPIResponse<boolean>>;
+	saveToken(token: string): Promise<IAPIResponse<boolean>>;
 	health(): Promise<IAPIResponse<boolean>>;
 	logout(token: string): Promise<IAPIResponse>;
 	urls: {[key: string]: string};

@@ -1,5 +1,9 @@
 import {Moment} from "moment";
 
+export interface IResource {
+
+}
+
 export interface IHiringManager {
 	id?: string,
 }
@@ -8,12 +12,12 @@ export interface IHumanResource {
 	id?: string,
 }
 
-export interface IRoom {
+export interface IRoom extends IResource {
 	id?: string,
 	name: string,
 }
 
-export interface ICandidate {
+export interface ICandidate extends IResource {
 	id?: string,
 	email: string,
 	phoneNumber: string,
@@ -24,7 +28,7 @@ export interface ICandidate {
 	availability?: IAvailability,
 }
 
-export interface IInterviewer {
+export interface IInterviewer extends IResource {
 	id?: string,
 	firstName: string,
 	lastName: string,
