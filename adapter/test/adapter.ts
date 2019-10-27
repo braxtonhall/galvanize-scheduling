@@ -1,3 +1,3 @@
-import {nodeAdapter} from "../dist";
+import {localDataAdapter} from "../dist";
 
-export default nodeAdapter;
+export default localDataAdapter;

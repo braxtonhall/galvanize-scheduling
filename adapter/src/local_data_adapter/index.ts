@@ -117,6 +117,9 @@ const adapter: IAPIAdapter = {
 		if (!checkToken(token)) {
 			return {success: false, error: tokenErrorMessage}
 		}
+		if (!candidates.has(candidate.id)) {
+			return {success: false, error: "Candidate not registered."};
+		}
 		return {success: true};
 	},
 	async submitAvailability(candidateID: string, availability: Array<{ start: Moment; end: Moment }>): Promise<IAPIResponse> {

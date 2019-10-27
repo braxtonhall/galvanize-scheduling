@@ -19,13 +19,13 @@ export interface IRoom extends IResource {
 
 export interface ICandidate extends IResource {
 	id?: string,
-	email: string,
-	phoneNumber: string,
-	firstName: string,
-	lastName: string,
-	position: string,
-	notes: string,
-	availability?: IAvailability,
+	email?: string,
+	phoneNumber?: string,
+	firstName?: string,
+	lastName?: string,
+	position?: string,
+	notes?: string,
+	availability?: IAvailability
 }
 
 export interface IInterviewer extends IResource {
