@@ -14,14 +14,14 @@ export default class ResourceFacade implements IResourceFacade {
 		this.rc = ControllerBuilder.getRoomController();
 	}
 	
-	public get(token: string, kind: ResourceKind): Promise<IResource[]> {
+	public list(token: string, kind: ResourceKind): Promise<IResource[]> {
 		switch (kind) {
 			case ResourceKind.Candidate:
-				return this.cc.getCandidates(token);
+				return this.cc.list(token);
 			case ResourceKind.Interviewer:
-				return this.ic.getInterviewers(token);
+				return this.ic.list(token);
 			case ResourceKind.Room:
-				return this.rc.getRooms(token);
+				return this.rc.list(token);
 			default:
 				throw new Error("Unsupported Kind");
 		}
@@ -30,11 +30,24 @@ export default class ResourceFacade implements IResourceFacade {
 	public create(token: string, resource: IResource, kind: ResourceKind): Promise<boolean> {
 		switch (kind) {
 			case ResourceKind.Candidate:
-				return this.cc.createCandidate(token, resource as ICandidate);
+				return this.cc.create(token, resource as ICandidate);
 			case ResourceKind.Interviewer:
-				return this.ic.createInterviewer(token, resource as IInterviewer);
+				return this.ic.create(token, resource as IInterviewer);
 			case ResourceKind.Room:
-				return this.rc.createRoom(token, resource as IRoom);
+				return this.rc.create(token, resource as IRoom);
+			default:
+				throw new Error("Unsupported Kind");
+		}
+	}
+
+	public delete(token: string, resource: IResource, kind: ResourceKind): Promise<boolean> {
+		switch (kind) {
+			case ResourceKind.Candidate:
+				return this.cc.delete(token, resource as ICandidate);
+			case ResourceKind.Interviewer:
+				return this.ic.delete(token, resource as IInterviewer);
+			case ResourceKind.Room:
+				return this.rc.delete(token, resource as IRoom);
 			default:
 				throw new Error("Unsupported Kind");
 		}

@@ -1,4 +1,4 @@
-import { IInterviewer, IRoom, ICandidate } from "adapter/dist/interfaces";
+import { IInterviewer, IRoom, ICandidate, IResource } from "adapter/dist/interfaces";
 
 export enum ResourceKind {
 	Candidate,
@@ -6,17 +6,20 @@ export enum ResourceKind {
 	Room,
 }
 
-export interface ICandidateController {
-	getCandidates(token: string): Promise<ICandidate[]>;
-	createCandidate(token: string, resource: ICandidate): Promise<boolean>;
+export interface IResourceController {
+	list(token: string): Promise<IResource[]>;
+	create(token: string, resource: IResource): Promise<boolean>;
+	delete(token: string, resource: IResource): Promise<boolean>;
 }
 
-export interface IInterviewerController {
-	getInterviewers(token: string): Promise<IInterviewer[]>;
-	createInterviewer(token: string, resource: IInterviewer): Promise<boolean>;
+export interface ICandidateController extends IResourceController {
+
 }
 
-export interface IRoomController {
-	getRooms(token: string): Promise<IRoom[]>;
-	createRoom(token: string, resource: IRoom): Promise<boolean>;
+export interface IInterviewerController extends IResourceController {
+
+}
+
+export interface IRoomController extends IResourceController {
+	
 }

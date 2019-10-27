@@ -10,7 +10,7 @@ const resourceFacade: IResourceFacade = new ResourceFacade();
 app.get(nodeAdapter.urls.INTERVIEWERS, async (req, res) => {
 	const token: string = req.header["token"];
 	try {
-		const interviewers = await resourceFacade.get(token, ResourceKind.Interviewer);
+		const interviewers = await resourceFacade.list(token, ResourceKind.Interviewer);
 		res.status(200).send(interviewers);
 	} catch (e) {
 		res.status(400).send(e);
