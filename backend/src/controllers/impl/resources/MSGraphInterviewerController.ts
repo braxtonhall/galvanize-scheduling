@@ -10,8 +10,8 @@ export default class MSGraphInterviewerController implements IInterviewerControl
 		throw  new Error("Unsupported Action - Creating new Interviewer");
 	}
 
-	public async delete(token: string, resource: IInterviewer): Promise<boolean> {
-		throw  new Error("Unsupported Action - Creating new Interviewer");
+	public async delete(token: string, id: string): Promise<boolean> {
+		throw  new Error("Unsupported Action - Deleting Interviewer");
 	}
 	
 }

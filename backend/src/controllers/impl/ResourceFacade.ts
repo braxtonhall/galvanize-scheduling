@@ -40,14 +40,14 @@ export default class ResourceFacade implements IResourceFacade {
 		}
 	}
 
-	public delete(token: string, resource: IResource, kind: ResourceKind): Promise<boolean> {
+	public delete(token: string, id: string, kind: ResourceKind): Promise<boolean> {
 		switch (kind) {
 			case ResourceKind.Candidate:
-				return this.cc.delete(token, resource as ICandidate);
+				return this.cc.delete(token, id);
 			case ResourceKind.Interviewer:
-				return this.ic.delete(token, resource as IInterviewer);
+				return this.ic.delete(token, id);
 			case ResourceKind.Room:
-				return this.rc.delete(token, resource as IRoom);
+				return this.rc.delete(token, id);
 			default:
 				throw new Error("Unsupported Kind");
 		}

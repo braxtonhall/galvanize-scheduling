@@ -22,7 +22,14 @@ export {tokens, candidates, interviewers}
 const adapter: IAPIAdapter = {
 	fullURLs: {},
 	urls: {},
-	async authenticateToken(token: string): Promise<IAPIResponse<boolean>> {
+	async checkToken(token: string): Promise<IAPIResponse<boolean>> {
+		await wait();
+		if (!checkToken(token)) {
+			return {success: false, error: tokenErrorMessage}
+		}
+		return {success: true, data: tokens.has(token)};
+	},
+	async saveToken(token: string): Promise<IAPIResponse<boolean>> {
 		await wait();
 		if (!checkToken(token)) {
 			return {success: false, error: tokenErrorMessage}

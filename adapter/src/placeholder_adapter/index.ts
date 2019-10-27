@@ -22,7 +22,8 @@ const adapter: IAPIAdapter = {
 	updateCandidate:autoFail,
 
 	// meta
-	authenticateToken: autoFail,
+	saveToken: autoFail,
+	checkToken: autoFail,
 	health: autoFail,
 	logout: autoFail,
 	urls: {},

@@ -9,7 +9,7 @@ export enum ResourceKind {
 export interface IResourceController {
 	list(token: string): Promise<IResource[]>;
 	create(token: string, resource: IResource): Promise<boolean>;
-	delete(token: string, resource: IResource): Promise<boolean>;
+	delete(token: string, id: string): Promise<boolean>;
 }
 
 export interface ICandidateController extends IResourceController {
