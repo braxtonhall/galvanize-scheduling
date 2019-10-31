@@ -15,11 +15,21 @@
   "author": "",
   "license": "UNLICENSED",
   "dependencies": {
+    "@microsoft/microsoft-graph-client": "^2.0.0",
     "@types/express": "^4.17.1",
     "@types/source-map-support": "^0.5.0",
     "adapter": "file:../adapter",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "express-session": "^1.17.0",
+    "isomorphic-fetch": "^2.2.1",
+    "passport": "^0.4.0",
+    "passport-azure-ad": "^4.1.0",
+    "simple-oauth2": "^3.0.1",
     "source-map-support": "^0.5.13",
     "typescript": "^3.6.3"
+  },
+  "devDependencies": {
+    "@microsoft/microsoft-graph-types": "^1.12.0"
   }
 }

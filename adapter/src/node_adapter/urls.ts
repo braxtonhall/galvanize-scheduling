@@ -11,6 +11,9 @@ const urls: {[key: string]: string} = new function() {
 	this.ROOM =  "/resource/room";
 	this.ROOMS = "/resource/rooms";
 
+	this.LOGIN = '/login';
+	this.LOGOUT = '/logout';
+
 } as {[key: string]: string};
 
 let fullURLs: {[key: string]: string} = {};
