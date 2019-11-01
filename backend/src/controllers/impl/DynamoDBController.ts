@@ -46,10 +46,10 @@ export class DynamoDBController implements IDynamoDBController {
 		{
 			TableName : DynamoDBController.ROOM_TABLE,
 			KeySchema: [
-				{ AttributeName: "room", KeyType: "HASH" }
+				{ AttributeName: "name", KeyType: "HASH" }
 			],
 			AttributeDefinitions: [
-				{ AttributeName: "room", AttributeType: "S" }
+				{ AttributeName: "name", AttributeType: "S" }
 			],
 			ProvisionedThroughput: {
 				ReadCapacityUnits: 10,
