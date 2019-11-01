@@ -24,10 +24,10 @@ export class Config {
 	private constructor() {
 		try {
 			this.config = {
-				[ConfigKey.awsRegion]:     process.env.AWS_REGION,
+				[ConfigKey.awsRegion]:     		 process.env.AWS_REGION,
 				[ConfigKey.awsAccessKeyId]:      process.env.AWS_ACCESS_KEY_ID,
 				[ConfigKey.awsSecretAccessKey]:  process.env.AWS_SECRET,
-				[ConfigKey.dbUrl]: process.env.DB_URL,
+				[ConfigKey.dbUrl]: 				 process.env.DB_URL,
 			};
 			// TODO check for testing scenario and change some of these props
 		} catch (err) {

@@ -24,6 +24,8 @@ services:
     restart: always
     env_file:
       - .env
+    environment:
+      - DB_URL=http://db:8000
     deploy:
       resources:
         limits:
@@ -34,3 +36,9 @@ services:
           memory: '128mb'
     ports:
       - 8080:8080
+  db:
+    # TODO use in image that we can map to disk
+    image: amazon/dynamodb-local
+    container_name: db
+    expose:
+      - 8000
