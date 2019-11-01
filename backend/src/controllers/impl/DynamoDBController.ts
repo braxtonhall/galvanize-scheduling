@@ -1,15 +1,16 @@
 import AWS from "aws-sdk";
 import {Config, ConfigKey} from "../../Config";
 import { ICandidate, IRoom } from "adapter/dist/interfaces";
+import {ResourceKind, assertIs} from "../Common";
 
 export interface IDynamoDBController {
 	getCandidate(id: string): Promise<ICandidate>;
 	getCandidates(): Promise<ICandidate[]>;
-	writeCandidate(candidate: ICandidate): Promise<ICandidate>;
+	writeCandidate(candidate: ICandidate): Promise<void>;
 
 	getRoom(id: string): Promise<IRoom>;
 	getRooms(): Promise<IRoom[]>;
-	writeRoom(room: IRoom): Promise<IRoom>;
+	writeRoom(room: IRoom): Promise<void>;
 }
 
 
@@ -32,7 +33,7 @@ export class DynamoDBController implements IDynamoDBController {
 		{
 			TableName : DynamoDBController.CANDIDATE_TABLE,
 			KeySchema: [
-				{ AttributeName: "id", KeyType: "RANGE" }
+				{ AttributeName: "id", KeyType: "HASH" }
 			],
 			AttributeDefinitions: [
 				{ AttributeName: "id", AttributeType: "S" }
@@ -45,10 +46,10 @@ export class DynamoDBController implements IDynamoDBController {
 		{
 			TableName : DynamoDBController.ROOM_TABLE,
 			KeySchema: [
-				{ AttributeName: "id", KeyType: "RANGE" }
+				{ AttributeName: "room", KeyType: "HASH" }
 			],
 			AttributeDefinitions: [
-				{ AttributeName: "id", AttributeType: "S" }
+				{ AttributeName: "room", AttributeType: "S" }
 			],
 			ProvisionedThroughput: {
 				ReadCapacityUnits: 10,
@@ -71,8 +72,9 @@ export class DynamoDBController implements IDynamoDBController {
 		return await this.scan(DynamoDBController.CANDIDATE_TABLE);
 	}
 	
-	public async writeCandidate(candidate: ICandidate): Promise<ICandidate> {
-		return await this.write(DynamoDBController.CANDIDATE_TABLE, candidate);
+	public async writeCandidate(candidate: ICandidate): Promise<void> {
+		assertIs(ResourceKind.Candidate, candidate);
+		await this.write(DynamoDBController.CANDIDATE_TABLE, candidate);
 	}
 
 	public async getRoom(id: string): Promise<IRoom> {
@@ -83,8 +85,9 @@ export class DynamoDBController implements IDynamoDBController {
 		return await this.scan(DynamoDBController.ROOM_TABLE);
 	}
 
-	public async writeRoom(room: IRoom): Promise<IRoom> {
-		return await this.write(DynamoDBController.ROOM_TABLE, room);
+	public async writeRoom(room: IRoom): Promise<void> {
+		assertIs(ResourceKind.Room, room);
+		await this.write(DynamoDBController.ROOM_TABLE, room);
 	}
 	
 	private async get(table: string, attrs: any): Promise<any> {
@@ -133,18 +136,18 @@ export class DynamoDBController implements IDynamoDBController {
 		}));
 	}
 	
-	private async write(table: string, item: any): Promise<any> {
+	private async write(table: string, item: any): Promise<void> {
 		const params = {
 			TableName: table,
 			Item: item,
 		};
 
 		return await new Promise((async (resolve, reject) => {
-			(await this.open()).put(params, function(err, data) {
+			(await this.open()).put(params, function(err) {
 				if (err) {
 					reject(err);
 				} else {
-					resolve(data);
+					resolve();
 				}
 			});
 		}));
@@ -161,14 +164,14 @@ export class DynamoDBController implements IDynamoDBController {
 	private async initDatabase(): Promise<void> {
 		const cf: Config = Config.getInstance();
 		AWS.config.update({
-			region: cf.getProp(ConfigKey.awsRegion),
-			accessKeyId: cf.getProp(ConfigKey.awsSecretAccessKey),
-			secretAccessKey: cf.getProp(ConfigKey.awsSecretAccessKey),
+			region: cf.get(ConfigKey.awsRegion),
+			accessKeyId: cf.get(ConfigKey.awsSecretAccessKey),
+			secretAccessKey: cf.get(ConfigKey.awsSecretAccessKey),
 			// @ts-ignore // TODO why is this?
-			endpoint: new AWS.Endpoint(cf.getProp(ConfigKey.dbUrl))
+			endpoint: new AWS.Endpoint(cf.get(ConfigKey.dbUrl))
 		});
 		const dynamoDB = new AWS.DynamoDB();
-		for (const scheme in DynamoDBController.SCHEMATA) {
+		for (const scheme of DynamoDBController.SCHEMATA) {
 			try {
 				await this.createTable(dynamoDB, scheme);
 			} catch (err) {

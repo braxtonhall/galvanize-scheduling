@@ -1,3 +1,6 @@
+import * as dotenv from 'dotenv';
+dotenv.config({path: "../.env"});
+
 
 export enum ConfigKey {
 	awsRegion = "region",
@@ -32,7 +35,13 @@ export class Config {
 		}
 	}
 
-	public getProp(prop: ConfigKey): any {
-		return this.config[prop] || null;
+	public get(key: ConfigKey): any {
+		return this.config[key] || null;
+	}
+	
+	public set(key: ConfigKey, value: any): void {
+		console.warn(`WARNING: Config setting ${key} to ${value}. ` +
+			`This should NOT occur in production. TEST ONLY`);
+		this.config[key] = value;
 	}
 }

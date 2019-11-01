@@ -1,7 +1,8 @@
 import IResourceFacade from "../IResourceFacade";
 import {IResource, ICandidate, IInterviewer, IRoom} from "adapter/dist/interfaces";
 import ControllerBuilder from "./ControllerBuilder";
-import {ICandidateController, IInterviewerController, IRoomController, ResourceKind} from "../ResourceControllerTypes";
+import {ICandidateController, IInterviewerController, IRoomController} from "../ResourceControllerTypes";
+import {ResourceKind} from "../Common";
 
 export default class ResourceFacade implements IResourceFacade {
 	private readonly cc: ICandidateController;
