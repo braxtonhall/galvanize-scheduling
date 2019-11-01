@@ -1,6 +1,6 @@
 import {IRoomController} from "../../ResourceControllerTypes";
 import { IRoom } from "adapter/dist/interfaces";
-import DynamoDBController from "../DynamoDBController";
+import {DynamoDBController} from "../DynamoDBController";
 
 export default class DynamoDBRoomController implements IRoomController {
 	private dbc: DynamoDBController;

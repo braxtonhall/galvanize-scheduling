@@ -1,9 +1,9 @@
 import {ICandidateController} from "../../ResourceControllerTypes";
 import { ICandidate } from "adapter/dist/interfaces";
-import DynamoDBController from "../DynamoDBController";
+import {DynamoDBController, IDynamoDBController} from "../DynamoDBController";
 
 export default class DynamoDBCandidateController implements ICandidateController {
-	private dbc: DynamoDBController;
+	private dbc: IDynamoDBController;
 
 	constructor() {
 		this.dbc = DynamoDBController.getInstance();

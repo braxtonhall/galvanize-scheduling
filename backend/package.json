@@ -6,7 +6,7 @@
   "scripts": {
     "start": "NODE_ENV=production node dist/index.js",
     "build": "rm -rf dist/ && tsc",
-    "build-docker": "docker build -t galvanize/backend --file ../Dockerfile_backend ../",
+    "build-docker": "docker build -t galvanize/backend --file ../Dockerfile_backend -e ../.env ../",
     "run-docker": "docker run --cpus=1 --memory=128mb --memory-swap=128mb -p 8080:8080 galvanize/backend",
     "kill-docker": "docker stop $(docker ps -aq) || true && docker rm $(docker ps -aq) || true",
     "clean-docker": "npm run kill-docker && docker system df && docker rmi $(docker images -q) || true",
@@ -15,11 +15,21 @@
   "author": "",
   "license": "UNLICENSED",
   "dependencies": {
+    "@types/aws-sdk": "^2.7.0",
+    "@types/chai": "^4.2.4",
+    "@types/dockerode": "^2.5.20",
     "@types/express": "^4.17.1",
+    "@types/mocha": "^5.2.7",
     "@types/source-map-support": "^0.5.0",
     "adapter": "file:../adapter",
+    "aws-sdk": "^2.561.0",
+    "chai": "^4.2.0",
+    "dockerode": "^3.0.2",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "mocha": "^6.2.2",
     "source-map-support": "^0.5.13",
+    "ts-node": "^8.4.1",
     "typescript": "^3.6.3"
   }
 }

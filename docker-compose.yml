@@ -22,6 +22,8 @@ services:
       dockerfile: ./Dockerfile_backend
     container_name: backend
     restart: always
+    env_file:
+      - .env
     deploy:
       resources:
         limits:

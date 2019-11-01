@@ -1,11 +1,5 @@
 import { IInterviewer, IRoom, ICandidate, IResource } from "adapter/dist/interfaces";
 
-export enum ResourceKind {
-	Candidate,
-	Interviewer,
-	Room,
-}
-
 export interface IResourceController {
 	list(token: string): Promise<IResource[]>;
 	create(token: string, resource: IResource): Promise<boolean>;
