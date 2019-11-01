@@ -31,22 +31,24 @@ const Login: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
 		return <Redirect to="/candidates"/>
 	}
 
-	async function login() {
-		startLoadingProcess();
-		const {success, data, error} = await adapter.login(email, password);
-
-		if (error) {
-			endLoadingProcess({error});
-			return;
-		}
-
-		if (success) {
-			endLoadingProcess({token: data});
-			updateRedirect(true);
-			return;
-		}
-
-		endLoadingProcess({error: "There was an error logging in. Your username/password may not be valid."});
+	async function login(e: React.FormEvent) {
+		e.preventDefault();
+		window.location.href = "http://localhost:8080/login";
+		// startLoadingProcess();
+		// const {success, data, error} = await adapter.login(email, password);
+		//
+		// if (error) {
+		// 	endLoadingProcess({error});
+		// 	return;
+		// }
+		//
+		// if (success) {
+		// 	endLoadingProcess({token: data});
+		// 	updateRedirect(true);
+		// 	return;
+		// }
+		//
+		// endLoadingProcess({error: "There was an error logging in. Your username/password may not be valid."});
 	}
 
 	return (
