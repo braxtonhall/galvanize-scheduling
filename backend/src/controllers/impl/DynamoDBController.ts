@@ -1,10 +1,15 @@
 import AWS from "aws-sdk";
 import {Config, ConfigKey} from "../../Config";
-import { ICandidate } from "adapter/dist/interfaces";
+import { ICandidate, IRoom } from "adapter/dist/interfaces";
 
 export interface IDynamoDBController {
 	getCandidate(id: string): Promise<ICandidate>;
-	getCandidates(): Promise<ICandidate[]>
+	getCandidates(): Promise<ICandidate[]>;
+	writeCandidate(candidate: ICandidate): Promise<ICandidate>;
+
+	getRoom(id: string): Promise<IRoom>;
+	getRooms(): Promise<IRoom[]>;
+	writeRoom(room: IRoom): Promise<IRoom>;
 }
 
 
@@ -66,11 +71,28 @@ export class DynamoDBController implements IDynamoDBController {
 		return await this.scan(DynamoDBController.CANDIDATE_TABLE);
 	}
 	
+	public async writeCandidate(candidate: ICandidate): Promise<ICandidate> {
+		return await this.write(DynamoDBController.CANDIDATE_TABLE, candidate);
+	}
+
+	public async getRoom(id: string): Promise<IRoom> {
+		return await this.get(DynamoDBController.ROOM_TABLE, {id});
+	}
+
+	public async getRooms(): Promise<IRoom[]> {
+		return await this.scan(DynamoDBController.ROOM_TABLE);
+	}
+
+	public async writeRoom(room: IRoom): Promise<IRoom> {
+		return await this.write(DynamoDBController.ROOM_TABLE, room);
+	}
+	
 	private async get(table: string, attrs: any): Promise<any> {
 		const params = {
 			TableName: table,
 			Key: attrs,
 		};
+		
 		return await new Promise((async (resolve, reject) => {
 			(await this.open()).get(params, function(err, data) {
 				if (err) {
