@@ -7,10 +7,12 @@ export interface IDynamoDBController {
 	getCandidate(id: string): Promise<ICandidate>;
 	getCandidates(): Promise<ICandidate[]>;
 	writeCandidate(candidate: ICandidate): Promise<void>;
+	deleteCandidate(id: string): Promise<void>;
 
-	getRoom(id: string): Promise<IRoom>;
+	getRoom(name: string): Promise<IRoom>;
 	getRooms(): Promise<IRoom[]>;
 	writeRoom(room: IRoom): Promise<void>;
+	deleteRoom(name: string): Promise<void>;
 }
 
 
@@ -76,9 +78,13 @@ export class DynamoDBController implements IDynamoDBController {
 		assertIs(ResourceKind.Candidate, candidate);
 		await this.write(DynamoDBController.CANDIDATE_TABLE, candidate);
 	}
+	
+	public async deleteCandidate(id: string): Promise<void> {
+		await this.delete(DynamoDBController.CANDIDATE_TABLE, {id});
+	}
 
-	public async getRoom(id: string): Promise<IRoom> {
-		return await this.get(DynamoDBController.ROOM_TABLE, {id});
+	public async getRoom(name: string): Promise<IRoom> {
+		return await this.get(DynamoDBController.ROOM_TABLE, {name});
 	}
 
 	public async getRooms(): Promise<IRoom[]> {
@@ -90,6 +96,10 @@ export class DynamoDBController implements IDynamoDBController {
 		await this.write(DynamoDBController.ROOM_TABLE, room);
 	}
 	
+	public async deleteRoom(name: string): Promise<void> {
+		await this.delete(DynamoDBController.ROOM_TABLE, {name});
+	}
+	
 	private async get(table: string, attrs: any): Promise<any> {
 		const params = {
 			TableName: table,
@@ -98,6 +108,23 @@ export class DynamoDBController implements IDynamoDBController {
 		
 		return await new Promise((async (resolve, reject) => {
 			(await this.open()).get(params, function(err, data) {
+				if (err) {
+					reject(err);
+				} else {
+					resolve(data);
+				}
+			});
+		}));
+	}
+
+	private async delete(table: string, attrs: any): Promise<any> {
+		const params = {
+			TableName: table,
+			Key: attrs,
+		};
+
+		return await new Promise((async (resolve, reject) => {
+			(await this.open()).delete(params, function(err, data) {
 				if (err) {
 					reject(err);
 				} else {

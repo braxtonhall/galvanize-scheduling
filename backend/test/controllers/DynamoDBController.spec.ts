@@ -28,6 +28,11 @@ describe("DynamoDBController", () => {
 		await dbc.writeCandidate(MOCK_CANDIDATES[0]);
 		expect(await dbc.getCandidates()).to.deep.equal([MOCK_CANDIDATES[0]]);
 	});
+	
+	it("Should delete a candidate", async () => {
+		await dbc.deleteCandidate(MOCK_CANDIDATES[0].id);
+		expect(await dbc.getCandidates()).to.deep.equal([]);
+	});
 
 	it("Should list no rooms", async () => {
 		expect(await dbc.getRooms()).to.deep.equal([]);
@@ -36,5 +41,10 @@ describe("DynamoDBController", () => {
 	it("Should list one room", async () => {
 		await dbc.writeRoom(MOCK_ROOMS[0]);
 		expect(await dbc.getRooms()).to.deep.equal([MOCK_ROOMS[0]]);
+	});
+
+	it("Should delete a room", async () => {
+		await dbc.deleteRoom(MOCK_ROOMS[0].name);
+		expect(await dbc.getRooms()).to.deep.equal([]);
 	});
 });

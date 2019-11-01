@@ -10,15 +10,18 @@ export default class DynamoDBCandidateController implements ICandidateController
 	}
 	
 	public async list(token: string): Promise<ICandidate[]> {
-		return [];
+		return await this.dbc.getCandidates();
 	}
 
 	public async create(token: string, resource: ICandidate): Promise<boolean> {
-		return false;
+		// TODO validation?
+		await this.dbc.writeCandidate(resource);
+		return true;
 	}
 
 	public async delete(token: string, id: string): Promise<boolean> {
-		return false;
+		await this.dbc.deleteCandidate(id);
+		return true; // TODO more guards?
 	}
 	
 }
