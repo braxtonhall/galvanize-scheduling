@@ -51,10 +51,14 @@ app.post('/callback', async (req, res) => {
 
 });
 
-app.get(nodeAdapter.urls.AUTHENTICATE, async (req, res) => {
-   // TODO check token
+app.post(nodeAdapter.urls.AUTHENTICATE, async (req, res) => {
+    const {token} = req.body; 
+    const result = await new AuthController().checkAuth(token);
+    res.send(result);
 });
 
 app.get(nodeAdapter.urls.LOGOUT, async (req, res) => {
-    // TODO remove token
+    const {token} = req.body;
+    const result = await new AuthController().removeAuth(token);
+    res.sendStatus(200);
 });

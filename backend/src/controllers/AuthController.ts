@@ -2,30 +2,29 @@ import {DynamoDBController} from "./impl/DynamoDBController";
 
 export interface IAuthController {
 	saveAuth(user: any): Promise<boolean>;
-	checkAuth(req: any): Promise<boolean>;
-	removeAuth(id: string): Promise<boolean>;
+	checkAuth(token: string): Promise<boolean>;
+	removeAuth(token: string): Promise<boolean>;
 }
 
-export class AuthController implements IAuthController {
-	private dbc: DynamoDBController = null;
+export default class AuthController implements IAuthController {
+	private readonly dbc: DynamoDBController;
 
 	constructor() {
 		this.dbc = DynamoDBController.getInstance();
 	}
 
-	public async checkAuth(req: any): Promise<boolean> {
-		return req.isAuthenticated();
+	public async checkAuth(token: string): Promise<boolean> {
+		return !!(await this.dbc.getOAuth(token));
 	}
 
-	public async removeAuth(id: string): Promise<boolean> {
-		return false; // TODO implement stub
+	public async removeAuth(token: string): Promise<boolean> {
+		await this.dbc.deleteOAuth(token);
+		return true;
 	}
 
-	public async saveAuth(user: any): Promise<boolean> {
-		await this.dbc.writeOAuth(user);
-		return false; // TODO implement stub
+	public async saveAuth(token: string): Promise<boolean> {
+		await this.dbc.writeOAuth(token);
+		return true; // TODO implement stub
 	}
 	
 }
-
-export default AuthController;
