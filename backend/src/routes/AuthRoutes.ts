@@ -43,7 +43,8 @@ app.post('/callback', async (req, res) => {
             }
         });
         response = await response.json();
-        res.redirect(config.get(ConfigKey.frontendUrl) + `/auth?token=${response['access_token']}`);
+        // TODO: before redirecting save token
+        res.redirect(config.get(ConfigKey.frontendUrl) + `/auth/${response['access_token']}`);
     } catch (e) {
         res.redirect(config.get(ConfigKey.frontendUrl));
     }
@@ -51,9 +52,9 @@ app.post('/callback', async (req, res) => {
 });
 
 app.get(nodeAdapter.urls.AUTHENTICATE, async (req, res) => {
-   // TODO
+   // TODO check token
 });
 
 app.get(nodeAdapter.urls.LOGOUT, async (req, res) => {
-    // TODO
+    // TODO remove token
 });
