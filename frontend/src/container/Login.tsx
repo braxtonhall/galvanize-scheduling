@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {
 	Card,
 	CardBody,
@@ -10,13 +10,17 @@ import {
 	CardText,
 } from "reactstrap"
 import adapter from "../services/Adapter";
+import Context from "../services/Context";
 
 const Login: React.FC = () => {
+	const {startLoadingProcess, endLoadingProcess} = useContext(Context);
 
 	async function login(e: React.FormEvent) {
+		startLoadingProcess();
 		e.preventDefault();
 		console.log(adapter.loginRedirectURL());
 		window.location.href = adapter.loginRedirectURL();
+		setTimeout(endLoadingProcess, 10000);
 	}
 
 	return (

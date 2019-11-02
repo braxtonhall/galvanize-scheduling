@@ -50,6 +50,11 @@ const Header: React.FC = () => {
 									</Link>
 								</NavItem>
 								<NavItem>
+									<Link className="nav-link" to="/rooms">
+										Rooms
+									</Link>
+								</NavItem>
+								<NavItem>
 									<Link className="nav-link" to="/login" onClick={logout}>
 										Logout
 									</Link>
