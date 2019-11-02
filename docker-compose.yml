@@ -1,4 +1,4 @@
-version: "3.7"
+version: "3.5"
 
 services:
   frontend:
@@ -37,8 +37,10 @@ services:
     ports:
       - 8080:8080
   db:
-    # TODO use in image that we can map to disk
     image: amazon/dynamodb-local
     container_name: db
+    command: -jar DynamoDBLocal.jar -dbPath /home/dynamodblocal/data/
+    volumes:
+      - $DB_HOST_PERSIST_DIR:/home/dynamodblocal/data
     expose:
       - 8000
