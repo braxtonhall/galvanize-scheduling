@@ -4,7 +4,7 @@ import {Config, ConfigKey} from "../src/Config";
 import { Context } from "mocha";
 
 export const MOCK_CANDIDATES: ReadonlyArray<ICandidate> = [
-		{
+	{
 		id: "1",
 		email: "christopher@frameonesoftware.com",
 		phoneNumber: "(604) 319-5219",
