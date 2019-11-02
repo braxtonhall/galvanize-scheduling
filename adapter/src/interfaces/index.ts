@@ -14,6 +14,7 @@ export interface IHumanResource extends IResource {
 
 export interface IRoom extends IResource {
 	name: string,
+	eligible: boolean,
 }
 
 export interface ICandidate extends IResource {

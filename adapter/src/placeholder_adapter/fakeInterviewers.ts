@@ -28,13 +28,13 @@ export const fakeSchedules: ISchedule[] = [
 				interviewers: [fakeInterviewers[0], fakeInterviewers[1]],
 				startTime: moment().startOf("day").add(10, "hour"),
 				endTime: moment().startOf("day").add(11, "hour"),
-				room: {id: "7", name: "Meeting Room #1"},
+				room: {id: "7", name: "Meeting Room #1", eligible: true},
 			},
 			{
 				interviewers: [fakeInterviewers[2]],
 				startTime: moment().startOf("day").add(11, "hour"),
 				endTime: moment().startOf("day").add(11.5, "hour"),
-				room: {id: "8", name: "Meeting Room #2"},
+				room: {id: "8", name: "Meeting Room #2", eligible: true},
 			},
 		]
 	},
@@ -45,7 +45,7 @@ export const fakeSchedules: ISchedule[] = [
 				interviewers: [fakeInterviewers[0], fakeInterviewers[1]],
 				startTime: moment().startOf("day").add(13.5, "hour"),
 				endTime: moment().startOf("day").add(14.5, "hour"),
-				room: {id: "9", name: "Meeting Room #3"},
+				room: {id: "9", name: "Meeting Room #3", eligible: true},
 			},
 		]
 	}

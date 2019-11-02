@@ -1,6 +1,6 @@
 import IAPIAdapter from "../IAPIAdapter";
 import IAPIResponse from "../IAPIResponse";
-import {ICandidate, IGetSchedulesOptions, IInterviewer, ISchedule} from "../interfaces";
+import {ICandidate, IGetSchedulesOptions, IInterviewer, IRoom, ISchedule} from "../interfaces";
 import {Moment} from "moment";
 import cloneDeep from "lodash/cloneDeep";
 import fakeCandidates from "../placeholder_adapter/fakeCandidates";
@@ -125,8 +125,15 @@ const adapter: IAPIAdapter = {
 		candidates.set(candidate.id, cloneDeep(candidate));
 		return {success: true};
 	},
-	async loginRedirect(): Promise<void> {
+	loginRedirectURL(): string {
 		authenticated = true;
+		return "";
+	},
+	async getRooms(): Promise<IAPIResponse<IRoom[]>> {
+		return {success: true, data: []}
+	},
+	async saveRoom(): Promise<IAPIResponse> {
+		return {success: true}
 	}
 };
 

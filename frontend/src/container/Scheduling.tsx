@@ -14,7 +14,7 @@ type IInterviewer = interfaces.IInterviewer;
 
 const Scheduling: React.FC = () => {
 
-	const {token, updateContext, startLoadingProcess, endLoadingProcess} = useContext(Context);
+	const {startLoadingProcess, endLoadingProcess} = useContext(Context);
 	const [candidates, updateCandidates] = useState<ICandidate[]>([]);
 	const [interviewerValue, updateInterviewerValue] = useState<InterviewSelectionValue>();
 	const [selectedCandidate, updateSelectedCandidate] = useState<ICandidate>();
@@ -26,7 +26,7 @@ const Scheduling: React.FC = () => {
 
 	async function refreshCandidates(): Promise<void> {
 		startLoadingProcess();
-		const {success, data, error} = await adapter.getCandidates(token);
+		const {success, data, error} = await adapter.getCandidates();
 		if (success) {
 			updateCandidates(data);
 			endLoadingProcess();
@@ -39,7 +39,7 @@ const Scheduling: React.FC = () => {
 
 	async function refreshInterviewers(): Promise<void> {
 		startLoadingProcess();
-		const {success, data, error} = await adapter.getInterviewers(token);
+		const {success, data, error} = await adapter.getInterviewers();
 		if (success) {
 			const value: InterviewSelectionValue = data.map((i: IInterviewer) => {
 				return {
@@ -60,7 +60,7 @@ const Scheduling: React.FC = () => {
 	async function refreshSchedules(v: InterviewSelectionValue): Promise<void> {
 		// TODO: Fill out input for getSchedules()
 		startLoadingProcess();
-		const {success, data, error} = await adapter.getSchedules(token, {});
+		const {success, data, error} = await adapter.getSchedules({});
 		console.log(success, data, error);
 		if (success) {
 			updateSchedules(data);

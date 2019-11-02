@@ -2,6 +2,7 @@ import IAPIAdapter from "../IAPIAdapter";
 import IAPIResponse from "../IAPIResponse";
 import fakeCandidates from "./fakeCandidates";
 import fakeInterviewers, {fakeSchedules} from "./fakeInterviewers";
+import {fullURLs} from "../node_adapter/urls";
 
 const adapter: IAPIAdapter = {
 	submitAvailability: autoFail,
@@ -16,7 +17,9 @@ const adapter: IAPIAdapter = {
 	getCandidates: async () => ({success: true, data: fakeCandidates}),
 	deleteCandidate: autoFail,
 	updateCandidate:autoFail,
-	loginRedirect: async () => {},
+	loginRedirectURL: () => "",
+	saveRoom: autoFail,
+	getRooms: autoFail,
 
 	// meta
 	isAuthenticated: autoFail,
