@@ -15,8 +15,8 @@ const Login: React.FC = () => {
 
 	async function login(e: React.FormEvent) {
 		e.preventDefault();
-		console.log(await adapter.loginRedirect);
-		await adapter.loginRedirect();
+		console.log(adapter.loginRedirectURL());
+		window.location.href = adapter.loginRedirectURL();
 	}
 
 	return (

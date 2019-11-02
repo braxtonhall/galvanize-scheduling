@@ -1,6 +1,5 @@
 import IAPIResponse from "../IAPIResponse";
 import {fullURLs} from "./urls";
-import axios from "axios";
 
 export function loginRedirectURL(): string {
     return fullURLs.LOGIN;
