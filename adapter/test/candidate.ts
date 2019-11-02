@@ -4,7 +4,7 @@ import {expect} from "chai";
 import {ICandidate} from "../dist/interfaces";
 import adapter from "../src/node_adapter";
 
-describe("Candidate Lifecycle Tests", () => {
+const candidateTests = (token: string) => () => {
     let mockCandidate: ICandidate = {
         email: "admin+tester@ph14solutions.onmicrosoft.com",
         phoneNumber: "17781234567",
@@ -18,7 +18,7 @@ describe("Candidate Lifecycle Tests", () => {
                 firstName: "Test",
                 lastName: "Doe"
             };
-            const {success, error} = await adapter.createCandidate(incompleteCandidate);
+            const {success, error} = await adapter.createCandidate(token, incompleteCandidate);
             expect(success).to.be.false;
             expect(error).to.not.be.undefined;
         });
@@ -28,7 +28,7 @@ describe("Candidate Lifecycle Tests", () => {
                 firstName: "Test",
                 lastName: "Doe"
             };
-            const {success, data} = await adapter.createCandidate(incompleteCandidate);
+            const {success, data} = await adapter.createCandidate(token, incompleteCandidate);
             expect(success).to.be.true;
             expect(data.id).to.not.be.null;
             mockCandidate = data;
@@ -49,4 +49,6 @@ describe("Candidate Lifecycle Tests", () => {
     context("deleteCandidate", () => {
 
     });
-});
+};
+
+export default candidateTests;
