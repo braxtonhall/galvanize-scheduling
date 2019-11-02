@@ -14,10 +14,12 @@ export class AuthController implements IAuthController {
 	}
 
 	public checkAuth(req): boolean {
+		console.log(req.user);
+		console.log(req.isAuthenticated);
 		return req.isAuthenticated();
 	}
 
-	public removeAuth(token: string): boolean {
+	public removeAuth(id): boolean {
 		return false; // TODO implement stub
 	}
 

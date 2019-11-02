@@ -5,7 +5,6 @@ import AuthController from '../controllers/AuthController';
 import {Config, ConfigKey} from "../Config";
 
 const passport = require('passport');
-const ac = new AuthController();
 
 const config: Config = Config.getInstance();
 
@@ -36,6 +35,7 @@ app.post('/callback',
     });
 
 app.get(nodeAdapter.urls.AUTHENTICATE, (req, res) => {
+    const ac = new AuthController();
     if (ac.checkAuth(req)) {
         res.status(200).send(true);
     } else {

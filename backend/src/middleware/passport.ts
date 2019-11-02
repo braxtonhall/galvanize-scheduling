@@ -49,6 +49,7 @@ const signInComplete = async (iss, sub, profile, accessToken, refreshToken, para
         const user = await client.api('/me').get();
         console.log(user);
     } catch(e) {
+        console.log(e);
         done(e, null);
     }
 
