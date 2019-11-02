@@ -4,8 +4,7 @@ import IResourceFacade from "../controllers/IResourceFacade";
 import ResourceFacade from "../controllers/impl/ResourceFacade";
 import {ResourceKind} from "../controllers/Common";
 import { IResource } from "adapter/dist/interfaces";
-import {IAuthController, AuthController} from "../controllers/AuthController";
-import MSGraphController from "../controllers/MSGraphController";
+import AuthController, {IAuthController} from "../controllers/AuthController";
 
 const resourceFacade: IResourceFacade = new ResourceFacade();
 const authController:IAuthController = new AuthController();
