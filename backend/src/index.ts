@@ -1,10 +1,11 @@
 import express from "express";
 import * as core from "express-serve-static-core";
 import sourceMapSupport from "source-map-support";
+import {Config, ConfigKey} from "./Config";
 
 sourceMapSupport.install();
 let app: core.Express;
-const port = process.env.PORT ? process.env.PORT : 8080;
+const port = Config.getInstance().get(ConfigKey.port) || 8080;
 
 (async () => {
 	app = express();

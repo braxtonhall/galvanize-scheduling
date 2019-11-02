@@ -13,8 +13,8 @@ export class AuthController implements IAuthController {
 		this.dbc = DynamoDBController.getInstance();
 	}
 
-	public checkAuth(token: string): boolean {
-		return true; // TODO implement stub
+	public checkAuth(req): boolean {
+		return req.isAuthenticated();
 	}
 
 	public removeAuth(token: string): boolean {
@@ -26,3 +26,5 @@ export class AuthController implements IAuthController {
 	}
 	
 }
+
+export default AuthController;
