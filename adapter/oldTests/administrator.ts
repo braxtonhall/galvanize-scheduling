@@ -1,6 +1,6 @@
 import adapter from "./adapter";
 import {expect} from 'chai';
-import {interfaces} from "../dist/";
+import {interfaces} from "../dist";
 
 import authTests from "./authentication";
 import scheduleTests from "./schedule";

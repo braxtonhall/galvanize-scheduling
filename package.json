@@ -17,6 +17,7 @@
     "detatch-backend": "docker-compose up -d backend",
     "stop-backend": "docker-compose down backend",
     "restart-backend": "docker-compose build backend && docker-compose up -d backend",
-    "test:backend": "npm --prefix ./backend run test"
+    "test:backend": "npm --prefix ./backend run test",
+    "test:adapter": "npm --prefix ./adapter run test"
   }
 }
