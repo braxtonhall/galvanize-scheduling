@@ -1,4 +1,4 @@
-version: "3.7"
+version: "3.5"
 
 services:
   frontend:
@@ -24,6 +24,8 @@ services:
     restart: always
     env_file:
       - .env
+    environment:
+      - DB_URL=http://db:8000
     deploy:
       resources:
         limits:
@@ -34,3 +36,11 @@ services:
           memory: '128mb'
     ports:
       - 8080:8080
+  db:
+    image: amazon/dynamodb-local
+    container_name: db
+    command: -jar DynamoDBLocal.jar -dbPath /home/dynamodblocal/data/
+    volumes:
+      - $DB_HOST_PERSIST_DIR:/home/dynamodblocal/data
+    expose:
+      - 8000

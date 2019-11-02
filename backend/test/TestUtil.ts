@@ -74,7 +74,7 @@ export async function startDockerDatabase(suite: Context): Promise<void> {
 			console.log("TestUtil::startDockerDatabase db container created. Starting.");
 			await dbContainer.start();
 			console.log("TestUtil::startDockerDatabase db container started. Sleeping for internal startup time.");
-			await sleep(10);
+			await sleep(5);
 		} catch (err) {
 			console.warn("TestUtil::startDockerDatabase port was busy. Tests will not manage startup and teardown.");
 		}

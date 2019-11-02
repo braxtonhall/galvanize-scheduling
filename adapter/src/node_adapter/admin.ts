@@ -1,7 +1,7 @@
 import IAPIResponse from "../IAPIResponse";
 import {fullURLs} from "./urls";
 import axios from "axios";
-import { ICandidate } from "../../dist/interfaces";
+import {ICandidate} from "../interfaces";
 
 export default {
     getCandidates: async() : Promise<IAPIResponse<ICandidate[]>> => {

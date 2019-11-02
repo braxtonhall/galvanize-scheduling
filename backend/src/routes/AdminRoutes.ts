@@ -2,8 +2,8 @@ import {app} from "../index";
 import {nodeAdapter} from "adapter";
 import IResourceFacade from "../controllers/IResourceFacade";
 import ResourceFacade from "../controllers/impl/ResourceFacade";
-import {ResourceKind} from "../controllers/ResourceControllerTypes";
-import {IInterviewer, IResource} from "adapter/dist/interfaces";
+import {ResourceKind} from "../controllers/Common";
+import { IResource } from "adapter/dist/interfaces";
 import {IAuthController, AuthController} from "../controllers/AuthController";
 import MSGraphController from "../controllers/MSGraphController";
 

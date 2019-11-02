@@ -10,15 +10,18 @@ export default class DynamoDBRoomController implements IRoomController {
 	}
 	
 	public async list(token: string): Promise<IRoom[]> {
-		return [];
+		return await this.dbc.getRooms();
 	}
 
 	public async create(token: string, resource: IRoom): Promise<boolean> {
-		return false;
+		// TODO validation?
+		await this.dbc.writeRoom(resource);
+		return true;
 	}
 
-	public async delete(token: string, id: string): Promise<boolean> {
-		return false;
+	public async delete(token: string, name: string): Promise<boolean> {
+		await this.dbc.deleteRoom(name);
+		return true;
 	}
 	
 }
