@@ -20,9 +20,9 @@ export interface IDynamoDBController {
 	writeRoom(room: IRoom): Promise<void>;
 	deleteRoom(name: string): Promise<void>;
 
-	writeOAuth(user: any): Promise<void>;
-	deleteOAuth(id: string): Promise<void>;
-	getOAuth(id: string): Promise<any>;
+	writeOAuth(token: string): Promise<void>;
+	deleteOAuth(token: string): Promise<void>;
+	getOAuth(token: string): Promise<any>;
 }
 
 
@@ -72,10 +72,10 @@ export class DynamoDBController implements IDynamoDBController {
 		{
 			TableName : DynamoDBController.OAUTH_TABLE,
 			KeySchema: [
-				{ AttributeName: "id", KeyType: "HASH" }
+				{ AttributeName: "token", KeyType: "HASH" }
 			],
 			AttributeDefinitions: [
-				{ AttributeName: "id", AttributeType: "S" }
+				{ AttributeName: "token", AttributeType: "S" }
 			],
 			ProvisionedThroughput: {
 				ReadCapacityUnits: 10,
@@ -141,23 +141,20 @@ export class DynamoDBController implements IDynamoDBController {
 		await this.delete(DynamoDBController.ROOM_TABLE, {name});
 	}
 
-	public async writeOAuth(user: any): Promise<void> {
-		if (!user.oid || !user.oauthToken) {
+	public async writeOAuth(token: string): Promise<void> {
+		if (!token) {
 			// TODO authentication
 			throw new Error("Required fields in user are missing. Cannot save to database");
 		}
-		await this.write(DynamoDBController.OAUTH_TABLE, {
-			id: user.oid,
-			oauthToken: user.oauthToken,
-		});
+		await this.write(DynamoDBController.OAUTH_TABLE, {token});
 	}
 
-	public async deleteOAuth(id: string): Promise<void> {
-		await this.delete(DynamoDBController.OAUTH_TABLE, {id});
+	public async deleteOAuth(token: string): Promise<void> {
+		await this.delete(DynamoDBController.OAUTH_TABLE, {token});
 	}
 
-	public async getOAuth(id: string): Promise<any> {
-		await this.get(DynamoDBController.OAUTH_TABLE, {id});
+	public async getOAuth(token: string): Promise<any> {
+		await this.get(DynamoDBController.OAUTH_TABLE, {token});
 	}
 
 	private async get(table: string, attrs: any): Promise<any> {

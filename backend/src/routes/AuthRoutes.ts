@@ -3,51 +3,62 @@ import {nodeAdapter} from "adapter/dist";
 
 import AuthController from '../controllers/AuthController';
 import {Config, ConfigKey} from "../Config";
-
-const passport = require('passport');
+import MSGraphController from "../controllers/MSGraphController";
 
 const config: Config = Config.getInstance();
 
-app.get(nodeAdapter.urls.LOGIN,
-    (req, res, next) => {
-        passport.authenticate('azuread-openidconnect', {
-            response: res,
-            prompt: 'login',
-            failureRedirect: config.get(ConfigKey.frontendUrl)
-        })(req, res, next)
-    },
-    (req, res) => {
-        res.redirect(`${config.get(ConfigKey.frontendUrl)}/candidates`);
-    });
+app.get(nodeAdapter.urls.LOGIN, (req, res) => {
+    const query = {
+        client_id: config.get(ConfigKey.msOAuthAppId),
+        response_type: "code",
+        redirect_uri: config.get(ConfigKey.msOAuthRedirectURI),
+        response_mode: "form_post",
+        scope: config.get(ConfigKey.msOAuthScopes),
+    };
 
-app.post('/callback',
-    (req, res, next) => {
-        passport.authenticate('azuread-openidconnect',
-            {
-                response: res,
-                failureRedirect: config.get(ConfigKey.frontendUrl)
+    res.redirect(MSGraphController.buildRequest(query));
+
+});
+
+app.post('/callback', async (req, res) => {
+    const {code} = req.body;
+
+    const query = {
+        client_id: config.get(ConfigKey.msOAuthAppId),
+        code: code,
+        redirect_uri: config.get(ConfigKey.msOAuthRedirectURI),
+        grant_type: "authorization_code",
+        scope: config.get(ConfigKey.msOAuthScopes),
+        client_secret: config.get(ConfigKey.msOAuthAppPassword)
+    };
+
+    try {
+        let body = encodeURI(Object.entries(query).map(([k, v]) => `${k}=${v}`).join("&"));
+
+        let response = await fetch(config.get(ConfigKey.msOAuthAuthority) + config.get(ConfigKey.msOAuthTokenEndpoint), {
+            method: 'post',
+            body,
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
             }
-        )(req, res, next)
-    },
-    (req, res) => {
-        console.log(req.user);
-        res.redirect(`${config.get(ConfigKey.frontendUrl)}/candidates`);
-    });
-
-app.get(nodeAdapter.urls.AUTHENTICATE, async (req, res) => {
-    const ac = new AuthController();
-    if (await ac.checkAuth(req)) {
-        res.status(200).send(true);
-    } else {
-        res.status(403).send(false);
+        });
+        response = await response.json();
+        // TODO: before redirecting save token
+        res.redirect(config.get(ConfigKey.frontendUrl) + `/auth/${response['access_token']}`);
+    } catch (e) {
+        res.redirect(config.get(ConfigKey.frontendUrl));
     }
+
+});
+
+app.post(nodeAdapter.urls.AUTHENTICATE, async (req, res) => {
+    const {token} = req.body; 
+    const result = await new AuthController().checkAuth(token);
+    res.send(result);
 });
 
 app.get(nodeAdapter.urls.LOGOUT, async (req, res) => {
-    await req.session.destroy((e : Error | undefined) => {
-        if (e) {
-            console.log(e);
-        }
-    });
-    res.redirect(config.get(ConfigKey.frontendUrl))
+    const {token} = req.body;
+    const result = await new AuthController().removeAuth(token);
+    res.sendStatus(200);
 });
