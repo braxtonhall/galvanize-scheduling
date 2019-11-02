@@ -1,23 +1,27 @@
-require('dotenv').config();
-const passport = require('passport');
-const OIDCStrategy = require('passport-azure-ad').OIDCStrategy;
+import {Config, ConfigKey} from "../Config";
 import MSGraphController from "../controllers/MSGraphController";
 
 import {app} from "../index";
+
+require('dotenv').config();
+const passport = require('passport');
+const OIDCStrategy = require('passport-azure-ad').OIDCStrategy;
+
+const config: Config = Config.getInstance();
 
 // TODO: change to db storage
 let users = {};
 
 passport.serializeUser((user, done) => {
     // TODO: save to db
-    console.log(1)
+    console.log(1);
     users[user.profile.oid] = user;
     done(null, user.profile.oid);
 });
 
 passport.deserializeUser((id, done) => {
     // TODO: remove from db
-    console.log(2)
+    console.log(2);
     done(null, users[id]);
 });
 
@@ -25,13 +29,13 @@ passport.deserializeUser((id, done) => {
 // use simple oauth2
 const oauth2 = require('simple-oauth2').create({
     client: {
-        id: process.env.OAUTH_APP_ID,
-        secret: process.env.OAUTH_APP_PASSWORD
+        id: config.get(ConfigKey.msOAuthAppId), // process.env.OAUTH_APP_ID,
+        secret: config.get(ConfigKey.msOAuthAppPassword), // process.env.OAUTH_APP_PASSWORD
     },
     auth: {
-        tokenHost: process.env.OAUTH_AUTHORITY,
-        authorizePath: process.env.OAUTH_AUTHORIZE_ENDPOINT,
-        tokenPath: process.env.OAUTH_TOKEN_ENDPOINT
+        tokenHost: config.get(ConfigKey.msOAuthAuthority), // process.env.OAUTH_AUTHORITY,
+        authorizePath: config.get(ConfigKey.msOAuthAuthorizeEndpoint), // process.env.OAUTH_AUTHORIZE_ENDPOINT,
+        tokenPath: config.get(ConfigKey.msOAuthTokenEndpoint), // process.env.OAUTH_TOKEN_ENDPOINT
     }
 });
 
@@ -60,16 +64,17 @@ const signInComplete = async (iss, sub, profile, accessToken, refreshToken, para
 // Configure OIDC strategy
 passport.use(new OIDCStrategy(
     {
-        identityMetadata: `${process.env.OAUTH_AUTHORITY}${process.env.OAUTH_ID_METADATA}`,
-        clientID: process.env.OAUTH_APP_ID,
+        // identityMetadata: `${process.env.OAUTH_AUTHORITY}${process.env.OAUTH_ID_METADATA}`,
+        identityMetadata: `${config.get(ConfigKey.msOAuthAuthority)}${config.get(ConfigKey.msOAuthMetaData)}`,
+        clientID: config.get(ConfigKey.msOAuthAppId), // process.env.OAUTH_APP_ID,
         responseType: 'code id_token',
         responseMode: 'form_post',
-        redirectUrl: process.env.OAUTH_REDIRECT_URI,
+        redirectUrl: config.get(ConfigKey.msOAuthRedirectURI), // process.env.OAUTH_REDIRECT_URI,
         allowHttpForRedirectUrl: true,
-        clientSecret: process.env.OAUTH_APP_PASSWORD,
+        clientSecret: config.get(ConfigKey.msOAuthAppPassword), // process.env.OAUTH_APP_PASSWORD,
         validateIssuer: false,
         passReqToCallback: false,
-        scope: process.env.OAUTH_SCOPES.split(' ')
+        scope: config.get(ConfigKey.msOAuthScopes).split(' '), // process.env.OAUTH_SCOPES.split(' ')
     },
     signInComplete
 ));
