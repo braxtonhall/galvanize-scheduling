@@ -31,6 +31,10 @@ app.post('/callback',
     });
 
 app.get(nodeAdapter.urls.LOGOUT, async (req, res) => {
-    await req["session"].destroy();
+    await req.session.destroy((e : Error | undefined) => {
+        if (e) {
+            console.log(e);
+        }
+    });
     res.redirect('http://localhost:3000/')
 });

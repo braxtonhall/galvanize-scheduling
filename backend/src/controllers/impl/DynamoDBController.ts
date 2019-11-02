@@ -3,7 +3,7 @@ import {Config, ConfigKey} from "../../Config";
 import {ResourceKind, assertIs} from "../Common";
 import { interfaces } from "adapter";
 import {MemoryStore, Store} from "express-session";
-import * as DynamoDBStore from "dynamodb-store"
+import DynamoDBStore from "dynamodb-store"
 type ICandidate = interfaces.ICandidate
 type IRoom = interfaces.IRoom
 
