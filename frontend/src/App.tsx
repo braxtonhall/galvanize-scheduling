@@ -10,6 +10,7 @@ import CandidateAvailability from "./container/CandidateAvailability";
 import LoadingOverlay from "react-loading-overlay";
 import Context from "./services/Context";
 import {Spinner} from "reactstrap";
+import AuthenticationRedirect from "./container/AuthenticationRedirect";
 
 const App: React.FC = () => {
 	const {operationsLoading} = useContext(Context);
@@ -33,6 +34,7 @@ const App: React.FC = () => {
 				<Switch>
 					<AuthenticatedRoute exact path="/candidates" component={CandidateMenu} />
 					<AuthenticatedRoute exact path="/scheduling" component={Scheduling} />
+					<Route exact path="/auth/:token" component={AuthenticationRedirect} />
 					<Route exact path="/login" component={Login} />
 					<Route exact path="/submit_availability/:candidateID" component={CandidateAvailability} />
 					<Redirect to="/login"/>

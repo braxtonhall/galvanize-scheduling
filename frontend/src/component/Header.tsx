@@ -30,7 +30,9 @@ const Header: React.FC = () => {
 		<div>
 			<Navbar color="light" light expand="md">
 				<NavbarBrand><img alt="galvanize logo" src="/galvanize-logo.svg"/></NavbarBrand>
-				{process.env.NODE_ENV === 'development' && <NavItem>Operations Loading: {operationsLoading}</NavItem> }
+				{process.env.NODE_ENV === 'development' && <NavItem className="px-2">Environment: {process.env.NODE_ENV}</NavItem> }
+				{process.env.NODE_ENV === 'development' && <NavItem className="px-2">Operations Loading: {operationsLoading}</NavItem> }
+				{process.env.NODE_ENV === 'development' && <NavItem className="px-2">Token: {token || "N/A"}</NavItem> }
 				{
 					token &&
 					<React.Fragment>
