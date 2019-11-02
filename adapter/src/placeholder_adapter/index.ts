@@ -1,8 +1,5 @@
 import IAPIAdapter from "../IAPIAdapter";
 import IAPIResponse from "../IAPIResponse";
-import {
-	Role
-} from "../interfaces";
 import fakeCandidates from "./fakeCandidates";
 import fakeInterviewers, {fakeSchedules} from "./fakeInterviewers";
 
@@ -11,7 +8,6 @@ const adapter: IAPIAdapter = {
 	isValidCandidateID: async () => ({success: true, data: true}),
 	getCandidateByID: async () => ({success: true, data: fakeCandidates[0]}),
 
-	login: async () => ({success: true, data: "fake_token"}),
 	createCandidate: autoFail,
 	sendAvailabilityEmail: autoFail,
 	getSchedules: async () => ({success: true, data: fakeSchedules}),
@@ -20,10 +16,10 @@ const adapter: IAPIAdapter = {
 	getCandidates: async () => ({success: true, data: fakeCandidates}),
 	deleteCandidate: autoFail,
 	updateCandidate:autoFail,
+	loginRedirect: async () => {},
 
 	// meta
-	saveToken: autoFail,
-	checkToken: autoFail,
+	isAuthenticated: autoFail,
 	health: autoFail,
 	logout: autoFail,
 	urls: {},

@@ -12,40 +12,31 @@ import random from "lodash/random";
  * I wrote this adapter for the demo to see data that actually moves
  */
 
-const tokens: Map<string, boolean> = new Map();
 const candidates: Map<string, ICandidate> = new Map(fakeCandidates.map(c => [c.id, c]));
 const interviewers: Map<string, IInterviewer> = new Map(fakeInterviewers.map(i => [i.id,i]));
-const users: Map<string, string> = new Map(fakeUsers);
 
-export {tokens, candidates, interviewers}
+export {candidates, interviewers}
 
 const adapter: IAPIAdapter = {
 	fullURLs: {},
 	urls: {},
-	async checkToken(token: string): Promise<IAPIResponse<boolean>> {
+	async isAuthenticated(): Promise<IAPIResponse<boolean>> {
 		await wait();
-		if (!checkToken(token)) {
+		if (!isAuthenticated()) {
 			return {success: false, error: tokenErrorMessage}
 		}
-		return {success: true, data: tokens.has(token)};
+		return {success: true, data: isAuthenticated()};
 	},
-	async saveToken(token: string): Promise<IAPIResponse<boolean>> {
+	async confirmSchedule(schedule: ISchedule): Promise<IAPIResponse> {
 		await wait();
-		if (!checkToken(token)) {
-			return {success: false, error: tokenErrorMessage}
-		}
-		return {success: true, data: tokens.has(token)};
-	},
-	async confirmSchedule(token: string, schedule: ISchedule): Promise<IAPIResponse> {
-		await wait();
-		if (!checkToken(token)) {
+		if (!isAuthenticated()) {
 			return {success: false, error: tokenErrorMessage}
 		}
 		return {success: true};
 	},
-	async createCandidate(token: string, candidate: ICandidate): Promise<IAPIResponse<ICandidate>> {
+	async createCandidate(candidate: ICandidate): Promise<IAPIResponse<ICandidate>> {
 		await wait();
-		if (!checkToken(token)) {
+		if (!isAuthenticated()) {
 			return {success: false, error: tokenErrorMessage}
 		}
 		const _candidate = cloneDeep(candidate);
@@ -56,9 +47,9 @@ const adapter: IAPIAdapter = {
 			data: _candidate,
 		};
 	},
-	async deleteCandidate(token: string, candidate: ICandidate): Promise<IAPIResponse> {
+	async deleteCandidate(candidate: ICandidate): Promise<IAPIResponse> {
 		await wait();
-		if (!checkToken(token)) {
+		if (!isAuthenticated()) {
 			return {success: false, error: tokenErrorMessage}
 		}
 		candidates.delete(candidate.id);
@@ -68,23 +59,23 @@ const adapter: IAPIAdapter = {
 		await wait();
 		return {success: candidates.has(candidateID), data: candidates.get(candidateID)};
 	},
-	async getCandidates(token: string): Promise<IAPIResponse<ICandidate[]>> {
+	async getCandidates(): Promise<IAPIResponse<ICandidate[]>> {
 		await wait();
-		if (!checkToken(token)) {
+		if (!isAuthenticated()) {
 			return {success: false, error: tokenErrorMessage}
 		}
 		return {success: true, data: Array.from(candidates.values())};
 	},
-	async getInterviewers(token: string): Promise<IAPIResponse<IInterviewer[]>> {
+	async getInterviewers(): Promise<IAPIResponse<IInterviewer[]>> {
 		await wait();
-		if (!checkToken(token)) {
+		if (!isAuthenticated()) {
 			return {success: false, error: tokenErrorMessage}
 		}
 		return {success: true, data: Array.from(interviewers.values())};
 	},
-	async getSchedules(token: string, options: IGetSchedulesOptions): Promise<IAPIResponse<ISchedule[]>> {
+	async getSchedules(options: IGetSchedulesOptions): Promise<IAPIResponse<ISchedule[]>> {
 		await wait();
-		if (!checkToken(token)) {
+		if (!isAuthenticated()) {
 			return {success: false, error: tokenErrorMessage}
 		}
 		return {success: true, data: fakeSchedules};
@@ -97,24 +88,14 @@ const adapter: IAPIAdapter = {
 		await wait();
 		return {success: true, data: candidates.has(candidateID)};
 	},
-	async login(username: string, password: string): Promise<IAPIResponse<string>> {
+	async logout(): Promise<IAPIResponse> {
 		await wait();
-		if (users.get(username) === password) {
-			const token = Math.random().toString();
-			tokens.set(token, true);
-			return {success: true, data: token};
-		} else {
-			return {success: false, error: "This version of the software is using mock data, and example user is 'peter@galvanize.com' with password 'i<3peter'"}
-		}
-	},
-	async logout(token: string): Promise<IAPIResponse> {
-		await wait();
-		tokens.delete(token);
+		authenticated = false;
 		return {success: true};
 	},
-	async sendAvailabilityEmail(token: string, candidate: ICandidate): Promise<IAPIResponse> {
+	async sendAvailabilityEmail(candidate: ICandidate): Promise<IAPIResponse> {
 		await wait();
-		if (!checkToken(token)) {
+		if (!isAuthenticated()) {
 			return {success: false, error: tokenErrorMessage}
 		}
 		if (!candidates.has(candidate.id)) {
@@ -133,9 +114,9 @@ const adapter: IAPIAdapter = {
 		}));
 		return {success: true};
 	},
-	async updateCandidate(token: string, candidate: ICandidate): Promise<IAPIResponse> {
+	async updateCandidate(candidate: ICandidate): Promise<IAPIResponse> {
 		await wait();
-		if (!checkToken(token)) {
+		if (!isAuthenticated()) {
 			return {success: false, error: tokenErrorMessage}
 		}
 		if (!candidates.has(candidate.id)) {
@@ -143,6 +124,9 @@ const adapter: IAPIAdapter = {
 		}
 		candidates.set(candidate.id, cloneDeep(candidate));
 		return {success: true};
+	},
+	async loginRedirect(): Promise<void> {
+		authenticated = true;
 	}
 };
 
@@ -157,8 +141,10 @@ function wait(): Promise<void> {
 	}
 }
 
-function checkToken(token: string): boolean {
-	return tokens.has(token);
+let authenticated: boolean = false;
+
+function isAuthenticated(): boolean {
+	return authenticated;
 }
 
 export default adapter;
