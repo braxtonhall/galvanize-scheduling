@@ -1,6 +1,7 @@
 import {IInterviewerController} from "../../ResourceControllerTypes";
-import { IInterviewer } from "adapter/dist/interfaces";
+import { interfaces } from "adapter";
 import MSGraphController from "../../MSGraphController";
+type IInterviewer = interfaces.IInterviewer;
 
 export default class MSGraphInterviewerController implements IInterviewerController {
 	public async list(token: string): Promise<IInterviewer[]> {
@@ -38,5 +39,5 @@ export default class MSGraphInterviewerController implements IInterviewerControl
 	public async delete(token: string, id: string): Promise<boolean> {
 		throw  new Error("Unsupported Action - Deleting Interviewer");
 	}
-	
+
 }

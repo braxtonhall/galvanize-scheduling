@@ -1,8 +1,8 @@
-import { IInterviewer, IRoom, ICandidate, IResource } from "adapter/dist/interfaces";
+import { interfaces } from "adapter";
 
 export interface IResourceController {
-	list(token: string): Promise<IResource[]>;
-	create(token: string, resource: IResource): Promise<boolean>;
+	list(token: string): Promise<interfaces.IResource[]>;
+	create(token: string, resource: interfaces.IResource): Promise<boolean>;
 	delete(token: string, id: string): Promise<boolean>;
 }
 
@@ -15,5 +15,5 @@ export interface IInterviewerController extends IResourceController {
 }
 
 export interface IRoomController extends IResourceController {
-	
+
 }

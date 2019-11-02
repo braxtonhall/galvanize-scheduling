@@ -1,5 +1,5 @@
 import {IRoomController} from "../../ResourceControllerTypes";
-import { IRoom } from "adapter/dist/interfaces";
+import { interfaces } from "adapter";
 import {DynamoDBController} from "../DynamoDBController";
 
 export default class DynamoDBRoomController implements IRoomController {
@@ -8,12 +8,12 @@ export default class DynamoDBRoomController implements IRoomController {
 	constructor() {
 		this.dbc = DynamoDBController.getInstance();
 	}
-	
-	public async list(token: string): Promise<IRoom[]> {
+
+	public async list(token: string): Promise<interfaces.IRoom[]> {
 		return await this.dbc.getRooms();
 	}
 
-	public async create(token: string, resource: IRoom): Promise<boolean> {
+	public async create(token: string, resource: interfaces.IRoom): Promise<boolean> {
 		// TODO validation?
 		await this.dbc.writeRoom(resource);
 		return true;
@@ -23,5 +23,4 @@ export default class DynamoDBRoomController implements IRoomController {
 		await this.dbc.deleteRoom(name);
 		return true;
 	}
-	
 }

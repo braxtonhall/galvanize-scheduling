@@ -1,5 +1,5 @@
 import {ICandidateController} from "../../ResourceControllerTypes";
-import { ICandidate } from "adapter/dist/interfaces";
+import { interfaces } from "adapter";
 import {DynamoDBController, IDynamoDBController} from "../DynamoDBController";
 
 export default class DynamoDBCandidateController implements ICandidateController {
@@ -8,12 +8,12 @@ export default class DynamoDBCandidateController implements ICandidateController
 	constructor() {
 		this.dbc = DynamoDBController.getInstance();
 	}
-	
-	public async list(token: string): Promise<ICandidate[]> {
+
+	public async list(token: string): Promise<interfaces.ICandidate[]> {
 		return await this.dbc.getCandidates();
 	}
 
-	public async create(token: string, resource: ICandidate): Promise<boolean> {
+	public async create(token: string, resource: interfaces.ICandidate): Promise<boolean> {
 		// TODO validation?
 		await this.dbc.writeCandidate(resource);
 		return true;
@@ -23,5 +23,5 @@ export default class DynamoDBCandidateController implements ICandidateController
 		await this.dbc.deleteCandidate(id);
 		return true; // TODO more guards?
 	}
-	
+
 }

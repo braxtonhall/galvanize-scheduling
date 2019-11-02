@@ -1,20 +1,24 @@
 import IResourceFacade from "../IResourceFacade";
-import {IResource, ICandidate, IInterviewer, IRoom} from "adapter/dist/interfaces";
+import {interfaces} from "adapter";
 import ControllerBuilder from "./ControllerBuilder";
 import {ICandidateController, IInterviewerController, IRoomController} from "../ResourceControllerTypes";
 import {ResourceKind} from "../Common";
+type IResource = interfaces.IResource;
+type ICandidate = interfaces.ICandidate;
+type IInterviewer = interfaces.IInterviewer;
+type IRoom = interfaces.IRoom;
 
 export default class ResourceFacade implements IResourceFacade {
 	private readonly cc: ICandidateController;
 	private readonly ic: IInterviewerController;
 	private readonly rc: IRoomController;
-	
+
 	constructor() {
 		this.cc = ControllerBuilder.getCandidateController();
 		this.ic = ControllerBuilder.getInterviewerController();
 		this.rc = ControllerBuilder.getRoomController();
 	}
-	
+
 	public list(token: string, kind: ResourceKind): Promise<IResource[]> {
 		switch (kind) {
 			case ResourceKind.Candidate:

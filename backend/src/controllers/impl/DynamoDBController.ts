@@ -1,7 +1,9 @@
 import AWS from "aws-sdk";
 import {Config, ConfigKey} from "../../Config";
-import { ICandidate, IRoom } from "adapter/dist/interfaces";
+import { interfaces } from "adapter";
 import {ResourceKind, assertIs} from "../Common";
+type ICandidate = interfaces.ICandidate
+type IRoom = interfaces.IRoom
 
 export interface IDynamoDBController {
 	getCandidate(id: string): Promise<ICandidate>;
@@ -17,20 +19,20 @@ export interface IDynamoDBController {
 
 
 export class DynamoDBController implements IDynamoDBController {
-	
+
 	private static instance: DynamoDBController = null;
-	
+
 	public static getInstance(): DynamoDBController {
 		if (!DynamoDBController.instance) {
 			DynamoDBController.instance = new DynamoDBController();
 		}
 		return DynamoDBController.instance;
 	}
-	
+
 	private static readonly CANDIDATE_TABLE: string = "Candidates";
 	private static readonly ROOM_TABLE: string = "Rooms";
 	private static readonly SESSION_TABLE: string = "Sessions"; // TODO use https://www.npmjs.com/package/connect-dynamodb ?
-	
+
 	private static readonly SCHEMATA: any[] = [
 		{
 			TableName : DynamoDBController.CANDIDATE_TABLE,
@@ -59,26 +61,26 @@ export class DynamoDBController implements IDynamoDBController {
 			}
 		}
 	];
-	
+
 	private db: AWS.DynamoDB.DocumentClient = null;
-	
+
 	constructor() {
 		// TODO
 	}
-	
+
 	public async getCandidate(id: string): Promise<ICandidate> {
 		return await this.get(DynamoDBController.CANDIDATE_TABLE, {id});
 	}
-	
+
 	public async getCandidates(): Promise<ICandidate[]> {
 		return await this.scan(DynamoDBController.CANDIDATE_TABLE);
 	}
-	
+
 	public async writeCandidate(candidate: ICandidate): Promise<void> {
 		assertIs(ResourceKind.Candidate, candidate);
 		await this.write(DynamoDBController.CANDIDATE_TABLE, candidate);
 	}
-	
+
 	public async deleteCandidate(id: string): Promise<void> {
 		await this.delete(DynamoDBController.CANDIDATE_TABLE, {id});
 	}
@@ -95,17 +97,17 @@ export class DynamoDBController implements IDynamoDBController {
 		assertIs(ResourceKind.Room, room);
 		await this.write(DynamoDBController.ROOM_TABLE, room);
 	}
-	
+
 	public async deleteRoom(name: string): Promise<void> {
 		await this.delete(DynamoDBController.ROOM_TABLE, {name});
 	}
-	
+
 	private async get(table: string, attrs: any): Promise<any> {
 		const params = {
 			TableName: table,
 			Key: attrs,
 		};
-		
+
 		return await new Promise((async (resolve, reject) => {
 			(await this.open()).get(params, function(err, data) {
 				if (err) {
@@ -133,7 +135,7 @@ export class DynamoDBController implements IDynamoDBController {
 			});
 		}));
 	}
-	
+
 	private async scan(table: string): Promise<any[]> {
 		return await new Promise((async (resolve, reject) => {
 			(await this.open()).scan({TableName : table}, function (err, data) {
@@ -145,13 +147,13 @@ export class DynamoDBController implements IDynamoDBController {
 			});
 		}));
 	}
-	
+
 	private async where(table: string, query: any): Promise<any[]> {
 		const params = {
 			TableName : table,
 			...query,
 		};
-		
+
 		return await new Promise((async (resolve, reject) => {
 			(await this.open()).query(params, function (err, data) {
 				if (err) {
@@ -162,7 +164,7 @@ export class DynamoDBController implements IDynamoDBController {
 			});
 		}));
 	}
-	
+
 	private async write(table: string, item: any): Promise<void> {
 		const params = {
 			TableName: table,
@@ -179,7 +181,7 @@ export class DynamoDBController implements IDynamoDBController {
 			});
 		}));
 	}
-	
+
 	private async open(): Promise<AWS.DynamoDB.DocumentClient> {
 		if (!this.db) {
 			await this.initDatabase();
@@ -187,7 +189,7 @@ export class DynamoDBController implements IDynamoDBController {
 		}
 		return this.db;
 	}
-	
+
 	private async initDatabase(): Promise<void> {
 		const cf: Config = Config.getInstance();
 		AWS.config.update({
@@ -211,7 +213,7 @@ export class DynamoDBController implements IDynamoDBController {
 			}
 		}
 	}
-	
+
 	private createTable(db: AWS.DynamoDB, params: any): Promise<void> {
 		return new Promise(((resolve, reject) => {
 			db.createTable(params, function(err, data) {
