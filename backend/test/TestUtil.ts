@@ -83,7 +83,8 @@ export async function startDockerDatabase(suite: Context): Promise<void> {
 	}
 	Config.getInstance().set(ConfigKey.dbUrl, "http://localhost:8000");
 	Config.getInstance().set(ConfigKey.awsAccessKeyId, suite.test.parent.fullTitle());
-	Config.getInstance().set(ConfigKey.awsRegion, suite.test.parent.fullTitle());
+	Config.getInstance().set(ConfigKey.awsRegion, "us-west-2");
+	Config.getInstance().set(ConfigKey.awsSecretAccessKey, suite.test.parent.fullTitle());
 }
 
 export async function stopDockerDatabase(): Promise<void> {

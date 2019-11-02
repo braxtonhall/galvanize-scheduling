@@ -10,7 +10,8 @@
     "run-docker": "docker run --cpus=1 --memory=128mb --memory-swap=128mb -p 8080:8080 galvanize/backend",
     "kill-docker": "docker stop $(docker ps -aq) || true && docker rm $(docker ps -aq) || true",
     "clean-docker": "npm run kill-docker && docker system df && docker rmi $(docker images -q) || true",
-    "restart-docker": "npm run build-docker && npm run kill-docker && npm run run-docker"
+    "restart-docker": "npm run build-docker && npm run kill-docker && npm run run-docker",
+    "test": "mocha --require ts-node/register --timeout 10000 test/**/*.spec.ts"
   },
   "author": "",
   "license": "UNLICENSED",
