@@ -17,5 +17,13 @@ export default {
         } catch {
             return {success: false}
         }
+    },
+    authenticate: async() : Promise<IAPIResponse> => {
+        try {
+            const {status, data} = await axios.get(fullURLs.AUTHENTICATE);
+            return {success: status === 200 && data}
+        } catch {
+            return {success: false};
+        }
     }
 }

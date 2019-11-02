@@ -6,11 +6,7 @@ type IInterviewer = interfaces.IInterviewer;
 export default class MSGraphInterviewerController implements IInterviewerController {
 	public async list(token: string): Promise<IInterviewer[]> {
 		const client = MSGraphController.getClient(token);
-		const groups = await client
-			.api('/groups')
-			.select('id, displayName')
-			.get();
-
+		const groups = await MSGraphController.getGroups(client);
 
 		let id;
 		for (let group of groups.value) {
@@ -24,12 +20,7 @@ export default class MSGraphInterviewerController implements IInterviewerControl
 			return [];
 		}
 
-		const data = await client
-			.api(`/groups/${id}/members`)
-			.select('id,givenName,surname')
-			.get();
-
-		return data.value as IInterviewer[];
+		return await MSGraphController.getInterviewers(client, id);
 	}
 
 	public async create(token: string, resource: IInterviewer): Promise<boolean> {
