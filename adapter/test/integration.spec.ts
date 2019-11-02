@@ -4,14 +4,15 @@ import candidateTests from "./candidate";
 describe("Adapter Integration Tests", () => {
     let token = null;
 
-    beforeEach(async () => {
+    before(async () => {
         token = await createTestToken();
     });
 
-    afterEach(async () => {
+    after(async () => {
        await deauthTestToken(token);
        token = null;
     });
 
     describe("Candidate Lifecycle", candidateTests(token));
+
 });
