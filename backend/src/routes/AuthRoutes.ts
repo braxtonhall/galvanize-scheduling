@@ -5,8 +5,6 @@ import AuthController from '../controllers/AuthController';
 import {Config, ConfigKey} from "../Config";
 import MSGraphController from "../controllers/MSGraphController";
 
-const passport = require('passport');
-
 const config: Config = Config.getInstance();
 
 app.get(nodeAdapter.urls.LOGIN, (req, res) => {
