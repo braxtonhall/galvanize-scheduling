@@ -134,7 +134,7 @@ export class DynamoDBController implements IDynamoDBController {
 				if (err) {
 					reject(err);
 				} else {
-					resolve(data);
+					resolve(data.Item);
 				}
 			});
 		}));

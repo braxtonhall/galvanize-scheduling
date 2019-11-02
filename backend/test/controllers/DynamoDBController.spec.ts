@@ -28,10 +28,24 @@ describe("DynamoDBController", () => {
 		await dbc.writeCandidate(MOCK_CANDIDATES[0]);
 		expect(await dbc.getCandidates()).to.deep.equal([MOCK_CANDIDATES[0]]);
 	});
-	
-	it("Should delete a candidate", async () => {
+
+	it("Should list one candidate with id", async() => {
+		expect(await dbc.getCandidate("1")).to.deep.equal(MOCK_CANDIDATES[0]);
+	});
+
+	it("should return null when getting an unstored candidate", async() => {
+		expect(await dbc.getCandidate("10")).to.deep.equal(undefined);
+	});
+
+	it ("hould list multiple candidates", async () => {
+		await dbc.writeCandidate(MOCK_CANDIDATES[1]);
+		await dbc.writeCandidate(MOCK_CANDIDATES[2]);
+		// scan api returns items in random order so used deep members
+		expect(await dbc.getCandidates()).to.have.deep.members(MOCK_CANDIDATES);
+	});
+	 it("Should delete a candidate", async () => {
 		await dbc.deleteCandidate(MOCK_CANDIDATES[0].id);
-		expect(await dbc.getCandidates()).to.deep.equal([]);
+		expect(await dbc.getCandidates()).to.have.deep.members(MOCK_CANDIDATES.slice(1,3));
 	});
 
 	it("Should list no rooms", async () => {
@@ -43,8 +57,38 @@ describe("DynamoDBController", () => {
 		expect(await dbc.getRooms()).to.deep.equal([MOCK_ROOMS[0]]);
 	});
 
+	it ("Should list one room with id", async () => {
+		expect(await dbc.getRoom("1")).to.deep.equal(MOCK_ROOMS[0]);
+	});
+
+	it ("Should list multiple rooms", async () => {
+		await dbc.writeRoom(MOCK_ROOMS[1]);
+		await dbc.writeRoom(MOCK_ROOMS[2]);
+		expect(await dbc.getRooms()).to.have.deep.members(MOCK_ROOMS);
+	});
+
+	it("should return null when getting an unstored room", async() => {
+		expect(await dbc.getRoom("10")).to.deep.equal(undefined);
+	});
+
 	it("Should delete a room", async () => {
 		await dbc.deleteRoom(MOCK_ROOMS[0].name);
-		expect(await dbc.getRooms()).to.deep.equal([]);
+		expect(await dbc.getRooms()).to.have.deep.members(MOCK_ROOMS.slice(1,3));
+	});
+
+	it ("Should not throw an error when trying to delete a unstored candidtate", async () => {
+		try {
+			await dbc.deleteCandidate("10");
+		} catch (err) {
+			expect.fail();
+		}
+	});
+
+	it ("Should not throw an error when trying to delete a unstored room", async () => {
+		try {
+			await dbc.deleteRoom("10");
+		} catch (err) {
+			expect.fail();
+		}
 	});
 });
