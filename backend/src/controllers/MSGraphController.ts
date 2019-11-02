@@ -1,8 +1,12 @@
 import {Client} from '@microsoft/microsoft-graph-client';
 import 'isomorphic-fetch';
 import {interfaces} from "adapter";
+import {Config, ConfigKey} from "../Config";
+
+const config: Config = Config.getInstance();
 
 export default class MSGraphController {
+
     static getClient(token: string): Client {
         return Client.init({
             authProvider: (done) => {
@@ -27,6 +31,12 @@ export default class MSGraphController {
             }
 
         }
+    }
+
+    static buildRequest(query) {
+        let url = config.get(ConfigKey.msOAuthAuthority) + config.get(ConfigKey.msOAuthAuthorizeEndpoint) + "?";
+
+        return url + encodeURI(Object.entries(query).map(([k, v]) => `${k}=${v}`).join("&"));
     }
 
     static async getGroups(client): Promise<any> {
