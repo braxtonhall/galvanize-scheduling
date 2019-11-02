@@ -1,22 +1,24 @@
 import {app} from "../index";
-
-const passport = require('passport');
 import {nodeAdapter} from "adapter/dist";
 
 import AuthController from '../controllers/AuthController';
+import {Config, ConfigKey} from "../Config";
+
+const passport = require('passport');
 const ac = new AuthController();
 
-// TODO: Change all localhost to env variables
+const config: Config = Config.getInstance();
+
 app.get(nodeAdapter.urls.LOGIN,
     (req, res, next) => {
         passport.authenticate('azuread-openidconnect', {
             response: res,
             prompt: 'login',
-            failureRedirect: 'http://localhost:3000/'
+            failureRedirect: config.get(ConfigKey.frontendUrl)
         })(req, res, next)
     },
     (req, res) => {
-        res.redirect('http://localhost:3000/candidates');
+        res.redirect(`${config.get(ConfigKey.frontendUrl)}/candidates`);
     });
 
 app.post('/callback',
@@ -24,13 +26,13 @@ app.post('/callback',
         passport.authenticate('azuread-openidconnect',
             {
                 response: res,
-                failureRedirect: 'http://localhost:3000/'
+                failureRedirect: config.get(ConfigKey.frontendUrl)
             }
         )(req, res, next)
     },
     (req, res) => {
         console.log(req.user);
-        res.redirect('http://localhost:3000/candidates');
+        res.redirect(`${config.get(ConfigKey.frontendUrl)}/candidates`);
     });
 
 app.get(nodeAdapter.urls.AUTHENTICATE, (req, res) => {
@@ -47,5 +49,5 @@ app.get(nodeAdapter.urls.LOGOUT, async (req, res) => {
             console.log(e);
         }
     });
-    res.redirect('http://localhost:3000/')
+    res.redirect(config.get(ConfigKey.frontendUrl))
 });

@@ -4,7 +4,8 @@ dotenv.config({path: "../.env"});
 
 export enum ConfigKey {
 	// Basic
-	port = "port",
+	backendPort = "port",
+	frontendUrl = "frontendUrl",
 	
 	// DynamoDB
 	awsRegion = "region",
@@ -38,7 +39,8 @@ export class Config {
 	private constructor() {
 		try {
 			this.config = {
-				[ConfigKey.port]: process.env.PORT,
+				[ConfigKey.backendPort]: process.env.PORT,
+				[ConfigKey.frontendUrl]: process.env.FRONTEND_URL,
 				
 				// DynamoDB
 				[ConfigKey.awsRegion]:     		 process.env.AWS_REGION,

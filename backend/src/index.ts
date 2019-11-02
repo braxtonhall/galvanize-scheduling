@@ -5,7 +5,7 @@ import {Config, ConfigKey} from "./Config";
 
 sourceMapSupport.install();
 let app: core.Express;
-const port = Config.getInstance().get(ConfigKey.port) || 8080;
+const port = Config.getInstance().get(ConfigKey.backendPort) || 8080;
 
 (async () => {
 	app = express();
