@@ -1,9 +1,9 @@
 import {DynamoDBController} from "./impl/DynamoDBController";
 
 export interface IAuthController {
-	saveAuth(token: string): boolean;
-	checkAuth(token: string): boolean;
-	removeAuth(token: string): boolean;
+	saveAuth(user: any): Promise<boolean>;
+	checkAuth(req: any): Promise<boolean>;
+	removeAuth(id: string): Promise<boolean>;
 }
 
 export class AuthController implements IAuthController {
@@ -13,17 +13,16 @@ export class AuthController implements IAuthController {
 		this.dbc = DynamoDBController.getInstance();
 	}
 
-	public checkAuth(req): boolean {
-		console.log(req.user);
-		console.log(req.isAuthenticated);
+	public async checkAuth(req: any): Promise<boolean> {
 		return req.isAuthenticated();
 	}
 
-	public removeAuth(id): boolean {
+	public async removeAuth(id: string): Promise<boolean> {
 		return false; // TODO implement stub
 	}
 
-	public saveAuth(token: string): boolean {
+	public async saveAuth(user: any): Promise<boolean> {
+		await this.dbc.writeOAuth(user);
 		return false; // TODO implement stub
 	}
 	
