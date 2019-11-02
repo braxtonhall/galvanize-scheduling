@@ -11,5 +11,5 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     unset: 'destroy',
-    // store: DynamoDBController.getInstance().getStore()
+    store: DynamoDBController.getInstance().getStore()
 }));

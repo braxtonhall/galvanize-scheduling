@@ -14,14 +14,12 @@ let users = {};
 
 passport.serializeUser((user, done) => {
     // TODO: save to db
-    console.log(1);
     users[user.profile.oid] = user;
     done(null, user.profile.oid);
 });
 
 passport.deserializeUser((id, done) => {
     // TODO: remove from db
-    console.log(2);
     done(null, users[id]);
 });
 
@@ -49,7 +47,6 @@ const signInComplete = async (iss, sub, profile, accessToken, refreshToken, para
         const user = await client.api('/me').get();
         console.log(user);
     } catch(e) {
-        console.log(e);
         done(e, null);
     }
 

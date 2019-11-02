@@ -34,9 +34,9 @@ app.post('/callback',
         res.redirect(`${config.get(ConfigKey.frontendUrl)}/candidates`);
     });
 
-app.get(nodeAdapter.urls.AUTHENTICATE, (req, res) => {
+app.get(nodeAdapter.urls.AUTHENTICATE, async (req, res) => {
     const ac = new AuthController();
-    if (ac.checkAuth(req)) {
+    if (await ac.checkAuth(req)) {
         res.status(200).send(true);
     } else {
         res.status(403).send(false);

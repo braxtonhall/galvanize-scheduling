@@ -19,6 +19,10 @@ export interface IDynamoDBController {
 	getRooms(): Promise<IRoom[]>;
 	writeRoom(room: IRoom): Promise<void>;
 	deleteRoom(name: string): Promise<void>;
+
+	writeOAuth(user: any): Promise<void>;
+	deleteOAuth(id: string): Promise<void>;
+	getOAuth(id: string): Promise<any>;
 }
 
 
@@ -35,7 +39,8 @@ export class DynamoDBController implements IDynamoDBController {
 
 	private static readonly CANDIDATE_TABLE: string = "Candidates";
 	private static readonly ROOM_TABLE: string = "Rooms";
-	private static readonly SESSION_TABLE: string = "Sessions"; // TODO use https://www.npmjs.com/package/connect-dynamodb ?
+	private static readonly SESSION_TABLE: string = "Sessions";
+	private static readonly OAUTH_TABLE: string = "OAuths";
 
 	private static readonly SCHEMATA: any[] = [
 		{
@@ -62,6 +67,19 @@ export class DynamoDBController implements IDynamoDBController {
 			ProvisionedThroughput: {
 				ReadCapacityUnits: 10,
 				WriteCapacityUnits: 10 // TODO what are these numbers?
+			}
+		},
+		{
+			TableName : DynamoDBController.OAUTH_TABLE,
+			KeySchema: [
+				{ AttributeName: "id", KeyType: "HASH" }
+			],
+			AttributeDefinitions: [
+				{ AttributeName: "id", AttributeType: "S" }
+			],
+			ProvisionedThroughput: {
+				ReadCapacityUnits: 10,
+				WriteCapacityUnits: 10 // TODO
 			}
 		}
 	];
@@ -121,6 +139,25 @@ export class DynamoDBController implements IDynamoDBController {
 
 	public async deleteRoom(name: string): Promise<void> {
 		await this.delete(DynamoDBController.ROOM_TABLE, {name});
+	}
+
+	public async writeOAuth(user: any): Promise<void> {
+		if (!user.oid || !user.oauthToken) {
+			// TODO authentication
+			throw new Error("Required fields in user are missing. Cannot save to database");
+		}
+		await this.write(DynamoDBController.OAUTH_TABLE, {
+			id: user.oid,
+			oauthToken: user.oauthToken,
+		});
+	}
+
+	public async deleteOAuth(id: string): Promise<void> {
+		await this.delete(DynamoDBController.OAUTH_TABLE, {id});
+	}
+
+	public async getOAuth(id: string): Promise<any> {
+		await this.get(DynamoDBController.OAUTH_TABLE, {id});
 	}
 
 	private async get(table: string, attrs: any): Promise<any> {
