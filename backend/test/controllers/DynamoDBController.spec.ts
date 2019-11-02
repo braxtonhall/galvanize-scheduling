@@ -1,6 +1,6 @@
 import "mocha";
 import {DynamoDBController} from "../../src/controllers/impl/DynamoDBController";
-import {MOCK_CANDIDATES, MOCK_ROOMS, startDockerDatabase, stopDockerDatabase} from "../TestUtil";
+import {MOCK_AUTHS, MOCK_CANDIDATES, MOCK_ROOMS, startDockerDatabase, stopDockerDatabase} from "../TestUtil";
 import {expect} from "chai";
 
 describe("DynamoDBController", () => {
@@ -91,4 +91,9 @@ describe("DynamoDBController", () => {
 			expect.fail();
 		}
 	});
+	
+	it("Should save a token", async () => {
+		await dbc.writeOAuth(MOCK_AUTHS[0].token);
+		expect(await dbc.getOAuth(MOCK_AUTHS[0].token)).to.deep.equal(MOCK_AUTHS[0]);
+	})
 });

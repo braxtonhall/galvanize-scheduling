@@ -153,8 +153,8 @@ export class DynamoDBController implements IDynamoDBController {
 		await this.delete(DynamoDBController.OAUTH_TABLE, {token});
 	}
 
-	public async getOAuth(token: string): Promise<any> {
-		await this.get(DynamoDBController.OAUTH_TABLE, {token});
+	public async getOAuth(token: string): Promise<{token: string}> {
+		return await this.get(DynamoDBController.OAUTH_TABLE, {token});
 	}
 
 	private async get(table: string, attrs: any): Promise<any> {
