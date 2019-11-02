@@ -10,12 +10,14 @@ let users = {};
 
 passport.serializeUser((user, done) => {
     // TODO: save to db
+    console.log(1)
     users[user.profile.oid] = user;
     done(null, user.profile.oid);
 });
 
 passport.deserializeUser((id, done) => {
     // TODO: remove from db
+    console.log(2)
     done(null, users[id]);
 });
 
