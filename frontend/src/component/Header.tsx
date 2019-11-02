@@ -12,7 +12,7 @@ import Context from '../services/Context';
 import {Link} from "react-router-dom";
 
 const Header: React.FC = () => {
-	const {authenticated, operationsLoading} = useContext(Context);
+	const {token, updateContext, operationsLoading} = useContext(Context);
 	const [isOpen, updateIsOpen] = useState(false);
 
 	function toggle() {
@@ -20,7 +20,10 @@ const Header: React.FC = () => {
 	}
 
 	async function logout() {
-		await adapter.logout();
+		if (token) {
+			await adapter.logout(token);
+			updateContext({token: undefined});
+		}
 	}
 
 	return (
@@ -29,7 +32,7 @@ const Header: React.FC = () => {
 				<NavbarBrand><img alt="galvanize logo" src="/galvanize-logo.svg"/></NavbarBrand>
 				{process.env.NODE_ENV === 'development' && <NavItem>Operations Loading: {operationsLoading}</NavItem> }
 				{
-					authenticated &&
+					token &&
 					<React.Fragment>
 						<NavbarToggler onClick={toggle}/>
 						<Collapse isOpen={isOpen} navbar>

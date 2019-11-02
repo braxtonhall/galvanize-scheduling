@@ -2,14 +2,12 @@ import IAPIAdapter from "../IAPIAdapter";
 import placeholderAdapter from "../placeholder_adapter";
 import {urls, fullURLs} from "./urls";
 import health from "./health";
-import {loginRedirectURL, logout, isAuthenticated} from "./auth";
+import auth from "./auth";
 import admin from "./admin";
 
 const adapter: IAPIAdapter = {
 	...placeholderAdapter,
-	loginRedirectURL,
-	logout,
-	isAuthenticated,
+	...auth,
 	...admin,
 	health,
 	urls,

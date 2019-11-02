@@ -3,7 +3,7 @@ import {
 	IAvailability,
 	ICandidate,
 	IGetSchedulesOptions,
-	IInterviewer, IRoom,
+	IInterviewer,
 	ISchedule
 } from "./interfaces";
 
@@ -14,22 +14,21 @@ export default interface IAPIAdapter {
 	getCandidateByID(candidateID: string): Promise<IAPIResponse<ICandidate>>;
 
 	// staff
-	loginRedirectURL(): string
-	createCandidate(candidate: ICandidate): Promise<IAPIResponse<ICandidate>>;
-	sendAvailabilityEmail(candidate: ICandidate): Promise<IAPIResponse>;
-	getSchedules(options: IGetSchedulesOptions): Promise<IAPIResponse<ISchedule[]>>;
-	confirmSchedule(schedule: ISchedule): Promise<IAPIResponse>;
-	getCandidates(): Promise<IAPIResponse<ICandidate[]>>;
-	deleteCandidate(candidate: ICandidate): Promise<IAPIResponse>;
-	updateCandidate(candidate: ICandidate): Promise<IAPIResponse>;
-	getInterviewers(): Promise<IAPIResponse<IInterviewer[]>>;
-	getRooms(): Promise<IAPIResponse<IRoom[]>>;
-	saveRoom(room: IRoom, eligible: boolean): Promise<IAPIResponse>;
+	login(username: string, password: string): Promise<IAPIResponse<string>>;
+	createCandidate(token: string, candidate: ICandidate): Promise<IAPIResponse<ICandidate>>;
+	sendAvailabilityEmail(token: string, candidate: ICandidate): Promise<IAPIResponse>;
+	getSchedules(token: string, options: IGetSchedulesOptions): Promise<IAPIResponse<ISchedule[]>>;
+	confirmSchedule(token: string, schedule: ISchedule): Promise<IAPIResponse>;
+	getCandidates(token: string): Promise<IAPIResponse<ICandidate[]>>;
+	deleteCandidate(token: string, candidate: ICandidate): Promise<IAPIResponse>;
+	updateCandidate(token: string, candidate: ICandidate): Promise<IAPIResponse>;
+	getInterviewers(token: string): Promise<IAPIResponse<IInterviewer[]>>;
 
 	// meta
-	isAuthenticated(): Promise<IAPIResponse<boolean>>;
+	checkToken(token: string): Promise<IAPIResponse<boolean>>;
+	saveToken(token: string): Promise<IAPIResponse<boolean>>;
 	health(): Promise<IAPIResponse<boolean>>;
-	logout(): Promise<IAPIResponse>;
+	logout(token: string): Promise<IAPIResponse>;
 	urls: {[key: string]: string};
 	fullURLs: {[key: string]: string};
 }

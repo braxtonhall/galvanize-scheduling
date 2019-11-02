@@ -4,12 +4,12 @@ import {Redirect, Route, RouteProps} from "react-router";
 import Context from "../services/Context";
 
 const AuthenticatedRoute: React.FC<RouteProps> = ({ component: Component, ...rest }) => {
-	const {authenticated} = useContext(Context);
+	const context = useContext(Context);
 	return (
 		<Route
 			{...rest}
-			render={async (props) => {
-				if (!authenticated) {
+			render={(props) => {
+				if (!context.token || context.token.length < 1) {
 					return <Redirect
 						to={{
 							pathname: "/login",
@@ -23,6 +23,6 @@ const AuthenticatedRoute: React.FC<RouteProps> = ({ component: Component, ...res
 			}}
 		/>
 		)
-};
+}
 
 export default AuthenticatedRoute;

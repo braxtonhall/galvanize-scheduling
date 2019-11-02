@@ -1,9 +1,9 @@
-import React, {useState, createContext, useEffect} from "react";
+import React, { useState, createContext } from "react";
 import App from "../App";
-import adapter from "../services/Adapter";
+import {interfaces} from "adapter";
 
 export interface IContext {
-	authenticated: boolean;
+	token?: string,
 	error?: string,
 	operationsLoading: number,
 	updateContext: (context: Partial<IContext>) => void
@@ -12,7 +12,6 @@ export interface IContext {
 }
 
 const Context = createContext<IContext>({
-	authenticated: false,
 	operationsLoading: 0,
 	updateContext: () => {},
 	startLoadingProcess: () => {},
@@ -26,22 +25,11 @@ export default Context;
 export const Root: React.FC = () => {
 
 	const [context, updateContext] = useState<IContext>({
-		authenticated: false,
 		operationsLoading: 0,
 		updateContext: () => {},
 		startLoadingProcess: () => {},
 		endLoadingProcess: () => {},
 	});
-
-	useEffect(() => {
-		adapter.isAuthenticated()
-			.then(({success, data}) => {
-				updateContext({
-					...context,
-					authenticated: success ? data : false,
-				})
-			})
-	}, []);
 
 	const newFunc = (c: Partial<IContext>): void => {
 		updateContext({

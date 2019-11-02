@@ -1,14 +1,17 @@
 import IAPIAdapter from "../IAPIAdapter";
 import IAPIResponse from "../IAPIResponse";
+import {
+	Role
+} from "../interfaces";
 import fakeCandidates from "./fakeCandidates";
 import fakeInterviewers, {fakeSchedules} from "./fakeInterviewers";
-import {fullURLs} from "../node_adapter/urls";
 
 const adapter: IAPIAdapter = {
 	submitAvailability: autoFail,
 	isValidCandidateID: async () => ({success: true, data: true}),
 	getCandidateByID: async () => ({success: true, data: fakeCandidates[0]}),
 
+	login: async () => ({success: true, data: "fake_token"}),
 	createCandidate: autoFail,
 	sendAvailabilityEmail: autoFail,
 	getSchedules: async () => ({success: true, data: fakeSchedules}),
@@ -17,12 +20,10 @@ const adapter: IAPIAdapter = {
 	getCandidates: async () => ({success: true, data: fakeCandidates}),
 	deleteCandidate: autoFail,
 	updateCandidate:autoFail,
-	loginRedirectURL: () => "",
-	saveRoom: autoFail,
-	getRooms: autoFail,
 
 	// meta
-	isAuthenticated: autoFail,
+	saveToken: autoFail,
+	checkToken: autoFail,
 	health: autoFail,
 	logout: autoFail,
 	urls: {},
