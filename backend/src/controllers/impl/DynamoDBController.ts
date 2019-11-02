@@ -1,9 +1,13 @@
 import AWS from "aws-sdk";
 import {Config, ConfigKey} from "../../Config";
-import { ICandidate, IRoom } from "adapter/dist/interfaces";
-import {ResourceKind, assertIs} from "../Common";
+import {ICandidate, IRoom} from "adapter/dist/interfaces";
+import {assertIs, ResourceKind} from "../Common";
+import {MemoryStore, Store} from "express-session";
+import * as DynamoDBStore from "dynamodb-store"
 
 export interface IDynamoDBController {
+	getStore(): Store | MemoryStore;
+	
 	getCandidate(id: string): Promise<ICandidate>;
 	getCandidates(): Promise<ICandidate[]>;
 	writeCandidate(candidate: ICandidate): Promise<void>;
@@ -66,6 +70,23 @@ export class DynamoDBController implements IDynamoDBController {
 		// TODO
 	}
 	
+	public getStore(): Store | MemoryStore {
+		return new DynamoDBStore({
+			table: {
+				name: DynamoDBController.SESSION_TABLE,
+			},
+			dynamoConfig: {
+				accessKeyId: Config.getInstance().get(ConfigKey.awsAccessKeyId),
+				secretAccessKey: Config.getInstance().get(ConfigKey.awsSecretAccessKey),
+				region: Config.getInstance().get(ConfigKey.awsRegion),
+				endpoint: Config.getInstance().get(ConfigKey.dbUrl)
+			},
+			keepExpired: false,
+			touchInterval: 30000,
+			ttl: 600000
+		});
+	}
+
 	public async getCandidate(id: string): Promise<ICandidate> {
 		return await this.get(DynamoDBController.CANDIDATE_TABLE, {id});
 	}
