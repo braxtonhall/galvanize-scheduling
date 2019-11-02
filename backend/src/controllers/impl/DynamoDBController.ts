@@ -20,7 +20,7 @@ export interface IDynamoDBController {
 	writeRoom(room: IRoom): Promise<void>;
 	deleteRoom(name: string): Promise<void>;
 
-	writeOAuth(user: any): Promise<void>;
+	writeOAuth(id: string, token: string): Promise<void>;
 	deleteOAuth(id: string): Promise<void>;
 	getOAuth(id: string): Promise<any>;
 }
@@ -141,15 +141,12 @@ export class DynamoDBController implements IDynamoDBController {
 		await this.delete(DynamoDBController.ROOM_TABLE, {name});
 	}
 
-	public async writeOAuth(user: any): Promise<void> {
-		if (!user.oid || !user.oauthToken) {
+	public async writeOAuth(id: string, token: string): Promise<void> {
+		if (!id || !token) {
 			// TODO authentication
 			throw new Error("Required fields in user are missing. Cannot save to database");
 		}
-		await this.write(DynamoDBController.OAUTH_TABLE, {
-			id: user.oid,
-			oauthToken: user.oauthToken,
-		});
+		await this.write(DynamoDBController.OAUTH_TABLE, {id, token});
 	}
 
 	public async deleteOAuth(id: string): Promise<void> {
