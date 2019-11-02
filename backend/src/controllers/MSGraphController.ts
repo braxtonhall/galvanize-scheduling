@@ -15,24 +15,6 @@ export default class MSGraphController {
         });
     }
 
-    static async getAccessToken(req) {
-        if (req.user) {
-            const storedToken = req.user.oauthToken;
-
-            if (storedToken) {
-                if (storedToken.expired()) {
-                    const newToken = await storedToken.refresh();
-
-                    req.user.oauthToken = newToken;
-                    return newToken.token.access_token;
-                }
-
-                return storedToken.token.access_token;
-            }
-
-        }
-    }
-
     static buildRequest(query) {
         let url = config.get(ConfigKey.msOAuthAuthority) + config.get(ConfigKey.msOAuthAuthorizeEndpoint) + "?";
 

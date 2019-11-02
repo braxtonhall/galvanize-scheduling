@@ -1,7 +1,7 @@
 import IAPIResponse from "../IAPIResponse";
 import {fullURLs} from "./urls";
 import axios from "axios";
-import {ICandidate} from "../interfaces";
+import {ICandidate, IInterviewer} from "../interfaces";
 
 export default {
     getCandidates: async() : Promise<IAPIResponse<ICandidate[]>> => {
@@ -33,5 +33,13 @@ export default {
             return {success: false}
         }
     },
+    getInterviewers: async(token: string) : Promise<IAPIResponse<IInterviewer[]>> => {
+        try {
+            const {status, data} = await axios.get(fullURLs.INTERVIEWERS, {params: {token}});
+            return {success: false, data: []};
+        } catch {
+            return {success: false};
+        }
+    }
 
 }

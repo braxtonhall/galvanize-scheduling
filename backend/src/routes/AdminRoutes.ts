@@ -28,9 +28,8 @@ const authController:IAuthController = new AuthController();
 	},
 ].forEach((resourceType) => {
 	app.get(nodeAdapter.urls[resourceType.multiple], async (req, res) => {
-		let token;
+		const {token} = req.query;
 		try {
-			token = await MSGraphController.getAccessToken(req);
 			const data: IResource[] = await resourceFacade.list(token, resourceType.kind);
 			console.log(data);
 			res.status(200).send(data);
