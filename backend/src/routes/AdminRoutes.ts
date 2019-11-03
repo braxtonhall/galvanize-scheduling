@@ -29,8 +29,12 @@ const authController:IAuthController = new AuthController();
 	app.get(nodeAdapter.urls[resourceType.multiple], async (req, res) => {
 		const token: string = req.header("token");
 		try {
-			const data: IResource[] = await resourceFacade.list(token, resourceType.kind);
-			res.status(200).send(data);
+			if (await authController.checkAuth(token)) {
+				const data: IResource[] = await resourceFacade.list(token, resourceType.kind);
+				res.status(200).send(data);
+			} else {
+				res.status(401);
+			}
 		} catch(e) {
 			res.status(e.statusCode).send(e.message);
 		}
@@ -38,18 +42,15 @@ const authController:IAuthController = new AuthController();
 
 	app.post(nodeAdapter.urls[resourceType.single], async (req, res) => {
 		const token: string = req.header("token");
-		console.log(req.body);
 		const data = req.body.data;
 		try {
 			if (await authController.checkAuth(token)) {
-				console.log("pass check auth");
 				const result = await resourceFacade.create(token, data, resourceType.kind);
 				res.status(200).send(result);
 			} else {
 				res.status(401);
 			}
 		} catch (e) {
-			console.error(e);
 			res.status(400).send(e);
 		}
 	});

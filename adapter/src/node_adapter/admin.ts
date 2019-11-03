@@ -6,7 +6,7 @@ import {ICandidate, IInterviewer} from "../interfaces";
 export default {
     getCandidates: async(token: string) : Promise<IAPIResponse<ICandidate[]>> => {
         try {
-            const {status, data} = await axios.get(fullURLs.CANDIDATES, {params: {token, "Content-Type": "application/json"}});
+            const {status, data} = await axios.get(fullURLs.CANDIDATES, {headers: {token, "Content-Type": "application/json"}});
             return {success: status === 200, data};
         } catch {
             return {success: false}
@@ -25,7 +25,7 @@ export default {
     },
     deleteCandidate: async(token: string, candidate: ICandidate) : Promise<IAPIResponse> => {
         try {
-            const {status, data} = await axios.delete(fullURLs.CANDIDATE, {params: {id: candidate.id}, headers: {token, "Content-Type": "application/json"}});
+            const {status, data} = await axios.delete(fullURLs.CANDIDATE, {data: {id: candidate.id}, headers: {token, "Content-Type": "application/json"}});
             return {success: status === 200};
         } catch (e) {
             return {success: false}

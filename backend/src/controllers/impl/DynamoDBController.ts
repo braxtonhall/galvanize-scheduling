@@ -4,6 +4,8 @@ import {ResourceKind, assertIs} from "../Common";
 import { interfaces } from "adapter";
 import {MemoryStore, Store} from "express-session";
 import DynamoDBStore from "dynamodb-store"
+import {ConfigurationServicePlaceholders} from "aws-sdk/lib/config_service_placeholders";
+import {APIVersions, ConfigurationOptions} from "aws-sdk/lib/config";
 type ICandidate = interfaces.ICandidate
 type IRoom = interfaces.IRoom
 
@@ -266,6 +268,15 @@ export class DynamoDBController implements IDynamoDBController {
 	}
 
 	private async write(table: string, item: any): Promise<void> {
+		for (const [key, value] of Object.entries(item)) {
+			if (typeof value === "string") {
+				item[key] = value.trim();
+			}
+			if (item[key] === "") {
+				delete item[key];
+			}
+		}
+
 		const params = {
 			TableName: table,
 			Item: item,
@@ -295,17 +306,17 @@ export class DynamoDBController implements IDynamoDBController {
 			region: cf.get(ConfigKey.awsRegion),
 			accessKeyId: cf.get(ConfigKey.awsSecretAccessKey),
 			secretAccessKey: cf.get(ConfigKey.awsSecretAccessKey),
-			// @ts-ignore // TODO why is this?
 			endpoint: new AWS.Endpoint(cf.get(ConfigKey.dbUrl))
-		});
+		} as {[key: string]: any});
+		// unfortunate static cast to get rid of build error
+		
 		const dynamoDB = new AWS.DynamoDB();
 		for (const scheme of DynamoDBController.SCHEMATA) {
 			try {
 				await this.createTable(dynamoDB, scheme);
 			} catch (err) {
 				if (err.code === "ResourceInUseException") {
-					// Pass. Already created.
-					// TODO log?
+					console.warn("While initing the database, table was already in use");
 				} else {
 					throw new Error("Unable to allocate resource in DB");
 				}
