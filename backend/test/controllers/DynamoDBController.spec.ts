@@ -95,5 +95,5 @@ describe("DynamoDBController", () => {
 	it("Should save a token", async () => {
 		await dbc.writeOAuth(MOCK_AUTHS[0].token);
 		expect(await dbc.getOAuth(MOCK_AUTHS[0].token)).to.deep.equal(MOCK_AUTHS[0]);
-	})
+	});
 });

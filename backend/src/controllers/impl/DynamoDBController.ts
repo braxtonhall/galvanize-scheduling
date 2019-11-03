@@ -22,7 +22,7 @@ export interface IDynamoDBController {
 
 	writeOAuth(token: string): Promise<void>;
 	deleteOAuth(token: string): Promise<void>;
-	getOAuth(token: string): Promise<any>;
+	getOAuth(token: string): Promise<{token: string}>;
 }
 
 
@@ -143,7 +143,6 @@ export class DynamoDBController implements IDynamoDBController {
 
 	public async writeOAuth(token: string): Promise<void> {
 		if (!token) {
-			// TODO authentication
 			throw new Error("Required fields in user are missing. Cannot save to database");
 		}
 		await this.write(DynamoDBController.OAUTH_TABLE, {token});
