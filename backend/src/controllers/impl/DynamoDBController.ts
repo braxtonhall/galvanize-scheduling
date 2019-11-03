@@ -19,6 +19,10 @@ export interface IDynamoDBController {
 	getRooms(): Promise<IRoom[]>;
 	writeRoom(room: IRoom): Promise<void>;
 	deleteRoom(name: string): Promise<void>;
+
+	writeOAuth(token: string): Promise<void>;
+	deleteOAuth(token: string): Promise<void>;
+	getOAuth(token: string): Promise<any>;
 }
 
 
@@ -35,7 +39,8 @@ export class DynamoDBController implements IDynamoDBController {
 
 	private static readonly CANDIDATE_TABLE: string = "Candidates";
 	private static readonly ROOM_TABLE: string = "Rooms";
-	private static readonly SESSION_TABLE: string = "Sessions"; // TODO use https://www.npmjs.com/package/connect-dynamodb ?
+	private static readonly SESSION_TABLE: string = "Sessions";
+	private static readonly OAUTH_TABLE: string = "OAuths";
 
 	private static readonly SCHEMATA: any[] = [
 		{
@@ -62,6 +67,19 @@ export class DynamoDBController implements IDynamoDBController {
 			ProvisionedThroughput: {
 				ReadCapacityUnits: 10,
 				WriteCapacityUnits: 10 // TODO what are these numbers?
+			}
+		},
+		{
+			TableName : DynamoDBController.OAUTH_TABLE,
+			KeySchema: [
+				{ AttributeName: "token", KeyType: "HASH" }
+			],
+			AttributeDefinitions: [
+				{ AttributeName: "token", AttributeType: "S" }
+			],
+			ProvisionedThroughput: {
+				ReadCapacityUnits: 10,
+				WriteCapacityUnits: 10 // TODO
 			}
 		}
 	];
@@ -121,6 +139,22 @@ export class DynamoDBController implements IDynamoDBController {
 
 	public async deleteRoom(name: string): Promise<void> {
 		await this.delete(DynamoDBController.ROOM_TABLE, {name});
+	}
+
+	public async writeOAuth(token: string): Promise<void> {
+		if (!token) {
+			// TODO authentication
+			throw new Error("Required fields in user are missing. Cannot save to database");
+		}
+		await this.write(DynamoDBController.OAUTH_TABLE, {token});
+	}
+
+	public async deleteOAuth(token: string): Promise<void> {
+		await this.delete(DynamoDBController.OAUTH_TABLE, {token});
+	}
+
+	public async getOAuth(token: string): Promise<{token: string}> {
+		return await this.get(DynamoDBController.OAUTH_TABLE, {token});
 	}
 
 	private async get(table: string, attrs: any): Promise<any> {

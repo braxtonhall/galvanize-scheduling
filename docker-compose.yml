@@ -26,6 +26,7 @@ services:
       - .env
     environment:
       - DB_URL=http://db:8000
+      - FRONTEND_URL=http://localhost:3000
     deploy:
       resources:
         limits:

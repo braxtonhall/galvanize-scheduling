@@ -1,7 +1,7 @@
 const urls: {[key: string]: string} = new function() {
 	// "/"
 	this.HEALTH = "/health";
-	
+
 	this.INTERVIEWER =  "/resource/interviewer";
 	this.INTERVIEWERS = "/resource/interviewers";
 
@@ -13,11 +13,12 @@ const urls: {[key: string]: string} = new function() {
 
 	this.LOGIN = '/login';
 	this.LOGOUT = '/logout';
+	this.AUTHENTICATE = '/authenticate';
 
 } as {[key: string]: string};
 
 let fullURLs: {[key: string]: string} = {};
-let base: string = process.env.REACT_APP_SERVER_ADDRESS;
+let base: string = process.env.REACT_APP_SERVER_ADDRESS || "http://localhost:8080";
 
 function generateFullURLS() {
 	fullURLs = {};

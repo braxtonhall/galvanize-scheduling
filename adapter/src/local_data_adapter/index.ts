@@ -97,16 +97,6 @@ const adapter: IAPIAdapter = {
 		await wait();
 		return {success: true, data: candidates.has(candidateID)};
 	},
-	async login(username: string, password: string): Promise<IAPIResponse<string>> {
-		await wait();
-		if (users.get(username) === password) {
-			const token = Math.random().toString();
-			tokens.set(token, true);
-			return {success: true, data: token};
-		} else {
-			return {success: false, error: "This version of the software is using mock data, and example user is 'peter@galvanize.com' with password 'i<3peter'"}
-		}
-	},
 	async logout(token: string): Promise<IAPIResponse> {
 		await wait();
 		tokens.delete(token);
@@ -143,7 +133,12 @@ const adapter: IAPIAdapter = {
 		}
 		candidates.set(candidate.id, cloneDeep(candidate));
 		return {success: true};
-	}
+	},
+	getTokenFromURL(url: string): string {
+		return "";
+	}, loginRedirectURL(): string {
+		return "";
+	},
 };
 
 const tokenErrorMessage = "This user is no longer authenticated, please login again";

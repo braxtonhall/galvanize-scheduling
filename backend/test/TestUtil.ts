@@ -45,6 +45,12 @@ export const MOCK_ROOMS: ReadonlyArray<IRoom> = [ // TODO what are we even stori
 	}
 ];
 
+export const MOCK_AUTHS: ReadonlyArray<{token: string}> = [
+	{
+		token: "TESTTOKEN1"
+	}
+];
+
 const sleep = (seconds) => new Promise(resolve => setTimeout(resolve, seconds * 1000));
 
 let docker: Dockerode = null;
