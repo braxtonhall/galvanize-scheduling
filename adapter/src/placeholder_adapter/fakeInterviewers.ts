@@ -1,4 +1,4 @@
-import {IInterviewer, ISchedule} from "../interfaces";
+import {IInterviewer, IRoom, ISchedule} from "../interfaces";
 import fakeCandidates from "./fakeCandidates";
 import moment from "moment";
 
@@ -20,6 +20,13 @@ const fakeInterviewers: IInterviewer[]= [
 	},
 ];
 
+export const fakeRooms: IRoom[] = [
+	{id: "7", name: "Meeting Room #1", eligible: true},
+	{id: "8", name: "Meeting Room #2", eligible: true},
+	{id: "9", name: "Meeting Room #3", eligible: true},
+];
+
+
 export const fakeSchedules: ISchedule[] = [
 	{
 		candidate: fakeCandidates[0],
@@ -28,13 +35,13 @@ export const fakeSchedules: ISchedule[] = [
 				interviewers: [fakeInterviewers[0], fakeInterviewers[1]],
 				startTime: moment().startOf("day").add(10, "hour"),
 				endTime: moment().startOf("day").add(11, "hour"),
-				room: {id: "7", name: "Meeting Room #1"},
+				room: fakeRooms[0],
 			},
 			{
 				interviewers: [fakeInterviewers[2]],
 				startTime: moment().startOf("day").add(11, "hour"),
 				endTime: moment().startOf("day").add(11.5, "hour"),
-				room: {id: "8", name: "Meeting Room #2"},
+				room: fakeRooms[1],
 			},
 		]
 	},
@@ -45,10 +52,11 @@ export const fakeSchedules: ISchedule[] = [
 				interviewers: [fakeInterviewers[0], fakeInterviewers[1]],
 				startTime: moment().startOf("day").add(13.5, "hour"),
 				endTime: moment().startOf("day").add(14.5, "hour"),
-				room: {id: "9", name: "Meeting Room #3"},
+				room: fakeRooms[2],
 			},
 		]
 	}
 ];
+
 
 export default fakeInterviewers;

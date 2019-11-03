@@ -26,7 +26,7 @@ const Login: React.FC = () => {
 	return (
 		<Container>
 			<Row>
-				<Col sm="12" md={{size: 6, offset: 3}}>
+				<Col sm="12" lg={{size: 6, offset: 3}} md={{size: 8, offset: 2}}>
 					<Card className="mt-4">
 						<CardHeader>Login</CardHeader>
 						<CardBody>

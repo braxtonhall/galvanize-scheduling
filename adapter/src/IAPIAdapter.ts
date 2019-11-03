@@ -3,7 +3,7 @@ import {
 	IAvailability,
 	ICandidate,
 	IGetSchedulesOptions,
-	IInterviewer,
+	IInterviewer, IRoom,
 	ISchedule
 } from "./interfaces";
 
@@ -23,6 +23,8 @@ export default interface IAPIAdapter {
 	deleteCandidate(token: string, candidate: ICandidate): Promise<IAPIResponse>;
 	updateCandidate(token: string, candidate: ICandidate): Promise<IAPIResponse>;
 	getInterviewers(token: string): Promise<IAPIResponse<IInterviewer[]>>;
+	getRooms(token: string): Promise<IAPIResponse<IRoom[]>>;
+	toggleEligibility(token: string, room: IRoom): Promise<IAPIResponse>;
 
 	// meta
 	loginRedirectURL(): string
