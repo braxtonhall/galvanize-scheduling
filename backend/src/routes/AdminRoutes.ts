@@ -4,8 +4,7 @@ import IResourceFacade from "../controllers/IResourceFacade";
 import ResourceFacade from "../controllers/impl/ResourceFacade";
 import {ResourceKind} from "../controllers/Common";
 import { IResource } from "adapter/dist/interfaces";
-import {IAuthController, AuthController} from "../controllers/AuthController";
-import MSGraphController from "../controllers/MSGraphController";
+import AuthController, {IAuthController} from "../controllers/AuthController";
 
 const resourceFacade: IResourceFacade = new ResourceFacade();
 const authController:IAuthController = new AuthController();
@@ -28,20 +27,8 @@ const authController:IAuthController = new AuthController();
 	},
 ].forEach((resourceType) => {
 	app.get(nodeAdapter.urls[resourceType.multiple], async (req, res) => {
-		// const token: string = req.header["token"];
-		// try {
-		// 	if (await authController.checkAuth(token)) {
-		// 		const interviewers = await resourceFacade.list(token, resourceType.kind);
-		// 		res.status(200).send(interviewers);
-		// 	} else {
-		// 		res.status(401);
-		// 	}
-		// } catch (e) {
-		// 	res.status(400).send(e);
-		// }
-		let token;
+		const {token} = req.query;
 		try {
-			token = await MSGraphController.getAccessToken(req);
 			const data: IResource[] = await resourceFacade.list(token, resourceType.kind);
 			console.log(data);
 			res.status(200).send(data);

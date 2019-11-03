@@ -4,14 +4,6 @@ export interface IResource {
 	id?: string,
 }
 
-export interface IHiringManager extends IResource {
-
-}
-
-export interface IHumanResource extends IResource {
-
-}
-
 export interface IRoom extends IResource {
 	name: string,
 }

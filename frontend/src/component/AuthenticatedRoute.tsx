@@ -23,6 +23,6 @@ const AuthenticatedRoute: React.FC<RouteProps> = ({ component: Component, ...res
 			}}
 		/>
 		)
-}
+};
 
 export default AuthenticatedRoute;
