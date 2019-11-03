@@ -8,6 +8,7 @@ import InterviewSelection from "../component/InterviewSelection";
 import {InterviewSelectionValue} from "../component/InterviewSelection";
 import ScheduleView from "../component/ScheduleView";
 import ScheduleActions from "../component/ScheduleActions";
+import Fade from 'react-reveal/Fade';
 type ICandidate = interfaces.ICandidate;
 type ISchedule = interfaces.ISchedule;
 type IInterviewer = interfaces.IInterviewer;
@@ -61,7 +62,6 @@ const Scheduling: React.FC = () => {
 		// TODO: Fill out input for getSchedules()
 		startLoadingProcess();
 		const {success, data, error} = await adapter.getSchedules(token, {});
-		console.log(success, data, error);
 		if (success) {
 			updateSchedules(data);
 			endLoadingProcess();
@@ -80,37 +80,45 @@ const Scheduling: React.FC = () => {
 		<Container className="mb-4">
 			<Row>
 				<Col md={12}>
-					<CandidateList
-						candidates={candidates}
-						selected={selectedCandidate}
-						actions={[{text: "Select", color: "primary", onClick: selectCandidate}]}
-					/>
+					<Fade left>
+						<CandidateList
+							candidates={candidates}
+							selected={selectedCandidate}
+							actions={[{text: "Select", color: "primary", onClick: selectCandidate}]}
+						/>
+					</Fade>
 				</Col>
 				{ selectedCandidate &&
 					<Col md={12}>
-						<InterviewSelection
-							value={interviewerValue}
-							onChange={updateInterviewerValue}
-							actions={[{text: "Generate Schedules", onClick: refreshSchedules}]}
-						/>
+						<Fade right>
+							<InterviewSelection
+								value={interviewerValue}
+								onChange={updateInterviewerValue}
+								actions={[{text: "Generate Schedules", onClick: refreshSchedules}]}
+							/>
+						</Fade>
 					</Col>
 				}
 				{
 					schedules &&
 					<Col md={12}>
-						<ScheduleView
-							schedules={schedules}
-							onSelect={updateSelectedSchedule}
-						/>
+						<Fade left>
+							<ScheduleView
+								schedules={schedules}
+								onSelect={updateSelectedSchedule}
+							/>
+						</Fade>
 					</Col>
 				}
 				{
 					selectedSchedule &&
 					<Col md={12}>
-						<ScheduleActions
-							schedule={selectedSchedule}
-							actions={[{text: "Schedule & Send Emails", onClick: () => {alert("feature not yet available.")}}]}
-						/>
+						<Fade right>
+							<ScheduleActions
+								schedule={selectedSchedule}
+								actions={[{text: "Schedule & Send Emails", onClick: () => {alert("feature not yet available.")}}]}
+							/>
+						</Fade>
 					</Col>
 				}
 			</Row>

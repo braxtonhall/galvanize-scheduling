@@ -3,6 +3,7 @@ import {Button, ButtonGroup, Card, CardBody, CardHeader, Col, Container, Row, Ta
 import adapter from "../services/Adapter";
 import Context from "../services/Context";
 import {interfaces} from "adapter";
+import Fade from 'react-reveal/Fade';
 type IRoom = interfaces.IRoom;
 
 const Rooms: React.FC = () => {
@@ -52,35 +53,39 @@ const Rooms: React.FC = () => {
 		<Container className="mb-4">
 			<Row>
 				<Col md={6} sm={12}>
-					<Card className="mt-4">
-						<CardHeader>Actions</CardHeader>
-						<CardBody>
-							<Button className="m-2" onClick={getRooms} color="primary">Refresh</Button>
-						</CardBody>
-					</Card>
+					<Fade left>
+						<Card className="mt-4">
+							<CardHeader>Actions</CardHeader>
+							<CardBody>
+								<Button className="m-2" onClick={getRooms} color="primary">Refresh</Button>
+							</CardBody>
+						</Card>
+					</Fade>
 				</Col>
 
 				<Col md={12}>
-					<Card className="mt-4">
-						<CardHeader>Rooms</CardHeader>
-						<CardBody>
-							<div className="table-responsive">
-								<Table hover>
-									<thead>
-									<tr>
-										<th>id</th>
-										<th>name</th>
-										<th>eligible</th>
-										<th>toggle</th>
-									</tr>
-									</thead>
-									<tbody>
-									{rooms.map(makeRow)}
-									</tbody>
-								</Table>
-							</div>
-						</CardBody>
-					</Card>
+					<Fade right>
+						<Card className="mt-4">
+							<CardHeader>Rooms</CardHeader>
+							<CardBody>
+								<div className="table-responsive">
+									<Table hover>
+										<thead>
+										<tr>
+											<th>id</th>
+											<th>name</th>
+											<th>eligible</th>
+											<th>toggle</th>
+										</tr>
+										</thead>
+										<tbody>
+										{rooms.map(makeRow)}
+										</tbody>
+									</Table>
+								</div>
+							</CardBody>
+						</Card>
+					</Fade>
 				</Col>
 			</Row>
 		</Container>

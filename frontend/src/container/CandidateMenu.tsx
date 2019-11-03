@@ -6,6 +6,7 @@ import {interfaces} from "adapter";
 import Context from "../services/Context";
 import adapter from "../services/Adapter";
 import {ToastsContainer, ToastsStore, ToastsContainerPosition} from 'react-toasts';
+import Fade from 'react-reveal/Fade';
 
 type ICandidate = interfaces.ICandidate;
 
@@ -125,31 +126,37 @@ const CandidateMenu: React.FC = () => {
 		<Container className="pb-4">
 			<Row>
 				<Col md={6} sm={12}>
-					<Card className="mt-4">
-						<CardHeader>Actions</CardHeader>
-						<CardBody>
-							<Button className="m-2" onClick={refreshCandidates} color="primary">Refresh</Button>
-							<Button className="m-2" onClick={newCandidate} color="primary">New Candidate</Button>
-						</CardBody>
-					</Card>
+					<Fade left>
+						<Card className="mt-4">
+							<CardHeader>Actions</CardHeader>
+							<CardBody>
+								<Button className="m-2" onClick={refreshCandidates} color="primary">Refresh</Button>
+								<Button className="m-2" onClick={newCandidate} color="primary">New Candidate</Button>
+							</CardBody>
+						</Card>
+					</Fade>
 				</Col>
 				<Col md={12}>
-					<CandidateList
-						candidates={candidates}
-						selected={selectedCandidate}
-						actions={actions}
-					/>
+					<Fade right>
+						<CandidateList
+							candidates={candidates}
+							selected={selectedCandidate}
+							actions={actions}
+						/>
+					</Fade>
 				</Col>
 				{
 					selectedCandidate &&
 					<Col md={12}>
-						<CandidateForm
-							candidate={selectedCandidate}
-							title={title}
-							description={description}
-							onChange={onChangeSelected}
-							buttons={buttons}
-						/>
+						<Fade left>
+							<CandidateForm
+								candidate={selectedCandidate}
+								title={title}
+								description={description}
+								onChange={onChangeSelected}
+								buttons={buttons}
+							/>
+						</Fade>
 					</Col>
 				}
 			</Row>
