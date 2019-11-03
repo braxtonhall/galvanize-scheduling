@@ -34,8 +34,6 @@ const authController:IAuthController = new AuthController();
 		} catch(e) {
 			res.status(e.statusCode).send(e.message);
 		}
-
-
 	});
 
 	app.post(nodeAdapter.urls[resourceType.single], async (req, res) => {

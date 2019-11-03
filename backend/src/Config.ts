@@ -22,6 +22,10 @@ export enum ConfigKey {
 	msOAuthMetaData = "oAuthMetaData",
 	msOAuthAuthorizeEndpoint = "oAuthAuthorizeEndpoint",
 	msOAuthTokenEndpoint = "oAuthTokenEndpoint",
+	
+	// Test
+	testSecretKey = "testSecretKey",
+	production = "production"
 }
 
 export class Config {
@@ -57,6 +61,10 @@ export class Config {
 				[ConfigKey.msOAuthMetaData]: 		  process.env.OAUTH_ID_METADATA,
 				[ConfigKey.msOAuthAuthorizeEndpoint]: process.env.OAUTH_AUTHORIZE_ENDPOINT,
 				[ConfigKey.msOAuthTokenEndpoint]: 	  process.env.OAUTH_TOKEN_ENDPOINT,
+				
+				// Testing
+				[ConfigKey.testSecretKey]: process.env.TEST_SECRET_KEY,
+				[ConfigKey.production]:    process.env.PRODUCTION.toLowerCase() === 'true',
 			};
 			// TODO check for testing scenario and change some of these props
 		} catch (err) {
