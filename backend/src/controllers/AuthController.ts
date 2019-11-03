@@ -14,8 +14,7 @@ export default class AuthController implements IAuthController {
 	}
 
 	public async checkAuth(token: string): Promise<boolean> {
-		let res = !!(await this.dbc.getOAuth(token));
-		return res;
+		return !!(await this.dbc.getOAuth(token));
 	}
 
 	public async removeAuth(token: string): Promise<boolean> {
@@ -25,7 +24,7 @@ export default class AuthController implements IAuthController {
 
 	public async saveAuth(token: string): Promise<boolean> {
 		await this.dbc.writeOAuth(token);
-		return true; // TODO implement stub
+		return true;
 	}
 	
 }
