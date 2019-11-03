@@ -100,13 +100,13 @@ const CandidateMenu: React.FC = () => {
 		startLoadingProcess();
 		const {success, error} = await adapter.createCandidate(token, candidate);
 		if (success) {
+			endLoadingProcess();
 			await refreshCandidates()
 		} else if (error) {
-			updateContext({error});
+			endLoadingProcess({error});
 		} else {
-			updateContext({error: "There was an error creating the candidate."})
+			endLoadingProcess({error: "There was an error creating the candidate."})
 		}
-		endLoadingProcess();
 	}
 
 	async function updateCandidate(candidate: ICandidate): Promise<void> {
@@ -115,11 +115,10 @@ const CandidateMenu: React.FC = () => {
 		if (success) {
 			await refreshCandidates()
 		} else if (error) {
-			updateContext({error});
+			endLoadingProcess({error});
 		} else {
-			updateContext({error: "There was an error updating the candidate."})
+			endLoadingProcess({error: "There was an error updating the candidate."})
 		}
-		endLoadingProcess();
 	}
 
 	return (
