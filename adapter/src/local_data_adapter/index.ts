@@ -147,12 +147,16 @@ const adapter: IAPIAdapter = {
 		if (!checkToken(token)) {
 			return {success: false, error: tokenErrorMessage}
 		}
-		
+		if (!rooms.has(room.id)) {
+			return {success: false};
+		}
+		rooms.set(room.id, cloneDeep(room));
 		return {success: true}
 	},
 	getTokenFromURL(url: string): string {
 		return "";
-	}, loginRedirectURL(): string {
+	},
+	loginRedirectURL(): string {
 		return "";
 	},
 };
