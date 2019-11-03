@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from "react";
-import {Button, Card, CardBody, CardHeader, Col, Container, Row} from "reactstrap";
+import {Button, ButtonGroup, Card, CardBody, CardHeader, Col, Container, Row, Table} from "reactstrap";
 import adapter from "../services/Adapter";
 import Context from "../services/Context";
 import {interfaces} from "adapter";
@@ -14,14 +14,38 @@ const Rooms: React.FC = () => {
 	async function getRooms(): Promise<void> {
 		startLoadingProcess();
 		const {success, data, error} = await adapter.getRooms(token);
+		console.log({success, data, error});
 		if (success) {
 			updateRooms(data);
+			endLoadingProcess();
 		} else if (error) {
-			updateContext({error});
+			endLoadingProcess({error});
 		} else {
-			updateContext({error: "There was an error getting the candidates, please try again."})
+			endLoadingProcess({error: "There was an error getting the candidates, please try again."})
 		}
-		endLoadingProcess();
+	}
+
+	function makeRow(room: IRoom, index: number): JSX.Element {
+		const {id, name, eligible} = room;
+
+		async function onClickWrapper() {
+			startLoadingProcess();
+			await adapter.toggleEligibility(token, room);
+			endLoadingProcess();
+		}
+
+		return (
+			<tr className={"text-nowrap"} key={"row_" + index}>
+				<th scope="row">{id}</th>
+				<td>{name}</td>
+				<td>{eligible}</td>
+				<td>
+					<ButtonGroup>
+						<Button onClick={onClickWrapper} size="sm" color="primary">{eligible ?  "remove eligibility" : "make eligible"}</Button>)
+					</ButtonGroup>
+				</td>
+			</tr>
+		)
 	}
 
 	return (
@@ -35,11 +59,26 @@ const Rooms: React.FC = () => {
 						</CardBody>
 					</Card>
 				</Col>
+
 				<Col md={12}>
 					<Card className="mt-4">
 						<CardHeader>Rooms</CardHeader>
 						<CardBody>
-
+							<div className="table-responsive">
+								<Table hover>
+									<thead>
+									<tr>
+										<th>id</th>
+										<th>name</th>
+										<th>eligible</th>
+										<th>toggle</th>
+									</tr>
+									</thead>
+									<tbody>
+									{rooms.map(makeRow)}
+									</tbody>
+								</Table>
+							</div>
 						</CardBody>
 					</Card>
 				</Col>
