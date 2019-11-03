@@ -11,6 +11,7 @@ const candidateTests = (token: string) => () => {
         firstName: "Test",
         lastName: "Doe"
     };
+    let nonExistentCandidate = {id: "0", ...mockCandidate};
 
     context("createCandidate", () => {
         it("should fail if candidate is missing an email", async () => {
@@ -41,6 +42,7 @@ const candidateTests = (token: string) => () => {
            expect(success).to.be.true;
            expect(data).to.deep.include(mockCandidate);
        });
+
        it("should find the new candidate when searching by ID", async () => {
            const {success, data} = await adapter.getCandidateByID(mockCandidate.id);
            expect(success).to.be.true;
@@ -62,26 +64,38 @@ const candidateTests = (token: string) => () => {
             expect(data).to.deep.equals(mockCandidate);
         });
 
-        it("should not modify the candidate id", async () => {
-            const idModifiedCandidate = {
-                ...mockCandidate,
-                id: "0"
-            };
-            const {success, data} = await adapter.updateCandidate(token, idModifiedCandidate);
+        it("succeed on no changes", async () => {
+            const {success, data} = await adapter.updateCandidate(token, mockCandidate);
             expect(success).to.be.true;
             expect(data).to.deep.equals(mockCandidate);
+        });
+
+        it("should fail on missing candidate", async () => {
+            const {success, error} = await adapter.updateCandidate(token, nonExistentCandidate);
+            expect(success).to.be.false;
+            expect(error).to.exist;
         });
     });
 
     context("sendAvailabilityEmail", () => {
-
+        it("should fail on missing candidate", async () => {
+            const {success, error} = await adapter.sendAvailabilityEmail(token, nonExistentCandidate);
+            expect(success).to.be.false;
+            expect(error).to.exist;
+        });
+        it("should succeed on existing candidate", async () => {
+            const {success, data} = await adapter.sendAvailabilityEmail(token, mockCandidate);
+            expect(success).to.be.true;
+            expect(data).to.exist; // TODO: what will be in the response?
+        });
     });
 
     context("submitAvailability", () => {
+
     });
 
     context("deleteCandidate", () => {
-
+        
     });
 };
 
