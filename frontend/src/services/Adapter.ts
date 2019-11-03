@@ -1,3 +1,3 @@
-import {localDataAdapter} from "adapter";
+import {nodeAdapter} from "adapter";
 
-export default localDataAdapter;
+export default nodeAdapter;

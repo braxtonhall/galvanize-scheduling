@@ -14,7 +14,7 @@ export default interface IAPIAdapter {
 	getCandidateByID(candidateID: string): Promise<IAPIResponse<ICandidate>>;
 
 	// staff
-	login(username: string, password: string): Promise<IAPIResponse<string>>;
+	getTokenFromURL(url: string): string;
 	createCandidate(token: string, candidate: ICandidate): Promise<IAPIResponse<ICandidate>>;
 	sendAvailabilityEmail(token: string, candidate: ICandidate): Promise<IAPIResponse>;
 	getSchedules(token: string, options: IGetSchedulesOptions): Promise<IAPIResponse<ISchedule[]>>;
@@ -25,7 +25,9 @@ export default interface IAPIAdapter {
 	getInterviewers(token: string): Promise<IAPIResponse<IInterviewer[]>>;
 
 	// meta
-	authenticateToken(token: string): Promise<IAPIResponse<boolean>>;
+	loginRedirectURL(): string
+	checkToken(token: string): Promise<IAPIResponse<boolean>>;
+	saveToken(token: string): Promise<IAPIResponse<boolean>>;
 	health(): Promise<IAPIResponse<boolean>>;
 	logout(token: string): Promise<IAPIResponse>;
 	urls: {[key: string]: string};

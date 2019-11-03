@@ -11,7 +11,7 @@ const adapter: IAPIAdapter = {
 	isValidCandidateID: async () => ({success: true, data: true}),
 	getCandidateByID: async () => ({success: true, data: fakeCandidates[0]}),
 
-	login: async () => ({success: true, data: "fake_token"}),
+	getTokenFromURL: () => "",
 	createCandidate: autoFail,
 	sendAvailabilityEmail: autoFail,
 	getSchedules: async () => ({success: true, data: fakeSchedules}),
@@ -22,7 +22,9 @@ const adapter: IAPIAdapter = {
 	updateCandidate:autoFail,
 
 	// meta
-	authenticateToken: autoFail,
+	loginRedirectURL: () => "",
+	saveToken: autoFail,
+	checkToken: autoFail,
 	health: autoFail,
 	logout: autoFail,
 	urls: {},

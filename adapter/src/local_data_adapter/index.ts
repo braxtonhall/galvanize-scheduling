@@ -22,7 +22,14 @@ export {tokens, candidates, interviewers}
 const adapter: IAPIAdapter = {
 	fullURLs: {},
 	urls: {},
-	async authenticateToken(token: string): Promise<IAPIResponse<boolean>> {
+	async checkToken(token: string): Promise<IAPIResponse<boolean>> {
+		await wait();
+		if (!checkToken(token)) {
+			return {success: false, error: tokenErrorMessage}
+		}
+		return {success: true, data: tokens.has(token)};
+	},
+	async saveToken(token: string): Promise<IAPIResponse<boolean>> {
 		await wait();
 		if (!checkToken(token)) {
 			return {success: false, error: tokenErrorMessage}
@@ -90,16 +97,6 @@ const adapter: IAPIAdapter = {
 		await wait();
 		return {success: true, data: candidates.has(candidateID)};
 	},
-	async login(username: string, password: string): Promise<IAPIResponse<string>> {
-		await wait();
-		if (users.get(username) === password) {
-			const token = Math.random().toString();
-			tokens.set(token, true);
-			return {success: true, data: token};
-		} else {
-			return {success: false, error: "This version of the software is using mock data, and example user is 'peter@galvanize.com' with password 'i<3peter'"}
-		}
-	},
 	async logout(token: string): Promise<IAPIResponse> {
 		await wait();
 		tokens.delete(token);
@@ -109,6 +106,9 @@ const adapter: IAPIAdapter = {
 		await wait();
 		if (!checkToken(token)) {
 			return {success: false, error: tokenErrorMessage}
+		}
+		if (!candidates.has(candidate.id)) {
+			return {success: false, error: "Candidate not registered."};
 		}
 		return {success: true};
 	},
@@ -133,7 +133,12 @@ const adapter: IAPIAdapter = {
 		}
 		candidates.set(candidate.id, cloneDeep(candidate));
 		return {success: true};
-	}
+	},
+	getTokenFromURL(url: string): string {
+		return "";
+	}, loginRedirectURL(): string {
+		return "";
+	},
 };
 
 const tokenErrorMessage = "This user is no longer authenticated, please login again";
