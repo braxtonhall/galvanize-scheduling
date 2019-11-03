@@ -32,7 +32,6 @@ const Header: React.FC = () => {
 				<NavbarBrand><img alt="galvanize logo" src="/galvanize-logo.svg"/></NavbarBrand>
 				{process.env.NODE_ENV === 'development' && <NavItem className="px-2">Environment: {process.env.NODE_ENV}</NavItem> }
 				{process.env.NODE_ENV === 'development' && <NavItem className="px-2">Operations Loading: {operationsLoading}</NavItem> }
-				{process.env.NODE_ENV === 'development' && <NavItem className="px-2">Token: {token || "N/A"}</NavItem> }
 				{
 					token &&
 					<React.Fragment>
@@ -40,13 +39,13 @@ const Header: React.FC = () => {
 						<Collapse isOpen={isOpen} navbar>
 							<Nav className="ml-auto" navbar>
 								<NavItem>
-									<Link className="nav-link" to="/candidates">
-										Candidates
+									<Link className="nav-link" to="/scheduling">
+										Scheduling
 									</Link>
 								</NavItem>
 								<NavItem>
-									<Link className="nav-link" to="/scheduling">
-										Scheduling
+									<Link className="nav-link" to="/candidates">
+										Candidates
 									</Link>
 								</NavItem>
 								<NavItem>
