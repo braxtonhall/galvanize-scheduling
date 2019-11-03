@@ -1,6 +1,5 @@
 import {Config, ConfigKey} from "../Config";
 import {app} from "../index";
-import {nodeAdapter} from "adapter";
 import AuthController from "../controllers/AuthController";
 
 const config = Config.getInstance();
