@@ -17,7 +17,7 @@ export default {
             return {success: false};
         }
         try {
-            const {status, data} = await axios.post(fullURLs.CANDIDATE, {token, data: candidate});
+            const {status, data} = await axios.post(fullURLs.CANDIDATE, {data: candidate}, {headers: {token}});
             return {success: status === 200, data};
         } catch {
             return {success: false}
@@ -25,7 +25,7 @@ export default {
     },
     deleteCandidate: async(token: string, candidate: ICandidate) : Promise<IAPIResponse> => {
         try {
-            const {status, data} = await axios.delete(fullURLs.CANDIDATE, {params: {token, id: candidate.id}});
+            const {status, data} = await axios.delete(fullURLs.CANDIDATE, {params: {id: candidate.id}, headers: {token}});
             return {success: status === 200};
         } catch (e) {
             return {success: false}
@@ -36,7 +36,7 @@ export default {
             return {success: false};
         }
         try {
-            const {status, data} = await axios.post(fullURLs.CANDIDATE, {token, data: candidate});
+            const {status, data} = await axios.post(fullURLs.CANDIDATE, {data: candidate}, {headers: {token}});
             return {success: status === 200, data};
         } catch {
             return {success: false}
@@ -44,7 +44,7 @@ export default {
     },
     getInterviewers: async(token: string) : Promise<IAPIResponse<IInterviewer[]>> => {
         try {
-            const {status, data} = await axios.get(fullURLs.INTERVIEWERS, {params: {token}});
+            const {status, data} = await axios.get(fullURLs.INTERVIEWERS, {headers: {token}});
             return {success: status === 200, data};
         } catch {
             return {success: false}

@@ -23,4 +23,8 @@ export default class DynamoDBRoomController implements IRoomController {
 		await this.dbc.deleteRoom(name);
 		return true;
 	}
+
+	public async exists(id: string): Promise<boolean> {
+		throw  new Error("Unsupported Action - Room Exists?");
+	}
 }

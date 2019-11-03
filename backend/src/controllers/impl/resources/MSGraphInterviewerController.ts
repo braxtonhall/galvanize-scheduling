@@ -31,4 +31,7 @@ export default class MSGraphInterviewerController implements IInterviewerControl
 		throw  new Error("Unsupported Action - Deleting Interviewer");
 	}
 
+	public async exists(id: string): Promise<boolean> {
+		throw  new Error("Unsupported Action - Interviewer Exists?");
+	}
 }

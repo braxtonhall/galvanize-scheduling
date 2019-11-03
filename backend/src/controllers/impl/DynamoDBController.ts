@@ -102,7 +102,7 @@ export class DynamoDBController implements IDynamoDBController {
 	private db: AWS.DynamoDB.DocumentClient = null;
 
 	constructor() {
-		// TODO
+		console.log("Database instance created");
 	}
 	
 	public getStore(): Store | MemoryStore {

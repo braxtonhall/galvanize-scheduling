@@ -27,10 +27,9 @@ const authController:IAuthController = new AuthController();
 	},
 ].forEach((resourceType) => {
 	app.get(nodeAdapter.urls[resourceType.multiple], async (req, res) => {
-		const {token} = req.query;
+		const token: string = req.header("token");
 		try {
 			const data: IResource[] = await resourceFacade.list(token, resourceType.kind);
-			console.log(data);
 			res.status(200).send(data);
 		} catch(e) {
 			res.status(e.statusCode).send(e.message);
@@ -40,7 +39,8 @@ const authController:IAuthController = new AuthController();
 	});
 
 	app.post(nodeAdapter.urls[resourceType.single], async (req, res) => {
-		const {token, data} = req.body;
+		const token: string = req.header("token");
+		const data = req.body.data;
 		try {
 			if (await authController.checkAuth(token)) {
 				const result = await resourceFacade.create(token, data, resourceType.kind);
@@ -54,7 +54,7 @@ const authController:IAuthController = new AuthController();
 	});
 
 	app.delete(nodeAdapter.urls[resourceType.single], async (req, res) => {
-		const token: string = req.header["token"];
+		const token: string = req.header("token");
 		const id: string = req.body.id;
 		try {
 			if (await authController.checkAuth(token)) {

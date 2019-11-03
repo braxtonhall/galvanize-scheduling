@@ -28,5 +28,9 @@ export default class DynamoDBCandidateController implements ICandidateController
 		await this.dbc.deleteCandidate(id);
 		return true; // TODO more guards?
 	}
+	
+	public async exists(id: string): Promise<boolean> {
+		return typeof (await this.dbc.getCandidate(id)) === "object";
+	}
 
 }
