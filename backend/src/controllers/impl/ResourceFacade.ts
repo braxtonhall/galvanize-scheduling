@@ -32,7 +32,7 @@ export default class ResourceFacade implements IResourceFacade {
 		}
 	}
 
-	public create(token: string, resource: IResource, kind: ResourceKind): Promise<boolean> {
+	public create(token: string, resource: IResource, kind: ResourceKind): Promise<IResource> {
 		switch (kind) {
 			case ResourceKind.Candidate:
 				return this.cc.create(token, resource as ICandidate);

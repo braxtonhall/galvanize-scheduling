@@ -9,8 +9,8 @@ describe("Adapter Integration Tests", () => {
     });
 
     after(async () => {
-       await deauthTestToken(token);
-       token = null;
+       await deauthTestToken(args.token);
+       args.token = null;
     });
 
     describe("Candidate Lifecycle", candidateTests(args));

@@ -23,7 +23,7 @@ export default class MSGraphInterviewerController implements IInterviewerControl
 		return await MSGraphController.getInterviewers(client, id);
 	}
 
-	public async create(token: string, resource: IInterviewer): Promise<boolean> {
+	public async create(token: string, resource: IInterviewer): Promise<IInterviewer> {
 		throw  new Error("Unsupported Action - Creating new Interviewer");
 	}
 

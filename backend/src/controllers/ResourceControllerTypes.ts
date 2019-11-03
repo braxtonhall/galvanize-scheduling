@@ -2,7 +2,7 @@ import { interfaces } from "adapter";
 
 export interface IResourceController {
 	list(token: string): Promise<interfaces.IResource[]>;
-	create(token: string, resource: interfaces.IResource): Promise<boolean>;
+	create(token: string, resource: interfaces.IResource): Promise<interfaces.IResource>;
 	delete(token: string, id: string): Promise<boolean>;
 }
 
