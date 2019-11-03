@@ -23,7 +23,7 @@ export default class MSGraphInterviewerController implements IInterviewerControl
 		return await MSGraphController.getInterviewers(client, id);
 	}
 
-	public async create(token: string, resource: IInterviewer): Promise<boolean> {
+	public async create(token: string, resource: IInterviewer): Promise<IInterviewer> {
 		throw  new Error("Unsupported Action - Creating new Interviewer");
 	}
 
@@ -31,4 +31,7 @@ export default class MSGraphInterviewerController implements IInterviewerControl
 		throw  new Error("Unsupported Action - Deleting Interviewer");
 	}
 
+	public async exists(id: string): Promise<boolean> {
+		throw  new Error("Unsupported Action - Interviewer Exists?");
+	}
 }

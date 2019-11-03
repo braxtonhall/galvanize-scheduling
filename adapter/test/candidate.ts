@@ -5,7 +5,8 @@ import moment = require("moment");
 import {ICandidate} from "../dist/interfaces";
 import adapter from "../src/node_adapter";
 
-const candidateTests = (token: string) => () => {
+const candidateTests = (args: any) => () => {
+    let token = args.token;
     let mockCandidate: ICandidate = {
         email: "admin+tester@ph14solutions.onmicrosoft.com",
         phoneNumber: "17781234567",

@@ -13,14 +13,18 @@ export default class DynamoDBRoomController implements IRoomController {
 		return await this.dbc.getRooms();
 	}
 
-	public async create(token: string, resource: interfaces.IRoom): Promise<boolean> {
+	public async create(token: string, resource: interfaces.IRoom): Promise<interfaces.IRoom> {
 		// TODO validation?
 		await this.dbc.writeRoom(resource);
-		return true;
+		return resource;
 	}
 
 	public async delete(token: string, name: string): Promise<boolean> {
 		await this.dbc.deleteRoom(name);
 		return true;
+	}
+
+	public async exists(id: string): Promise<boolean> {
+		throw  new Error("Unsupported Action - Room Exists?");
 	}
 }

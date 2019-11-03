@@ -4,6 +4,8 @@ import {ResourceKind, assertIs} from "../Common";
 import { interfaces } from "adapter";
 import {MemoryStore, Store} from "express-session";
 import DynamoDBStore from "dynamodb-store"
+import {ConfigurationServicePlaceholders} from "aws-sdk/lib/config_service_placeholders";
+import {APIVersions, ConfigurationOptions} from "aws-sdk/lib/config";
 type ICandidate = interfaces.ICandidate
 type IRoom = interfaces.IRoom
 
@@ -13,6 +15,7 @@ export interface IDynamoDBController {
 	getCandidate(id: string): Promise<ICandidate>;
 	getCandidates(): Promise<ICandidate[]>;
 	writeCandidate(candidate: ICandidate): Promise<void>;
+	createCandidate(candidate: ICandidate): Promise<ICandidate>;
 	deleteCandidate(id: string): Promise<void>;
 
 	getRoom(name: string): Promise<IRoom>;
@@ -41,6 +44,7 @@ export class DynamoDBController implements IDynamoDBController {
 	private static readonly ROOM_TABLE: string = "Rooms";
 	private static readonly SESSION_TABLE: string = "Sessions";
 	private static readonly OAUTH_TABLE: string = "OAuths";
+	private static readonly TICKER_TABLE: string = "Tickers";
 
 	private static readonly SCHEMATA: any[] = [
 		{
@@ -70,12 +74,25 @@ export class DynamoDBController implements IDynamoDBController {
 			}
 		},
 		{
-			TableName : DynamoDBController.OAUTH_TABLE,
+			TableName: DynamoDBController.OAUTH_TABLE,
 			KeySchema: [
 				{ AttributeName: "token", KeyType: "HASH" }
 			],
 			AttributeDefinitions: [
 				{ AttributeName: "token", AttributeType: "S" }
+			],
+			ProvisionedThroughput: {
+				ReadCapacityUnits: 10,
+				WriteCapacityUnits: 10 // TODO
+			}
+		},
+		{
+			TableName: DynamoDBController.TICKER_TABLE,
+			KeySchema: [
+				{ AttributeName: "ticker", KeyType: "HASH" }
+			],
+			AttributeDefinitions: [
+				{ AttributeName: "ticker", AttributeType: "S" }
 			],
 			ProvisionedThroughput: {
 				ReadCapacityUnits: 10,
@@ -87,7 +104,7 @@ export class DynamoDBController implements IDynamoDBController {
 	private db: AWS.DynamoDB.DocumentClient = null;
 
 	constructor() {
-		// TODO
+		console.log("Database instance created");
 	}
 	
 	public getStore(): Store | MemoryStore {
@@ -120,6 +137,12 @@ export class DynamoDBController implements IDynamoDBController {
 		await this.write(DynamoDBController.CANDIDATE_TABLE, candidate);
 	}
 
+	public async createCandidate(candidate: ICandidate): Promise<ICandidate> {
+		candidate.id = await this.getCandidateId();
+		await this.write(DynamoDBController.CANDIDATE_TABLE, candidate);
+		return candidate;
+	}
+
 	public async deleteCandidate(id: string): Promise<void> {
 		await this.delete(DynamoDBController.CANDIDATE_TABLE, {id});
 	}
@@ -134,7 +157,8 @@ export class DynamoDBController implements IDynamoDBController {
 
 	public async writeRoom(room: IRoom): Promise<void> {
 		assertIs(ResourceKind.Room, room);
-		await this.write(DynamoDBController.ROOM_TABLE, room);
+		const {name} = room;
+		await this.write(DynamoDBController.ROOM_TABLE, {name});
 	}
 
 	public async deleteRoom(name: string): Promise<void> {
@@ -154,6 +178,30 @@ export class DynamoDBController implements IDynamoDBController {
 
 	public async getOAuth(token: string): Promise<{token: string}> {
 		return await this.get(DynamoDBController.OAUTH_TABLE, {token});
+	}
+	
+	private async getCandidateId(): Promise<string> {
+		const params = {
+			TableName: DynamoDBController.TICKER_TABLE,
+			Key:{
+				"ticker": DynamoDBController.CANDIDATE_TABLE
+			},
+			UpdateExpression: "set tick = tick + :val",
+			ExpressionAttributeValues:{
+				":val": 1
+			},
+			ReturnValues:"UPDATED_NEW"
+		};
+		
+		return await new Promise(async (resolve, reject) => {
+			(await this.open()).update(params, function (err, data) {
+				if (err) {
+					reject(err);
+				} else {
+					resolve(String(data.Attributes.tick));
+				}
+			});
+		});
 	}
 
 	private async get(table: string, attrs: any): Promise<any> {
@@ -220,6 +268,15 @@ export class DynamoDBController implements IDynamoDBController {
 	}
 
 	private async write(table: string, item: any): Promise<void> {
+		for (const [key, value] of Object.entries(item)) {
+			if (typeof value === "string") {
+				item[key] = value.trim();
+			}
+			if (item[key] === "") {
+				delete item[key];
+			}
+		}
+
 		const params = {
 			TableName: table,
 			Item: item,
@@ -239,7 +296,6 @@ export class DynamoDBController implements IDynamoDBController {
 	private async open(): Promise<AWS.DynamoDB.DocumentClient> {
 		if (!this.db) {
 			await this.initDatabase();
-			this.db = new AWS.DynamoDB.DocumentClient();
 		}
 		return this.db;
 	}
@@ -250,22 +306,38 @@ export class DynamoDBController implements IDynamoDBController {
 			region: cf.get(ConfigKey.awsRegion),
 			accessKeyId: cf.get(ConfigKey.awsSecretAccessKey),
 			secretAccessKey: cf.get(ConfigKey.awsSecretAccessKey),
-			// @ts-ignore // TODO why is this?
 			endpoint: new AWS.Endpoint(cf.get(ConfigKey.dbUrl))
-		});
+		} as {[key: string]: any});
+		// unfortunate static cast to get rid of build error
+		
 		const dynamoDB = new AWS.DynamoDB();
 		for (const scheme of DynamoDBController.SCHEMATA) {
 			try {
 				await this.createTable(dynamoDB, scheme);
 			} catch (err) {
 				if (err.code === "ResourceInUseException") {
-					// Pass. Already created.
-					// TODO log?
+					console.warn("While initing the database, table was already in use");
 				} else {
 					throw new Error("Unable to allocate resource in DB");
 				}
 			}
 		}
+		this.db = new AWS.DynamoDB.DocumentClient();
+		await new Promise(async (resolve, reject) => {
+			this.db.put({
+				TableName: DynamoDBController.TICKER_TABLE,
+				Item: {
+					ticker: DynamoDBController.CANDIDATE_TABLE,
+					tick: 0
+				}
+			}, function (err) {
+				if (err) {
+					reject(err);
+				} else {
+					resolve();
+				}
+			});
+		});
 	}
 
 	private createTable(db: AWS.DynamoDB, params: any): Promise<void> {

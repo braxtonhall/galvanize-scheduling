@@ -36,12 +36,15 @@ export const MOCK_CANDIDATES: ReadonlyArray<ICandidate> = [
 export const MOCK_ROOMS: ReadonlyArray<IRoom> = [ // TODO what are we even storing?
 	{
 		name: "1",
+		eligible: true,
 	},
 	{
 		name: "2",
+		eligible: true,
 	},
 	{
 		name: "3",
+		eligible: true,
 	}
 ];
 

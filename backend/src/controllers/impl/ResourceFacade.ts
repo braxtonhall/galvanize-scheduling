@@ -32,7 +32,7 @@ export default class ResourceFacade implements IResourceFacade {
 		}
 	}
 
-	public create(token: string, resource: IResource, kind: ResourceKind): Promise<boolean> {
+	public create(token: string, resource: IResource, kind: ResourceKind): Promise<IResource> {
 		switch (kind) {
 			case ResourceKind.Candidate:
 				return this.cc.create(token, resource as ICandidate);
@@ -53,6 +53,19 @@ export default class ResourceFacade implements IResourceFacade {
 				return this.ic.delete(token, id);
 			case ResourceKind.Room:
 				return this.rc.delete(token, id);
+			default:
+				throw new Error("Unsupported Kind");
+		}
+	}
+	
+	public exists(id: string, kind: ResourceKind): Promise<boolean> {
+		switch (kind) {
+			case ResourceKind.Candidate:
+				return this.cc.exists(id);
+			case ResourceKind.Interviewer:
+				return this.ic.exists(id);
+			case ResourceKind.Room:
+				return this.rc.exists(id);
 			default:
 				throw new Error("Unsupported Kind");
 		}
