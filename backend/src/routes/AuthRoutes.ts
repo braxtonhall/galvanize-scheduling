@@ -43,7 +43,7 @@ app.post('/callback', async (req, res) => {
             }
         });
         response = await response.json();
-        // TODO: before redirecting save token
+        await new AuthController().saveAuth(response['access_token']);
         res.redirect(config.get(ConfigKey.frontendUrl) + `/auth/${response['access_token']}`);
     } catch (e) {
         res.redirect(config.get(ConfigKey.frontendUrl));
@@ -52,7 +52,7 @@ app.post('/callback', async (req, res) => {
 });
 
 app.post(nodeAdapter.urls.AUTHENTICATE, async (req, res) => {
-    const {token} = req.body; 
+    const {token} = req.body;
     const result = await new AuthController().checkAuth(token);
     res.send(result);
 });
