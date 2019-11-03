@@ -13,6 +13,9 @@ export default {
         }
     },
     createCandidate: async(token: string, candidate: ICandidate) : Promise<IAPIResponse<ICandidate>> => {
+        if (typeof candidate.id === "string") {
+            return {success: false};
+        }
         try {
             const {status, data} = await axios.post(fullURLs.CANDIDATE, {token, data: candidate});
             return {success: status === 200, data};
@@ -20,26 +23,31 @@ export default {
             return {success: false}
         }
     },
-    deleteCandidate: async() : Promise<IAPIResponse> => {
+    deleteCandidate: async(token: string, candidate: ICandidate) : Promise<IAPIResponse> => {
         try {
-            return {success: false}
+            const {status, data} = await axios.delete(fullURLs.CANDIDATE, {params: {token, id: candidate.id}});
+            return {success: status === 200};
         } catch (e) {
             return {success: false}
         }
     },
-    updateCandidate: async() : Promise<IAPIResponse> => {
+    updateCandidate: async(token: string, candidate: ICandidate) : Promise<IAPIResponse> => {
+        if (typeof candidate.id !== "string") {
+            return {success: false};
+        }
         try {
-            return {success: false}
-        } catch(e) {
+            const {status, data} = await axios.post(fullURLs.CANDIDATE, {token, data: candidate});
+            return {success: status === 200, data};
+        } catch {
             return {success: false}
         }
     },
     getInterviewers: async(token: string) : Promise<IAPIResponse<IInterviewer[]>> => {
         try {
             const {status, data} = await axios.get(fullURLs.INTERVIEWERS, {params: {token}});
-            return {success: false, data: []};
+            return {success: status === 200, data};
         } catch {
-            return {success: false};
+            return {success: false}
         }
     }
 
