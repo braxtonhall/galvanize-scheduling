@@ -1,10 +1,10 @@
 import IAPIAdapter from "../IAPIAdapter";
 import IAPIResponse from "../IAPIResponse";
-import {ICandidate, IGetSchedulesOptions, IInterviewer, ISchedule} from "../interfaces";
+import {ICandidate, IGetSchedulesOptions, IInterviewer, IRoom, ISchedule} from "../interfaces";
 import {Moment} from "moment";
 import cloneDeep from "lodash/cloneDeep";
 import fakeCandidates from "../placeholder_adapter/fakeCandidates";
-import fakeInterviewers, {fakeSchedules} from "../placeholder_adapter/fakeInterviewers";
+import fakeInterviewers, {fakeRooms, fakeSchedules} from "../placeholder_adapter/fakeInterviewers";
 import fakeUsers from "./fakeUsers";
 import random from "lodash/random";
 
@@ -15,6 +15,7 @@ import random from "lodash/random";
 const tokens: Map<string, boolean> = new Map();
 const candidates: Map<string, ICandidate> = new Map(fakeCandidates.map(c => [c.id, c]));
 const interviewers: Map<string, IInterviewer> = new Map(fakeInterviewers.map(i => [i.id,i]));
+const rooms: Map<string, IRoom> = new Map(fakeRooms.map(i => [i.id,i]));
 const users: Map<string, string> = new Map(fakeUsers);
 
 export {tokens, candidates, interviewers}
@@ -134,9 +135,28 @@ const adapter: IAPIAdapter = {
 		candidates.set(candidate.id, cloneDeep(candidate));
 		return {success: true};
 	},
+	async getRooms(token: string): Promise<IAPIResponse<IRoom[]>> {
+		await wait();
+		if (!checkToken(token)) {
+			return {success: false, error: tokenErrorMessage}
+		}
+		return {success: true, data: Array.from(rooms.values())}
+	},
+	async toggleEligibility(token: string, room: IRoom): Promise<IAPIResponse> {
+		await wait();
+		if (!checkToken(token)) {
+			return {success: false, error: tokenErrorMessage}
+		}
+		if (!rooms.has(room.id)) {
+			return {success: false};
+		}
+		rooms.set(room.id, cloneDeep(room));
+		return {success: true}
+	},
 	getTokenFromURL(url: string): string {
 		return "";
-	}, loginRedirectURL(): string {
+	},
+	loginRedirectURL(): string {
 		return "";
 	},
 };
