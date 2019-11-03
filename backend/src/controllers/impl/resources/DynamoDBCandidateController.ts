@@ -15,6 +15,7 @@ export default class DynamoDBCandidateController implements ICandidateController
 
 	public async create(token: string, resource: interfaces.ICandidate): Promise<boolean> {
 		// TODO validation?
+		// TODO: add an id so creating candidates work?
 		await this.dbc.writeCandidate(resource);
 		return true;
 	}

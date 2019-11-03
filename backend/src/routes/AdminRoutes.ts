@@ -40,11 +40,10 @@ const authController:IAuthController = new AuthController();
 	});
 
 	app.post(nodeAdapter.urls[resourceType.single], async (req, res) => {
-		const token: string = req.header["token"];
-		const interviewer: IResource = req.body;
+		const {token, data} = req.body;
 		try {
 			if (await authController.checkAuth(token)) {
-				const result = await resourceFacade.create(token, interviewer, resourceType.kind);
+				const result = await resourceFacade.create(token, data, resourceType.kind);
 				res.status(200).send(result);
 			} else {
 				res.status(401);

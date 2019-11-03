@@ -4,17 +4,18 @@ import axios from "axios";
 import {ICandidate, IInterviewer} from "../interfaces";
 
 export default {
-    getCandidates: async() : Promise<IAPIResponse<ICandidate[]>> => {
+    getCandidates: async(token: string) : Promise<IAPIResponse<ICandidate[]>> => {
         try {
-            const {status, data} = await axios.get(fullURLs.CANDIDATES);
+            const {status, data} = await axios.get(fullURLs.CANDIDATES, {params: {token}});
             return {success: status === 200, data};
         } catch {
             return {success: false}
         }
     },
-    createCandidate: async() : Promise<IAPIResponse<ICandidate>> => {
+    createCandidate: async(token: string, candidate: ICandidate) : Promise<IAPIResponse<ICandidate>> => {
         try {
-            return {success: false, data: null};
+            const {status, data} = await axios.post(fullURLs.CANDIDATE, {token, data: candidate});
+            return {success: status === 200, data};
         } catch {
             return {success: false}
         }
