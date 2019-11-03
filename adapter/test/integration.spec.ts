@@ -2,10 +2,10 @@ import {createTestToken, deauthTestToken} from "./TestUtils";
 import candidateTests from "./candidate";
 
 describe("Adapter Integration Tests", () => {
-    let token = null;
+    const args: any = {};
 
     before(async () => {
-        token = await createTestToken();
+        args.token = await createTestToken();
     });
 
     after(async () => {
@@ -13,6 +13,6 @@ describe("Adapter Integration Tests", () => {
        token = null;
     });
 
-    describe("Candidate Lifecycle", candidateTests(token));
+    describe("Candidate Lifecycle", candidateTests(args));
 
 });
