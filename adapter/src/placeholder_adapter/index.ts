@@ -20,6 +20,8 @@ const adapter: IAPIAdapter = {
 	getCandidates: async () => ({success: true, data: fakeCandidates}),
 	deleteCandidate: autoFail,
 	updateCandidate:autoFail,
+	getRooms: autoFail,
+	toggleEligibility: autoFail,
 
 	// meta
 	loginRedirectURL: () => "",
