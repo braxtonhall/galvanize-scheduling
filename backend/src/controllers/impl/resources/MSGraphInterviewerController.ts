@@ -1,9 +1,9 @@
-import {IInterviewerController} from "../../ResourceControllerTypes";
+import {InterviewerController} from "../../ResourceControllers";
 import { interfaces } from "adapter";
 import MSGraphController from "../../MSGraphController";
 type IInterviewer = interfaces.IInterviewer;
 
-export default class MSGraphInterviewerController implements IInterviewerController {
+export default class MSGraphInterviewerController extends InterviewerController {
 	public async list(token: string): Promise<IInterviewer[]> {
 		const client = MSGraphController.getClient(token);
 		const groups = await MSGraphController.getGroups(client);

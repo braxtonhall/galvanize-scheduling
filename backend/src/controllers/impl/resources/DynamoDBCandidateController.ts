@@ -1,11 +1,12 @@
-import {ICandidateController} from "../../ResourceControllerTypes";
-import { interfaces } from "adapter";
+import {CandidateController} from "../../ResourceControllers";
+import {interfaces} from "adapter";
 import {DynamoDBController, IDynamoDBController} from "../DynamoDBController";
 
-export default class DynamoDBCandidateController implements ICandidateController {
+export default class DynamoDBCandidateController extends CandidateController {
 	private dbc: IDynamoDBController;
 
 	constructor() {
+		super();
 		this.dbc = DynamoDBController.getInstance();
 	}
 
@@ -16,6 +17,7 @@ export default class DynamoDBCandidateController implements ICandidateController
 	public async create(token: string, resource: interfaces.ICandidate): Promise<interfaces.ICandidate> {
 		// TODO validation?
 		// TODO: add an id so creating candidates work?
+		resource = this.assertCandidate(resource);
 		if (typeof resource.id === "string") {
 			await this.dbc.writeCandidate(resource);
 			return resource;

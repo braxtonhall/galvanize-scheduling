@@ -1,7 +1,7 @@
 import IResourceFacade from "../IResourceFacade";
 import {interfaces} from "adapter";
 import ControllerBuilder from "./ControllerBuilder";
-import {ICandidateController, IInterviewerController, IRoomController} from "../ResourceControllerTypes";
+import {CandidateController, InterviewerController, RoomController} from "../ResourceControllers";
 import {ResourceKind} from "../Common";
 type IResource = interfaces.IResource;
 type ICandidate = interfaces.ICandidate;
@@ -9,9 +9,9 @@ type IInterviewer = interfaces.IInterviewer;
 type IRoom = interfaces.IRoom;
 
 export default class ResourceFacade implements IResourceFacade {
-	private readonly cc: ICandidateController;
-	private readonly ic: IInterviewerController;
-	private readonly rc: IRoomController;
+	private readonly cc: CandidateController;
+	private readonly ic: InterviewerController;
+	private readonly rc: RoomController;
 
 	constructor() {
 		this.cc = ControllerBuilder.getCandidateController();

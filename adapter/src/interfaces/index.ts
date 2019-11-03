@@ -10,8 +10,7 @@ export interface IRoom extends IResource {
 }
 
 export interface ICandidate extends IResource {
-	id?: string,
-	email?: string,
+	email: string,
 	phoneNumber?: string,
 	firstName?: string,
 	lastName?: string,

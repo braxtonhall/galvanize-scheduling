@@ -1,6 +1,5 @@
 import AWS from "aws-sdk";
 import {Config, ConfigKey} from "../../Config";
-import {ResourceKind, assertIs} from "../Common";
 import { interfaces } from "adapter";
 type ICandidate = interfaces.ICandidate
 type IRoom = interfaces.IRoom
@@ -109,7 +108,6 @@ export class DynamoDBController implements IDynamoDBController {
 	}
 
 	public async writeCandidate(candidate: ICandidate): Promise<void> {
-		assertIs(ResourceKind.Candidate, candidate);
 		await this.write(DynamoDBController.CANDIDATE_TABLE, candidate);
 	}
 
@@ -132,7 +130,6 @@ export class DynamoDBController implements IDynamoDBController {
 	}
 
 	public async writeRoom(room: IRoom): Promise<void> {
-		assertIs(ResourceKind.Room, room);
 		const {name} = room;
 		await this.write(DynamoDBController.ROOM_TABLE, {name});
 	}

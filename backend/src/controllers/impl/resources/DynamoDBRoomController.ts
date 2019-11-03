@@ -1,11 +1,12 @@
-import {IRoomController} from "../../ResourceControllerTypes";
-import { interfaces } from "adapter";
+import {RoomController} from "../../ResourceControllers";
+import {interfaces} from "adapter";
 import {DynamoDBController} from "../DynamoDBController";
 
-export default class DynamoDBRoomController implements IRoomController {
+export default class DynamoDBRoomController extends RoomController {
 	private dbc: DynamoDBController;
 
 	constructor() {
+		super();
 		this.dbc = DynamoDBController.getInstance();
 	}
 
@@ -14,7 +15,7 @@ export default class DynamoDBRoomController implements IRoomController {
 	}
 
 	public async create(token: string, resource: interfaces.IRoom): Promise<interfaces.IRoom> {
-		// TODO validation?
+		resource = this.assertRoom(resource);
 		await this.dbc.writeRoom(resource);
 		return resource;
 	}
