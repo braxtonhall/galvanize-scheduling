@@ -3,8 +3,8 @@ import {nodeAdapter} from "adapter";
 import IResourceFacade from "../controllers/IResourceFacade";
 import ResourceFacade from "../controllers/impl/ResourceFacade";
 import {ResourceKind} from "../controllers/Common";
-import { IResource } from "adapter/dist/interfaces";
-import AuthController, {IAuthController} from "../controllers/AuthController";
+import {IResource} from "adapter/dist/interfaces";
+import AuthController from "../controllers/AuthController";
 
 const resourceFacade: IResourceFacade = new ResourceFacade();
 
@@ -68,4 +68,18 @@ const resourceFacade: IResourceFacade = new ResourceFacade();
 			res.status(400).send(e);
 		}
 	});
+});
+
+app.get(nodeAdapter.urls.GET_SCHEDULES, async (req, res) => {
+	const token: string = req.header("token");
+	try {
+		if (await AuthController.getInstance().checkAuth(token)) {
+			const data: any[] = await resourceFacade.list(token, ResourceKind.Schedule, req.query); // TODO
+			res.status(200).send(data);
+		} else {
+			res.status(401);
+		}
+	} catch(e) {
+		res.status(e.statusCode).send(e.message);
+	}
 });

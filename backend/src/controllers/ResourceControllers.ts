@@ -51,8 +51,8 @@ export abstract class InterviewerController implements IResourceController {
 		if (!(typeof object["id"] === "string" && object["id"] !== "")) {
 			throw new Error("Interviewer must contain an id");
 		}
-		const {id, firstName, lastName} = object;
-		return {id, firstName, lastName};
+		const {id, firstName, lastName, email} = object;
+		return {id, firstName, lastName, email};
 
 	}
 }

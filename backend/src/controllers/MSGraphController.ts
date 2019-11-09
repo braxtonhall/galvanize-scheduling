@@ -74,6 +74,7 @@ export default class MSGraphController {
 					.post(this.buildMeeting(room, group, candidate)));
 			}
 			const results = await Promise.all(promises);
+			console.log(results);
 		}
     	
 	}

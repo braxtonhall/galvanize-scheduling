@@ -1,7 +1,7 @@
 import IAPIResponse from "../IAPIResponse";
 import {fullURLs} from "./urls";
 import axios from "axios";
-import {ICandidate, IInterviewer, IRoom} from "../interfaces";
+import {ICandidate, IGetSchedulesOptions, IInterviewer, IRoom, ISchedule} from "../interfaces";
 
 export default {
     getCandidates: async(token: string) : Promise<IAPIResponse<ICandidate[]>> => {
@@ -73,6 +73,13 @@ export default {
         } catch {
             return {success: false};
         }
-        
-    }
+    },
+    getSchedules: async(token: string, options: IGetSchedulesOptions) : Promise<IAPIResponse<ISchedule[]>> => {
+        try {
+            const {status, data} = await axios.get(fullURLs.GET_SCHEDULES, {headers: {token, "Content-Type": "application/json"}, params: options});
+            return {success: status === 200, data};
+        } catch {
+            return {success: false};
+        }
+    },
 }

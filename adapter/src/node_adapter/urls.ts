@@ -18,6 +18,7 @@ const urls: {[key: string]: string} = new function() {
 	this.EXISTS_CANDIDATE = '/exists/candidate';
 	this.UPDATE_AVAILABILITY = '/submitavailability';
 	this.SEND_AVAILABILITY = '/sendavailability';
+	this.GET_SCHEDULES = '/schedules';
 
 } as {[key: string]: string};
 
