@@ -7,7 +7,7 @@ import Fade from 'react-reveal/Fade';
 type IRoom = interfaces.IRoom;
 
 const Rooms: React.FC = () => {
-	const {token, updateContext, startLoadingProcess, endLoadingProcess} = useContext(Context);
+	const {token, startLoadingProcess, endLoadingProcess} = useContext(Context);
 
 	const [rooms, updateRooms] = useState<IRoom[]>([]);
 	useEffect(() => {getRooms().then()}, []);
@@ -15,7 +15,6 @@ const Rooms: React.FC = () => {
 	async function getRooms(): Promise<void> {
 		startLoadingProcess();
 		const {success, data, error} = await adapter.getRooms(token);
-		console.log({success, data, error});
 		if (success) {
 			updateRooms(data);
 			endLoadingProcess();
@@ -32,6 +31,7 @@ const Rooms: React.FC = () => {
 		async function onClickWrapper() {
 			startLoadingProcess();
 			await adapter.toggleEligibility(token, room);
+			await getRooms();
 			endLoadingProcess();
 		}
 
@@ -39,10 +39,10 @@ const Rooms: React.FC = () => {
 			<tr className={"text-nowrap"} key={"row_" + index}>
 				<th scope="row">{id}</th>
 				<td>{name}</td>
-				<td>{eligible}</td>
+				<td>{eligible ? "eligible" : "not eligible"}</td>
 				<td>
 					<ButtonGroup>
-						<Button onClick={onClickWrapper} size="sm" color="primary">{eligible ?  "remove eligibility" : "make eligible"}</Button>)
+						<Button onClick={onClickWrapper} size="sm" color="primary">{eligible ?  "Remove Eligibility" : "Make Eligible"}</Button>
 					</ButtonGroup>
 				</td>
 			</tr>

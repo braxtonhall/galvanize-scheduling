@@ -60,7 +60,7 @@ const InterviewSelection: React.FC<IProps> = (props: IProps) => {
 
 		return (
 			<tr key={"interviewer_" + interviewer.id}>
-				<th scope="row">{id}</th>
+				{/*<th scope="row">{id}</th>*/}
 				<td>{firstName}</td>
 				<td>{lastName}</td>
 				<td>
@@ -93,7 +93,7 @@ const InterviewSelection: React.FC<IProps> = (props: IProps) => {
 					<Table hover>
 						<thead>
 						<tr>
-							<th>ID</th>
+							{/*<th>ID</th>*/}
 							<th>First Name</th>
 							<th>Last Name</th>
 							<th>Preference</th>
