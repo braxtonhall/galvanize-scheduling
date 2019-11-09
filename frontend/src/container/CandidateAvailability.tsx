@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from "react";
-import {Button, Card, CardBody, CardHeader, CardSubtitle, CardText, CardTitle, Container} from "reactstrap";
+import {Button, Card, CardBody, CardFooter, CardHeader, CardSubtitle, CardText, CardTitle, Container} from "reactstrap";
 import {
 	useParams
 } from "react-router-dom";
@@ -58,27 +58,33 @@ const CandidateAvailability: React.FC = (props) => {
 		<Container>
 			{
 				candidate &&
-				<Card className="mt-4">
-					<CardHeader>Submit Availability</CardHeader>
-					<CardBody>
-						{candidate.firstName && <CardTitle><h5>Hello {candidate.firstName},</h5></CardTitle>}
-						{!submitted ?
-							<React.Fragment>
-								<CardSubtitle>
-									Please submit your available schedule so we can book a time with out interviewers.
-								</CardSubtitle>
-								<hr/>
-								<AvailableTimes
-									onChange={onChange}
-									height="50vh"
-								/>
-								<Button className="mt-3" onClick={submitAvailability} color="primary">Submit
-									Availability</Button>
-							</React.Fragment> :
-							<CardText>Thank you for submitting your availability, you may now close this page.</CardText>
+					<Card className="mt-4">
+						<CardHeader>Submit Availability</CardHeader>
+						<CardBody>
+							{candidate.firstName && <CardTitle><h5>Hello {candidate.firstName},</h5></CardTitle>}
+							{!submitted ?
+								<React.Fragment>
+									<CardSubtitle>
+										Please submit your available schedule so we can book a time with out interviewers.
+									</CardSubtitle>
+									<hr/>
+									<AvailableTimes
+										onChange={onChange}
+										height="50vh"
+									/>
+									<Button className="mt-3" onClick={submitAvailability} color="primary">Submit
+										Availability</Button>
+								</React.Fragment> :
+								<CardText>Thank you for submitting your availability, you may now close this page.</CardText>
+							}
+						</CardBody>
+						{
+							candidate.availability &&
+							<CardFooter>
+								You have already submitted an availability! by submitting another, you will override your previous entry.
+							</CardFooter>
 						}
-					</CardBody>
-				</Card>
+					</Card>
 			}
 		</Container>
 	);
