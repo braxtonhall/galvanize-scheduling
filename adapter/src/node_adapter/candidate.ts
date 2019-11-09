@@ -14,6 +14,9 @@ export default {
 		}
 	},
 	submitAvailability: async(candidateID: string, availability: IAvailability): Promise<IAPIResponse> => {
+		if (!!availability) {
+			return {success: false, error: "Availability was not defined"};
+		}
 		try {
 			availability = availability.map(a => ({
 				start: (a.start as Moment).toISOString(),
