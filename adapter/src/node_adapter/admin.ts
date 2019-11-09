@@ -1,7 +1,7 @@
 import IAPIResponse from "../IAPIResponse";
 import {fullURLs} from "./urls";
 import axios from "axios";
-import {ICandidate, IInterviewer} from "../interfaces";
+import {ICandidate, IInterviewer, IRoom} from "../interfaces";
 
 export default {
     getCandidates: async(token: string) : Promise<IAPIResponse<ICandidate[]>> => {
@@ -39,7 +39,7 @@ export default {
             const {status, data} = await axios.post(fullURLs.CANDIDATE, {data: candidate}, {headers: {token, "Content-Type": "application/json"}});
             return {success: status === 200, data};
         } catch {
-            return {success: false}
+            return {success: false};
         }
     },
     getInterviewers: async(token: string) : Promise<IAPIResponse<IInterviewer[]>> => {
@@ -47,8 +47,33 @@ export default {
             const {status, data} = await axios.get(fullURLs.INTERVIEWERS, {headers: {token, "Content-Type": "application/json"}});
             return {success: status === 200, data};
         } catch {
-            return {success: false}
+            return {success: false};
         }
+    },
+    getRooms: async(token: string) : Promise<IAPIResponse<IRoom[]>> => {
+        try {
+            const {status, data} = await axios.get(fullURLs.ROOMS, {headers: {token, "Content-Type": "application/json"}});
+            return {success: status === 200, data};
+        } catch {
+            return {success: false};
+        }
+    },
+    toggleEligibility: async(token: string, room: IRoom) : Promise<IAPIResponse> => {
+        if (room.eligible === undefined) {
+            return {success: false, error: "Incomplete room object supplied. Field `eligible` required."};
+        }
+        try {
+            if (room.eligible) {
+                const {status, data} = await axios.delete(fullURLs.ROOM, {data: room, headers: {token, "Content-Type": "application/json"}});
+                return {success: status === 200};
+            } else {
+                const {status, data} = await axios.post(fullURLs.ROOM, {data: room}, {headers: {token, "Content-Type": "application/json"}});
+                return {success: status === 200, data};
+            }
+        } catch {
+            return {success: false};
+        }
+        
     }
 
 }
