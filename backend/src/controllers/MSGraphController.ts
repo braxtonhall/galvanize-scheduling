@@ -29,13 +29,13 @@ export default class MSGraphController {
     }
     
     static async getRooms(token: string): Promise<interfaces.IRoom[]> {
-		return (await (this.getClient(token)).api('/me/findRooms')
+		return (await (this.getClient(token)).api('/places/microsoft.graph.room')
 			.version('beta')
 			.get())
 			.value
 			.map((room) => ({
-				id: room.name,
-				name: room.name
+				id: room.displayName,
+				name: room.displayName
 			}));
 	}
 
