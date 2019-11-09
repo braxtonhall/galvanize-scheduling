@@ -71,9 +71,9 @@ const Rooms: React.FC = () => {
 									<Table hover>
 										<thead>
 										<tr>
-											<th>room</th>
-											<th>eligible</th>
-											<th>toggle</th>
+											<th>Room</th>
+											<th>Eligible</th>
+											<th>Toggle</th>
 										</tr>
 										</thead>
 										<tbody>
