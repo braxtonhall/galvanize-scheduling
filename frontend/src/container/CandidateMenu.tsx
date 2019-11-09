@@ -1,5 +1,17 @@
 import React, {useContext, useEffect, useState} from "react";
-import {Container, Row, Col, Card, Button, CardBody, CardHeader, Modal, CardText} from "reactstrap";
+import {
+	Container,
+	Row,
+	Col,
+	Card,
+	Button,
+	CardBody,
+	CardHeader,
+	Modal,
+	CardText,
+	ModalHeader,
+	ModalBody, ModalFooter
+} from "reactstrap";
 import CandidateForm from "../component/CandidateForm";
 import CandidateList from "../component/CandidateList";
 import {interfaces} from "adapter";
@@ -9,6 +21,7 @@ import {ToastsContainer, ToastsStore, ToastsContainerPosition} from 'react-toast
 import Fade from 'react-reveal/Fade';
 
 type ICandidate = interfaces.ICandidate;
+export const EMAIL_REGEX = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
 const CandidateMenu: React.FC = () => {
 	const {token, updateContext, startLoadingProcess, endLoadingProcess} = useContext(Context);
@@ -105,6 +118,10 @@ const CandidateMenu: React.FC = () => {
 	}
 
 	async function createNewCandidate(candidate: ICandidate): Promise<void> {
+		if (!EMAIL_REGEX.test(candidate.email)) {
+			updateContext({error: "You must submit a valid email."});
+			return;
+		}
 		startLoadingProcess();
 		const {success, error} = await adapter.createCandidate(token, candidate);
 		if (success) {
@@ -168,15 +185,15 @@ const CandidateMenu: React.FC = () => {
 				}
 			</Row>
 			<ToastsContainer position={ToastsContainerPosition.BOTTOM_RIGHT} store={ToastsStore}/>
-			<Modal isOpen={deleteCandidateSelected !== undefined}>
-				<Card>
-					<CardHeader>Delete Candidate</CardHeader>
-					<CardBody>
-						<CardText>Are you sure you want to delete this candidate?</CardText>
-						<Button className="m-2" color="danger" onClick={deleteCandidate}>Yes, delete the Candidate.</Button>
-						<Button className="m-2" color="primary" onClick={() => updateDeleteCandidateSelected(undefined)}>Cancel</Button>
-					</CardBody>
-				</Card>
+			<Modal className="overflow-auto" isOpen={deleteCandidateSelected !== undefined} toggle={() => updateDeleteCandidateSelected(undefined)}>
+				<ModalHeader>Delete Candidate</ModalHeader>
+				<ModalBody>
+					Are you sure you want to delete this candidate?
+				</ModalBody>
+				<ModalFooter>
+					<Button className="m-2" color="danger" onClick={deleteCandidate}>Yes, delete the Candidate.</Button>
+					<Button className="m-2" color="primary" onClick={() => updateDeleteCandidateSelected(undefined)}>Cancel</Button>
+				</ModalFooter>
 			</Modal>
 		</Container>
 	)
