@@ -14,16 +14,14 @@ export default class DynamoDBCandidateController extends CandidateController {
 		return await this.dbc.getCandidates();
 	}
 
-	public async create(token: string, resource: interfaces.ICandidate): Promise<interfaces.ICandidate> {
+	public async create(token: string, candidate: interfaces.ICandidate): Promise<interfaces.ICandidate> {
 		// TODO validation?
-		// TODO: add an id so creating candidates work?
-		resource = this.assertCandidate(resource);
-		if (typeof resource.id === "string") {
-			await this.dbc.writeCandidate(resource);
-			return resource;
-		} else {
-			return await this.dbc.createCandidate(resource);
+		candidate = this.assertCandidate(candidate);
+		if (typeof candidate.id !== "string") {
+			candidate.id = this.hashID(await this.dbc.createCandidateID());
 		}
+		await this.dbc.writeCandidate(candidate);
+		return candidate;
 	}
 
 	public async delete(token: string, id: string): Promise<boolean> {
@@ -33,6 +31,21 @@ export default class DynamoDBCandidateController extends CandidateController {
 	
 	public async exists(id: string): Promise<boolean> {
 		return typeof (await this.dbc.getCandidate(id)) === "object";
+	}
+	
+	private hashID(id: string): string {
+		// https://gist.github.com/iperelivskiy/4110988
+		var a = 1, c = 0, h, o;
+		if (id) {
+			a = 0;
+			for (h = id.length - 1; h >= 0; h--) {
+				o = id.charCodeAt(h);
+				a = (a<<6&268435455) + o + (o<<14);
+				c = a & 266338304;
+				a = c!==0?a^c>>21:a;
+			}
+		}
+		return String(a);
 	}
 
 }

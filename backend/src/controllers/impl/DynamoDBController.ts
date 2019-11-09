@@ -8,7 +8,7 @@ export interface IDynamoDBController {
 	getCandidate(id: string): Promise<ICandidate>;
 	getCandidates(): Promise<ICandidate[]>;
 	writeCandidate(candidate: ICandidate): Promise<void>;
-	createCandidate(candidate: ICandidate): Promise<ICandidate>;
+	createCandidateID(): Promise<string>;
 	deleteCandidate(id: string): Promise<void>;
 
 	getRoom(name: string): Promise<IRoom>;
@@ -111,12 +111,6 @@ export class DynamoDBController implements IDynamoDBController {
 		await this.write(DynamoDBController.CANDIDATE_TABLE, candidate);
 	}
 
-	public async createCandidate(candidate: ICandidate): Promise<ICandidate> {
-		candidate.id = await this.getCandidateId();
-		await this.write(DynamoDBController.CANDIDATE_TABLE, candidate);
-		return candidate;
-	}
-
 	public async deleteCandidate(id: string): Promise<void> {
 		await this.delete(DynamoDBController.CANDIDATE_TABLE, {id});
 	}
@@ -168,7 +162,7 @@ export class DynamoDBController implements IDynamoDBController {
 		return auth;
 	}
 	
-	private async getCandidateId(): Promise<string> {
+	public async createCandidateID(): Promise<string> {
 		const params = {
 			TableName: DynamoDBController.TICKER_TABLE,
 			Key:{
