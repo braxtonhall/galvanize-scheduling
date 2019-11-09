@@ -55,12 +55,19 @@ const InterviewSelection: React.FC<IProps> = (props: IProps) => {
 		const onMinuteChange: ChangeEventHandler<HTMLInputElement> = (e) => {
 			const newValues: InterviewSelectionValue = cloneDeep(value);
 			newValues[index].minutes = parseFloat(e.target.value);
+			if (newValues[index].preference) {
+				for (let i = 0; i < newValues.length; i++) {
+					if (newValues[i].interviewer.id === newValues[index].preference.id) {
+						newValues[i].minutes = newValues[index].minutes;
+						break;
+					}
+				}
+			}
 			onChange(newValues);
 		};
 
 		return (
 			<tr key={"interviewer_" + interviewer.id}>
-				{/*<th scope="row">{id}</th>*/}
 				<td>{firstName}</td>
 				<td>{lastName}</td>
 				<td>
@@ -93,7 +100,6 @@ const InterviewSelection: React.FC<IProps> = (props: IProps) => {
 					<Table hover>
 						<thead>
 						<tr>
-							{/*<th>ID</th>*/}
 							<th>First Name</th>
 							<th>Last Name</th>
 							<th>Preference</th>

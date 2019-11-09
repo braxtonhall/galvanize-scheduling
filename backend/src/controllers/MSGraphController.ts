@@ -25,7 +25,7 @@ export default class MSGraphController {
             .select('id, displayName')
             .get();
     }
-    
+
     static async getRooms(token: string): Promise<Array<interfaces.IRoom & {email: string, capacity: number}>> {
 		return (await (this.getClient(token))
 			.api('/places/microsoft.graph.room')
@@ -51,11 +51,11 @@ export default class MSGraphController {
                 lastName: m.surname
             }));
     }
-    
+
     static async getMeetingTimes(
     	token:string,
 		rooms: Array<interfaces.IRoom & {email: string, capacity: number}>,
-		options: interfaces.IGetScheduleOptions
+		options: interfaces.IGetSchedulesOptions
 	): Promise<any> {
 	}
 }

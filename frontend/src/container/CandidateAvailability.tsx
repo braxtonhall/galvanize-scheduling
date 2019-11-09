@@ -46,7 +46,7 @@ const CandidateAvailability: React.FC = (props) => {
 
 	async function submitAvailability(): Promise<void> {
 		startLoadingProcess();
-		const {success} = await adapter.submitAvailability(candidateID, availability);
+		const {success, error} = await adapter.submitAvailability(candidateID, availability);
 		if (!success) {
 			endLoadingProcess({error: "There was an error submitting your availability."});
 			return;
