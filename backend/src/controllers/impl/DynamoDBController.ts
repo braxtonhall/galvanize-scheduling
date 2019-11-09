@@ -1,18 +1,14 @@
 import AWS from "aws-sdk";
 import {Config, ConfigKey} from "../../Config";
-import {ResourceKind, assertIs} from "../Common";
 import { interfaces } from "adapter";
-import {MemoryStore, Store} from "express-session";
-import DynamoDBStore from "dynamodb-store"
 type ICandidate = interfaces.ICandidate
 type IRoom = interfaces.IRoom
 
 export interface IDynamoDBController {
-	getStore(): Store | MemoryStore;
-	
 	getCandidate(id: string): Promise<ICandidate>;
 	getCandidates(): Promise<ICandidate[]>;
 	writeCandidate(candidate: ICandidate): Promise<void>;
+	createCandidate(candidate: ICandidate): Promise<ICandidate>;
 	deleteCandidate(id: string): Promise<void>;
 
 	getRoom(name: string): Promise<IRoom>;
@@ -39,8 +35,8 @@ export class DynamoDBController implements IDynamoDBController {
 
 	private static readonly CANDIDATE_TABLE: string = "Candidates";
 	private static readonly ROOM_TABLE: string = "Rooms";
-	private static readonly SESSION_TABLE: string = "Sessions";
 	private static readonly OAUTH_TABLE: string = "OAuths";
+	private static readonly TICKER_TABLE: string = "Tickers";
 
 	private static readonly SCHEMATA: any[] = [
 		{
@@ -70,12 +66,25 @@ export class DynamoDBController implements IDynamoDBController {
 			}
 		},
 		{
-			TableName : DynamoDBController.OAUTH_TABLE,
+			TableName: DynamoDBController.OAUTH_TABLE,
 			KeySchema: [
 				{ AttributeName: "token", KeyType: "HASH" }
 			],
 			AttributeDefinitions: [
 				{ AttributeName: "token", AttributeType: "S" }
+			],
+			ProvisionedThroughput: {
+				ReadCapacityUnits: 10,
+				WriteCapacityUnits: 10 // TODO
+			}
+		},
+		{
+			TableName: DynamoDBController.TICKER_TABLE,
+			KeySchema: [
+				{ AttributeName: "ticker", KeyType: "HASH" }
+			],
+			AttributeDefinitions: [
+				{ AttributeName: "ticker", AttributeType: "S" }
 			],
 			ProvisionedThroughput: {
 				ReadCapacityUnits: 10,
@@ -87,24 +96,7 @@ export class DynamoDBController implements IDynamoDBController {
 	private db: AWS.DynamoDB.DocumentClient = null;
 
 	constructor() {
-		// TODO
-	}
-	
-	public getStore(): Store | MemoryStore {
-		return new DynamoDBStore({
-			table: {
-				name: DynamoDBController.SESSION_TABLE,
-			},
-			dynamoConfig: {
-				accessKeyId: Config.getInstance().get(ConfigKey.awsAccessKeyId),
-				secretAccessKey: Config.getInstance().get(ConfigKey.awsSecretAccessKey),
-				region: Config.getInstance().get(ConfigKey.awsRegion),
-				endpoint: Config.getInstance().get(ConfigKey.dbUrl)
-			},
-			keepExpired: false,
-			touchInterval: 30000,
-			ttl: 600000
-		});
+		console.log("Database instance created");
 	}
 
 	public async getCandidate(id: string): Promise<ICandidate> {
@@ -116,8 +108,13 @@ export class DynamoDBController implements IDynamoDBController {
 	}
 
 	public async writeCandidate(candidate: ICandidate): Promise<void> {
-		assertIs(ResourceKind.Candidate, candidate);
 		await this.write(DynamoDBController.CANDIDATE_TABLE, candidate);
+	}
+
+	public async createCandidate(candidate: ICandidate): Promise<ICandidate> {
+		candidate.id = await this.getCandidateId();
+		await this.write(DynamoDBController.CANDIDATE_TABLE, candidate);
+		return candidate;
 	}
 
 	public async deleteCandidate(id: string): Promise<void> {
@@ -133,8 +130,8 @@ export class DynamoDBController implements IDynamoDBController {
 	}
 
 	public async writeRoom(room: IRoom): Promise<void> {
-		assertIs(ResourceKind.Room, room);
-		await this.write(DynamoDBController.ROOM_TABLE, room);
+		const {name} = room;
+		await this.write(DynamoDBController.ROOM_TABLE, {name});
 	}
 
 	public async deleteRoom(name: string): Promise<void> {
@@ -145,7 +142,9 @@ export class DynamoDBController implements IDynamoDBController {
 		if (!token) {
 			throw new Error("Required fields in user are missing. Cannot save to database");
 		}
-		await this.write(DynamoDBController.OAUTH_TABLE, {token});
+		// Expiration date (ttl) is current time + 1 hour in SECONDS
+		const ttl = Math.round(Date.now() / 1000) + 60 * 60;
+		await this.write(DynamoDBController.OAUTH_TABLE, {token, ttl});
 	}
 
 	public async deleteOAuth(token: string): Promise<void> {
@@ -153,7 +152,44 @@ export class DynamoDBController implements IDynamoDBController {
 	}
 
 	public async getOAuth(token: string): Promise<{token: string}> {
-		return await this.get(DynamoDBController.OAUTH_TABLE, {token});
+		const auth = await this.get(DynamoDBController.OAUTH_TABLE, {token});
+		// If the auth wasn't in the database return undefined
+		if (!auth) {
+			return auth;
+		}
+		// If the auth was in the database but is expired, return undefined
+		// The auth will automatically be deleted at a later time
+		if (auth["ttl"] < Math.round(Date.now() / 1000)) {
+			return undefined;
+		}
+		// Remove ttl so it's not seen by the user. For DDBC use only
+		delete auth["ttl"];
+		// Return the auth
+		return auth;
+	}
+	
+	private async getCandidateId(): Promise<string> {
+		const params = {
+			TableName: DynamoDBController.TICKER_TABLE,
+			Key:{
+				"ticker": DynamoDBController.CANDIDATE_TABLE
+			},
+			UpdateExpression: "set tick = tick + :val",
+			ExpressionAttributeValues:{
+				":val": 1
+			},
+			ReturnValues:"UPDATED_NEW"
+		};
+		
+		return await new Promise(async (resolve, reject) => {
+			(await this.open()).update(params, function (err, data) {
+				if (err) {
+					reject(err);
+				} else {
+					resolve(String(data.Attributes.tick));
+				}
+			});
+		});
 	}
 
 	private async get(table: string, attrs: any): Promise<any> {
@@ -220,6 +256,15 @@ export class DynamoDBController implements IDynamoDBController {
 	}
 
 	private async write(table: string, item: any): Promise<void> {
+		for (const [key, value] of Object.entries(item)) {
+			if (typeof value === "string") {
+				item[key] = value.trim();
+			}
+			if (item[key] === "") {
+				delete item[key];
+			}
+		}
+
 		const params = {
 			TableName: table,
 			Item: item,
@@ -239,7 +284,6 @@ export class DynamoDBController implements IDynamoDBController {
 	private async open(): Promise<AWS.DynamoDB.DocumentClient> {
 		if (!this.db) {
 			await this.initDatabase();
-			this.db = new AWS.DynamoDB.DocumentClient();
 		}
 		return this.db;
 	}
@@ -250,22 +294,49 @@ export class DynamoDBController implements IDynamoDBController {
 			region: cf.get(ConfigKey.awsRegion),
 			accessKeyId: cf.get(ConfigKey.awsSecretAccessKey),
 			secretAccessKey: cf.get(ConfigKey.awsSecretAccessKey),
-			// @ts-ignore // TODO why is this?
 			endpoint: new AWS.Endpoint(cf.get(ConfigKey.dbUrl))
-		});
+		} as {[key: string]: any});
+		// unfortunate static cast to get rid of build error
+		
 		const dynamoDB = new AWS.DynamoDB();
 		for (const scheme of DynamoDBController.SCHEMATA) {
 			try {
 				await this.createTable(dynamoDB, scheme);
 			} catch (err) {
 				if (err.code === "ResourceInUseException") {
-					// Pass. Already created.
-					// TODO log?
+					console.warn("While initing the database, table was already in use");
 				} else {
 					throw new Error("Unable to allocate resource in DB");
 				}
 			}
 		}
+		
+		try {
+			await dynamoDB.updateTimeToLive({
+				TableName: DynamoDBController.OAUTH_TABLE,
+				TimeToLiveSpecification: {Enabled: true, AttributeName: "ttl"}
+			});
+		} catch (err) {
+			console.error(err);
+			console.warn("Error setting the time to live of the database. Ignoring");
+		}
+		
+		this.db = new AWS.DynamoDB.DocumentClient();
+		await new Promise(async (resolve, reject) => {
+			this.db.put({
+				TableName: DynamoDBController.TICKER_TABLE,
+				Item: {
+					ticker: DynamoDBController.CANDIDATE_TABLE,
+					tick: 0
+				}
+			}, function (err) {
+				if (err) {
+					reject(err);
+				} else {
+					resolve();
+				}
+			});
+		});
 	}
 
 	private createTable(db: AWS.DynamoDB, params: any): Promise<void> {

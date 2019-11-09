@@ -27,24 +27,25 @@ const authController:IAuthController = new AuthController();
 	},
 ].forEach((resourceType) => {
 	app.get(nodeAdapter.urls[resourceType.multiple], async (req, res) => {
-		const {token} = req.query;
+		const token: string = req.header("token");
 		try {
-			const data: IResource[] = await resourceFacade.list(token, resourceType.kind);
-			console.log(data);
-			res.status(200).send(data);
+			if (await authController.checkAuth(token)) {
+				const data: IResource[] = await resourceFacade.list(token, resourceType.kind);
+				res.status(200).send(data);
+			} else {
+				res.status(401);
+			}
 		} catch(e) {
 			res.status(e.statusCode).send(e.message);
 		}
-
-
 	});
 
 	app.post(nodeAdapter.urls[resourceType.single], async (req, res) => {
-		const token: string = req.header["token"];
-		const interviewer: IResource = req.body;
+		const token: string = req.header("token");
+		const data = req.body.data;
 		try {
 			if (await authController.checkAuth(token)) {
-				const result = await resourceFacade.create(token, interviewer, resourceType.kind);
+				const result = await resourceFacade.create(token, data, resourceType.kind);
 				res.status(200).send(result);
 			} else {
 				res.status(401);
@@ -55,7 +56,7 @@ const authController:IAuthController = new AuthController();
 	});
 
 	app.delete(nodeAdapter.urls[resourceType.single], async (req, res) => {
-		const token: string = req.header["token"];
+		const token: string = req.header("token");
 		const id: string = req.body.id;
 		try {
 			if (await authController.checkAuth(token)) {
