@@ -29,20 +29,20 @@ app.get(nodeAdapter.urls.CANDIDATE, async (req, res) => {
 		}
 		res.status(200).send(data);
 	} catch(e) {
-		res.status(500).send(e.message);
+		res.status(500).send(e);
 	}
 });
 
 app.post(nodeAdapter.urls.UPDATE_AVAILABILITY, async (req, res) => {
-	const token: string = req.header("token");
-	let {id, availability} = req.body.data;
 	try {
+		const token: string = req.header("token");
+		let {id, availability} = req.body.data;
 		if (await resourceFacade.exists(id, ResourceKind.Candidate)) {
-			const candidate: interfaces.ICandidate = {...await resourceFacade.get(token, id, ResourceKind.Candidate), id, availability};
+			const candidate = {...await resourceFacade.get(token, id, ResourceKind.Candidate), id, availability};
 			await resourceFacade.create(token, candidate, ResourceKind.Candidate);
-			res.status(200);
+			res.sendStatus(200);
 		} else {
-			res.status(401);
+			res.sendStatus(401);
 		}
 	} catch (e) {
 		res.status(400).send(e);

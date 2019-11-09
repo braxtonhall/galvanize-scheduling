@@ -36,7 +36,7 @@ export interface IMeeting {
 	room: IRoom
 }
 
-export type IAvailability = Array<{start: Moment, end: Moment}>
+export type IAvailability = Array<{start: Moment | string, end: Moment | string}>
 
 export interface IGetSchedulesOptions {
 
