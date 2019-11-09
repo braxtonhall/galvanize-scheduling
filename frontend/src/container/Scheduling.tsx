@@ -29,7 +29,8 @@ const Scheduling: React.FC = () => {
 		startLoadingProcess();
 		const {success, data, error} = await adapter.getCandidates(token);
 		if (success) {
-			updateCandidates(data);
+			const onlyWithAvailabilities = data.filter(c => c.availability !== undefined);
+			updateCandidates(onlyWithAvailabilities);
 			endLoadingProcess();
 		} else if (error) {
 			endLoadingProcess({error});
