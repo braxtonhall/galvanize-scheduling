@@ -20,6 +20,7 @@ export interface ICandidate extends IResource {
 }
 
 export interface IInterviewer extends IResource {
+	email: string,
 	firstName: string,
 	lastName: string,
 }

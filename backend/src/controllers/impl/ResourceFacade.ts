@@ -64,7 +64,7 @@ export default class ResourceFacade implements IResourceFacade {
 				throw new Error("Unsupported Kind");
 		}
 	}
-	
+
 	public exists(id: string, kind: ResourceKind): Promise<boolean> {
 		switch (kind) {
 			case ResourceKind.Candidate:
@@ -77,7 +77,7 @@ export default class ResourceFacade implements IResourceFacade {
 				throw new Error("Unsupported Kind");
 		}
 	}
-	
+
 	public get(token: string, id: string, kind: ResourceKind): Promise<IResource> {
 		switch (kind) {
 			case ResourceKind.Candidate:
@@ -90,6 +90,7 @@ export default class ResourceFacade implements IResourceFacade {
 				throw new Error("Unsupported Kind");
 		}
 	}
+
 	
 	private async returnSchedules(token: string, options: interfaces.IGetSchedulesOptions): Promise<any> { // TODO
 		if (!!options) {

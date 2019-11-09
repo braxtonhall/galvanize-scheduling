@@ -25,7 +25,7 @@ export default class MSGraphController {
             .select('id, displayName')
             .get();
     }
-    
+
     static async getRooms(token: string): Promise<Array<interfaces.IRoom & {email: string, capacity: number}>> {
 		return (await (this.getClient(token))
 			.api('/places/microsoft.graph.room')
@@ -52,12 +52,96 @@ export default class MSGraphController {
                 email: m.emailAddress
             }));
     }
-    
-    static async getMeetingTimes(
-    	token: string,
+
+    public static async getMeetingTimes(
+    	token:string,
 		rooms: Array<interfaces.IRoom & {email: string, capacity: number}>,
 		options: interfaces.IGetSchedulesOptions
 	): Promise<any> {
+    	rooms.sort((a, b) => a.capacity - b.capacity);
+    	const {candidate, preferences} = options;
+    	const groups = this.buildGroups(preferences);
+    	const suggestions = [];
+    	const client = this.getClient(token);
+    	for (const room of rooms) {
+			if (room.capacity < 2) {
+				continue;
+			}
+			const promises = [];
+			for (const group of groups) {
+				promises.push(client
+					.api('/me/findMeetingTimes')
+					.post(this.buildMeeting(room, group, candidate)));
+			}
+			const results = await Promise.all(promises);
+		}
+    	
+	}
+	
+	private static buildMeeting(room, group: any[], candidate): any {
+    	return {
+    		attendees: [
+				{
+					type: "resource",
+					emailAddress: {
+						name: room.name,
+						address: room.email,
+					},
+				},
+			].concat(group
+				.map((p) => ({
+					type: "required",
+					emailAddress: {
+						name: `${p.interviewer.firstName} ${p.interviewer.lastName}`,
+						address: p.interviewer.email
+					}}))),
+			timeConstraints: {
+    			activityDomain: "work",
+				timeslots: candidate.availability.map((a) => ({
+					start: {
+						dateTime: a.start,
+						timeZone: "Pacific Standard Time"
+					},
+					end: {
+						dateTime: a.end,
+						timeZone: "Pacific Standard Time"
+					},
+				})),
+			},
+			isOrganizerOptional: true,
+			meetingDuration: `PTH${Math.floor(group[0].minutes / 60)}M${group[0].minutes % 60}`,
+			returnSuggestionReasons: false,
+			minimumAttendeePercentage: 1 / group.length
+		};
+	}
+	
+	private static buildGroups(preferences: Array<{interviewer: interfaces.IInterviewer, preference?: interfaces.IInterviewer, minutes: number}>)
+		: Array<Array<{interviewer: interfaces.IInterviewer, preference?: interfaces.IInterviewer, minutes: number}>> {
+    	const groups = [];
+		for (const preference of preferences) {
+			let found = false;
+			for (const group of groups) {
+				if (preference.interviewer.id in group.members && preference.preference) {
+					group.members.add(preference.preference.id);
+					group.data.push(preference);
+					found = true;
+					break;
+				} else if (preference.preference && preference.preference.id in group.members) {
+					group.members.add(preference.interviewer.id);
+					group.data.push(preference);
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				const set = new Set(preference.interviewer.id);
+				if (preference) {
+					set.add(preference.preference.id);
+				}
+				groups.push({members: set, data: [preference]});
+			}
+		}
+		return groups;
 	}
 
 	static async sendAvailabilityEmail(token: string, content: any): Promise<any> {

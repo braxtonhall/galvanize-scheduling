@@ -14,7 +14,7 @@ export default {
 		}
 	},
 	submitAvailability: async(candidateID: string, availability: IAvailability): Promise<IAPIResponse> => {
-		if (!!availability) {
+		if (availability === undefined) {
 			return {success: false, error: "Availability was not defined"};
 		}
 		try {
