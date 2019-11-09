@@ -91,7 +91,7 @@ export default class ResourceFacade implements IResourceFacade {
 		}
 	}
 	
-	private async returnSchedules(token: string, options: interfaces.IGetScheduleOptions): Promise<any> { // TODO
+	private async returnSchedules(token: string, options: interfaces.IGetSchedulesOptions): Promise<any> { // TODO
 		if (!!options) {
 			throw new Error("Attempting to schedule without any options!");
 		}

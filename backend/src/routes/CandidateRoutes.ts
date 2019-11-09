@@ -4,6 +4,8 @@ import IResourceFacade from "../controllers/IResourceFacade";
 import ResourceFacade from "../controllers/impl/ResourceFacade";
 import {ResourceKind} from "../controllers/Common";
 import AuthController from "../controllers/AuthController";
+import MSGraphController from "../controllers/MSGraphController";
+import createEmail from "../controllers/EmailConfig";
 
 const resourceFacade: IResourceFacade = new ResourceFacade();
 
@@ -41,6 +43,22 @@ app.post(nodeAdapter.urls.UPDATE_AVAILABILITY, async (req, res) => {
 			const candidate = {...await resourceFacade.get(token, id, ResourceKind.Candidate), id, availability};
 			await resourceFacade.create(token, candidate, ResourceKind.Candidate);
 			res.sendStatus(200);
+		} else {
+			res.sendStatus(401);
+		}
+	} catch (e) {
+		res.status(400).send(e);
+	}
+});
+
+app.post(nodeAdapter.urls.SEND_AVAILABILITY, async (req, res) => {
+	const token: string = req.header("token");
+	const candidate: interfaces.ICandidate = req.body.data;
+	try {
+		if (token && await AuthController.getInstance().checkAuth(token)) {
+			const result = await MSGraphController.sendAvailabilityEmail(token, createEmail(candidate));
+			console.log(result);
+			res.status(200).send(result);
 		} else {
 			res.sendStatus(401);
 		}

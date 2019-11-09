@@ -28,4 +28,12 @@ export default {
 			return {success: false}
 		}
 	},
+	sendAvailabilityEmail: async (token: string, candidate: ICandidate): Promise<IAPIResponse> => {
+		try {
+			const {status} = await axios.post(fullURLs.SEND_AVAILABILITY, {data: candidate}, {headers: {token, "Content-Type": "application/json"}});
+			return {success: status === 200};
+		} catch {
+			return {success: false};
+		}
+	}
 }

@@ -43,19 +43,26 @@ export default class MSGraphController {
     static async getInterviewers(token: string, id: string): Promise<interfaces.IInterviewer[]> {
         return (await (this.getClient(token))
             .api(`/groups/${id}/members`)
-            .select('id,givenName,surname')
+            .select('id,givenName,surname,emailAddress')
             .get()).value
             .map((m) => ({
                 id: m.id,
                 firstName: m.givenName,
-                lastName: m.surname
+                lastName: m.surname,
+                email: m.emailAddress
             }));
     }
     
     static async getMeetingTimes(
-    	token:string,
+    	token: string,
 		rooms: Array<interfaces.IRoom & {email: string, capacity: number}>,
-		options: interfaces.IGetScheduleOptions
+		options: interfaces.IGetSchedulesOptions
 	): Promise<any> {
 	}
+
+	static async sendAvailabilityEmail(token: string, content: any): Promise<any> {
+        return (await (this.getClient(token))
+            .api("/me/sendMail")
+            .post(content));
+    }
 }
