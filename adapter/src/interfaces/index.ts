@@ -39,7 +39,7 @@ export interface IMeeting {
 export type IAvailability = Array<{start: Moment | string, end: Moment | string}>
 
 export interface IGetSchedulesOptions {
-
+	preferences: Array<{int1: IInterviewer, int2: IInterviewer, minutes: number}>
 }
 
 export enum Role {
