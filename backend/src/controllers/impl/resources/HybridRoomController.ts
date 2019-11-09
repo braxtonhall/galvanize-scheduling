@@ -12,9 +12,13 @@ export default class HybridRoomController extends RoomController {
 	}
 
 	public async list(token: string): Promise<interfaces.IRoom[]> {
-		const keys = (await this.dbc.getRooms()).map((room) => room.name);
+		const keys = (await this.dbc.getRooms()).map(room => room.name);
 		return (await MSGraphController.getRooms(token))
-			.map((room) => ({...room, eligible: keys.includes(room.name)}));
+			.map(room => ({
+				id: room.id,
+				name: room.name,
+				eligible: keys.includes(room.name)
+			}));
 	}
 
 	public async create(token: string, resource: interfaces.IRoom): Promise<interfaces.IRoom> {
