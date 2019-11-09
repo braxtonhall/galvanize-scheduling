@@ -11,12 +11,11 @@ export default class HybridRoomController extends RoomController {
 		this.dbc = DynamoDBController.getInstance();
 	}
 
-	public async list(token: string): Promise<interfaces.IRoom[]> {
+	public async list(token: string): Promise<Array<interfaces.IRoom & {email: string, capacity: number}>> {
 		const keys = (await this.dbc.getRooms()).map(room => room.name);
 		return (await MSGraphController.getRooms(token))
 			.map(room => ({
-				id: room.id,
-				name: room.name,
+				...room,
 				eligible: keys.includes(room.name)
 			}));
 	}
