@@ -4,13 +4,13 @@ import MSGraphController from "../../MSGraphController";
 type IInterviewer = interfaces.IInterviewer;
 
 export default class MSGraphInterviewerController extends InterviewerController {
+
 	public async list(token: string): Promise<IInterviewer[]> {
-		const client = MSGraphController.getClient(token);
-		const groups = await MSGraphController.getGroups(client);
+		const groups = await MSGraphController.getGroups(token);
 
 		let id;
 		for (let group of groups.value) {
-			if (group.displayName === 'Interviewers') {
+			if (group.displayName === 'Interviewers') { // TODO make this an environment variable
 				id = group.id;
 				break;
 			}
@@ -19,8 +19,8 @@ export default class MSGraphInterviewerController extends InterviewerController 
 		if (!id) {
 			return [];
 		}
-
-		return await MSGraphController.getInterviewers(client, id);
+		// TODO wrap in try catch
+		return await MSGraphController.getInterviewers(token, id);
 	}
 
 	public async create(token: string, resource: IInterviewer): Promise<IInterviewer> {

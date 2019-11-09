@@ -1,8 +1,9 @@
 import {RoomController} from "../../ResourceControllers";
 import {interfaces} from "adapter";
 import {DynamoDBController} from "../DynamoDBController";
+import MSGraphController from "../../MSGraphController";
 
-export default class DynamoDBRoomController extends RoomController {
+export default class HybridRoomController extends RoomController {
 	private dbc: DynamoDBController;
 
 	constructor() {
@@ -11,11 +12,14 @@ export default class DynamoDBRoomController extends RoomController {
 	}
 
 	public async list(token: string): Promise<interfaces.IRoom[]> {
-		return await this.dbc.getRooms();
+		const keys = (await this.dbc.getRooms()).map((room) => room.name);
+		return (await MSGraphController.getRooms(token))
+			.map((room) => ({...room, eligible: keys.includes(room.name)}));
 	}
 
 	public async create(token: string, resource: interfaces.IRoom): Promise<interfaces.IRoom> {
 		resource = this.assertRoom(resource);
+		// TODO make sure it's actually in the Graph
 		await this.dbc.writeRoom(resource);
 		return resource;
 	}

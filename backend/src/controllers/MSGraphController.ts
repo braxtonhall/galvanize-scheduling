@@ -7,7 +7,7 @@ const config: Config = Config.getInstance();
 
 export default class MSGraphController {
 
-    static getClient(token: string): Client {
+    private static getClient(token: string): Client {
         return Client.init({
             authProvider: (done) => {
                 done(null, token);
@@ -21,15 +21,26 @@ export default class MSGraphController {
         return url + encodeURI(Object.entries(query).map(([k, v]) => `${k}=${v}`).join("&"));
     }
 
-    static async getGroups(client): Promise<any> {
-        return  await client
+    static async getGroups(token: string): Promise<any> {
+        return  await (this.getClient(token))
             .api('/groups')
             .select('id, displayName')
             .get();
     }
+    
+    static async getRooms(token: string): Promise<interfaces.IRoom[]> {
+		return (await (this.getClient(token)).api('/me/findRooms')
+			.version('beta')
+			.get())
+			.value
+			.map((room) => ({
+				id: room.name,
+				name: room.name
+			}));
+	}
 
-    static async getInterviewers(client, id): Promise<interfaces.IInterviewer[]> {
-        return (await client
+    static async getInterviewers(token: string, id: string): Promise<interfaces.IInterviewer[]> {
+        return (await (this.getClient(token))
             .api(`/groups/${id}/members`)
             .select('id,givenName,surname')
             .get()).value

@@ -1,7 +1,7 @@
 import {CandidateController, InterviewerController, RoomController} from "../ResourceControllers";
 import DynamoDBCandidateController from "./resources/DynamoDBCandidateController";
 import MSGraphInterviewerController from "./resources/MSGraphInterviewerController";
-import DynamoDBRoomController from "./resources/DynamoDBRoomController";
+import HybridRoomController from "./resources/HybridRoomController";
 
 export default class ControllerBuilder {
 	public static getCandidateController(): CandidateController {
@@ -13,6 +13,6 @@ export default class ControllerBuilder {
 	}
 	
 	public static getRoomController(): RoomController {
-		return new DynamoDBRoomController();
+		return new HybridRoomController();
 	}
 }
