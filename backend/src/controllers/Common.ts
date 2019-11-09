@@ -2,15 +2,7 @@ export enum ResourceKind {
 	Candidate,
 	Interviewer,
 	Room,
+	Schedule,
 }
 
-/**
- * Asserts that the given object is of the type claimed.
- * 	If so, silently returns
- * 	Else, throws an Error
- * @param kind
- * @param object
- */
-export function assertIs(kind: ResourceKind, object: any): void {
-	// TODO
-}
+export const EMAIL_REGEX = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;

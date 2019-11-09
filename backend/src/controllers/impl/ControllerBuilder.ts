@@ -1,18 +1,18 @@
-import {ICandidateController, IInterviewerController, IRoomController} from "../ResourceControllerTypes";
+import {CandidateController, InterviewerController, RoomController} from "../ResourceControllers";
 import DynamoDBCandidateController from "./resources/DynamoDBCandidateController";
 import MSGraphInterviewerController from "./resources/MSGraphInterviewerController";
-import DynamoDBRoomController from "./resources/DynamoDBRoomController";
+import HybridRoomController from "./resources/HybridRoomController";
 
 export default class ControllerBuilder {
-	public static getCandidateController(): ICandidateController {
+	public static getCandidateController(): CandidateController {
 		return new DynamoDBCandidateController();
 	}
 	
-	public static getInterviewerController(): IInterviewerController {
+	public static getInterviewerController(): InterviewerController {
 		return new MSGraphInterviewerController();
 	}
 	
-	public static getRoomController(): IRoomController {
-		return new DynamoDBRoomController();
+	public static getRoomController(): RoomController {
+		return new HybridRoomController();
 	}
 }

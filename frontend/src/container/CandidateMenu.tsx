@@ -1,5 +1,17 @@
 import React, {useContext, useEffect, useState} from "react";
-import {Container, Row, Col, Card, Button, CardBody, CardHeader} from "reactstrap";
+import {
+	Container,
+	Row,
+	Col,
+	Card,
+	Button,
+	CardBody,
+	CardHeader,
+	Modal,
+	CardText,
+	ModalHeader,
+	ModalBody, ModalFooter
+} from "reactstrap";
 import CandidateForm from "../component/CandidateForm";
 import CandidateList from "../component/CandidateList";
 import {interfaces} from "adapter";
@@ -9,18 +21,20 @@ import {ToastsContainer, ToastsStore, ToastsContainerPosition} from 'react-toast
 import Fade from 'react-reveal/Fade';
 
 type ICandidate = interfaces.ICandidate;
+export const EMAIL_REGEX = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
 const CandidateMenu: React.FC = () => {
 	const {token, updateContext, startLoadingProcess, endLoadingProcess} = useContext(Context);
 	const [candidates, updateCandidates] = useState<ICandidate[]>([]);
 	const [selectedCandidate, updateSelectedCandidate] = useState<ICandidate>();
 	const [title, updateTitle] = useState<string>();
+	const [deleteCandidateSelected, updateDeleteCandidateSelected] = useState<ICandidate>();
 	const [description, updateDescription] = useState<string>();
 	const [buttons, updateButtons] = useState<Array<{text: string, onClick: (candidate: ICandidate) => (void | Promise<void>)}>>();
 	const actions: Array<{text: string, color: string, onClick: (candidate: ICandidate) => (void | Promise<void>)}> = [
 		{text: "Select", onClick: selectCandidate, color: "primary"},
 		{text: "Send Availability", onClick: sendAvailabilityEmail, color: "primary"},
-		{text: "Delete", onClick: deleteCandidate, color: "danger"},
+		{text: "Delete", onClick: selectDeleteCandidate, color: "danger"},
 	];
 
 	useEffect(() => {refreshCandidates().then()}, []);
@@ -32,6 +46,10 @@ const CandidateMenu: React.FC = () => {
 		updateButtons([{text: "Update", onClick: updateCandidate}])
 	}
 
+	function selectDeleteCandidate(candidate: ICandidate): void {
+		updateDeleteCandidateSelected(candidate);
+	}
+
 	async function sendAvailabilityEmail(candidate: ICandidate): Promise<void> {
 		startLoadingProcess();
 		const {success, error} = await adapter.sendAvailabilityEmail(token, candidate);
@@ -40,7 +58,7 @@ const CandidateMenu: React.FC = () => {
 		} else if (!success) {
 			endLoadingProcess({error: "There was an error sending the availability email."})
 		} else {
-			ToastsStore.success(`The url for the candidates availability is '/submit_schedule/${candidate.id}'. An email has been sent to the candidate.`);
+			ToastsStore.success(`An email has been sent to the candidate.`);
 			endLoadingProcess();
 		}
 	}
@@ -66,9 +84,12 @@ const CandidateMenu: React.FC = () => {
 	}
 
 	// API calls
-	async function deleteCandidate(candidate: ICandidate): Promise<void> {
+	async function deleteCandidate(): Promise<void> {
 		startLoadingProcess();
-		const {success, error} = await adapter.deleteCandidate(token, candidate);
+		// incase context is loss, prevents double pressing
+		const temp: ICandidate = {...deleteCandidateSelected};
+		updateDeleteCandidateSelected(undefined);
+		const {success, error} = await adapter.deleteCandidate(token, temp);
 		if (success) {
 			await refreshCandidates()
 		} else if (error) {
@@ -97,6 +118,10 @@ const CandidateMenu: React.FC = () => {
 	}
 
 	async function createNewCandidate(candidate: ICandidate): Promise<void> {
+		if (!EMAIL_REGEX.test(candidate.email)) {
+			updateContext({error: "You must submit a valid email."});
+			return;
+		}
 		startLoadingProcess();
 		const {success, error} = await adapter.createCandidate(token, candidate);
 		if (success) {
@@ -160,6 +185,16 @@ const CandidateMenu: React.FC = () => {
 				}
 			</Row>
 			<ToastsContainer position={ToastsContainerPosition.BOTTOM_RIGHT} store={ToastsStore}/>
+			<Modal className="overflow-auto" isOpen={deleteCandidateSelected !== undefined} toggle={() => updateDeleteCandidateSelected(undefined)}>
+				<ModalHeader>Delete Candidate</ModalHeader>
+				<ModalBody>
+					Are you sure you want to delete this candidate?
+				</ModalBody>
+				<ModalFooter>
+					<Button className="m-2" color="danger" onClick={deleteCandidate}>Yes, delete the Candidate.</Button>
+					<Button className="m-2" color="primary" onClick={() => updateDeleteCandidateSelected(undefined)}>Cancel</Button>
+				</ModalFooter>
+			</Modal>
 		</Container>
 	)
 };

@@ -29,7 +29,8 @@ const Scheduling: React.FC = () => {
 		startLoadingProcess();
 		const {success, data, error} = await adapter.getCandidates(token);
 		if (success) {
-			updateCandidates(data);
+			const onlyWithAvailabilities = data.filter(c => c.availability !== undefined);
+			updateCandidates(onlyWithAvailabilities);
 			endLoadingProcess();
 		} else if (error) {
 			endLoadingProcess({error});
@@ -59,9 +60,11 @@ const Scheduling: React.FC = () => {
 	}
 
 	async function refreshSchedules(v: InterviewSelectionValue): Promise<void> {
-		// TODO: Fill out input for getSchedules()
 		startLoadingProcess();
-		const {success, data, error} = await adapter.getSchedules(token, {});
+		const {success, data, error} = await adapter.getSchedules(token, {
+			preferences: interviewerValue,
+			candidate: selectedCandidate,
+		});
 		if (success) {
 			updateSchedules(data);
 			endLoadingProcess();

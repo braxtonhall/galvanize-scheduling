@@ -11,7 +11,7 @@ if (!config.get(ConfigKey.production)) {
 		try {
 			if (secret === config.get(ConfigKey.testSecretKey)) {
 				console.warn("WARNING: A new authorization is being saved. TEST ONLY code.");
-				await new AuthController().saveAuth(token);
+				await AuthController.getInstance().saveAuth(token);
 				res.sendStatus(200)
 			} else {
 				res.status(401);

@@ -74,7 +74,12 @@ export class Config {
 	}
 
 	public get(key: ConfigKey): any {
-		return this.config[key] || null;
+		if (this.config[key] !== null && this.config[key] !== undefined) {
+			return this.config[key];
+		} else {
+			console.warn(`Config Key "${key}" was not set, yet accessed.`);
+			return null;
+		}
 	}
 	
 	public set(key: ConfigKey, value: any): void {

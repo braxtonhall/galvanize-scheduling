@@ -4,16 +4,19 @@ import moment from "moment";
 
 const fakeInterviewers: IInterviewer[]= [
 	{
+		email: "",
 		id: "4",
 		firstName: "Andrea",
 		lastName: "Tamez",
 	},
 	{
+		email: "",
 		id: "5",
 		firstName: "Masahiro",
 		lastName: "Toyomura",
 	},
 	{
+		email: "",
 		id: "6",
 		firstName: "Cindy",
 		lastName: "Hsu",

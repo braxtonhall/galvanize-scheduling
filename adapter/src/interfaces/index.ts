@@ -6,12 +6,11 @@ export interface IResource {
 
 export interface IRoom extends IResource {
 	name: string,
-	eligible: boolean,
+	eligible?: boolean,
 }
 
 export interface ICandidate extends IResource {
-	id?: string,
-	email?: string,
+	email: string,
 	phoneNumber?: string,
 	firstName?: string,
 	lastName?: string,
@@ -21,6 +20,7 @@ export interface ICandidate extends IResource {
 }
 
 export interface IInterviewer extends IResource {
+	email: string,
 	firstName: string,
 	lastName: string,
 }
@@ -37,10 +37,11 @@ export interface IMeeting {
 	room: IRoom
 }
 
-export type IAvailability = Array<{start: Moment, end: Moment}>
+export type IAvailability = Array<{start: Moment | string, end: Moment | string}>
 
 export interface IGetSchedulesOptions {
-
+	preferences: Array<{interviewer: IInterviewer, preference?: IInterviewer, minutes: number}>;
+	candidate: ICandidate;
 }
 
 export enum Role {

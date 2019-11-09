@@ -1,16 +1,16 @@
-import {IInterviewerController} from "../../ResourceControllerTypes";
+import {InterviewerController} from "../../ResourceControllers";
 import { interfaces } from "adapter";
 import MSGraphController from "../../MSGraphController";
 type IInterviewer = interfaces.IInterviewer;
 
-export default class MSGraphInterviewerController implements IInterviewerController {
+export default class MSGraphInterviewerController extends InterviewerController {
+
 	public async list(token: string): Promise<IInterviewer[]> {
-		const client = MSGraphController.getClient(token);
-		const groups = await MSGraphController.getGroups(client);
+		const groups = await MSGraphController.getGroups(token);
 
 		let id;
 		for (let group of groups.value) {
-			if (group.displayName === 'Interviewers') {
+			if (group.displayName === 'Interviewers') { // TODO make this an environment variable
 				id = group.id;
 				break;
 			}
@@ -19,8 +19,8 @@ export default class MSGraphInterviewerController implements IInterviewerControl
 		if (!id) {
 			return [];
 		}
-
-		return await MSGraphController.getInterviewers(client, id);
+		// TODO wrap in try catch
+		return await MSGraphController.getInterviewers(token, id);
 	}
 
 	public async create(token: string, resource: IInterviewer): Promise<IInterviewer> {
@@ -33,5 +33,9 @@ export default class MSGraphInterviewerController implements IInterviewerControl
 
 	public async exists(id: string): Promise<boolean> {
 		throw  new Error("Unsupported Action - Interviewer Exists?");
+	}
+
+	public get(token: string, id: string): Promise<interfaces.IResource> {
+		throw  new Error("Unsupported Action - Get Interviewer");
 	}
 }

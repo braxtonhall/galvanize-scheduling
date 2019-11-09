@@ -2,6 +2,7 @@ import React from "react";
 import {ButtonGroup, Table} from 'reactstrap';
 import {Button, Card, CardBody, CardHeader} from "reactstrap";
 import {interfaces} from "adapter";
+import {Link} from "react-router-dom";
 
 type ICandidate = interfaces.ICandidate;
 
@@ -37,6 +38,7 @@ const CandidateList: React.FC<IProps> = (props: IProps) => {
 				<td>{emptyEntry(firstName)}</td>
 				<td>{emptyEntry(lastName)}</td>
 				<td>{emptyEntry(position)}</td>
+				<td><Link to={`/submit_availability/${candidate.id}`}>/submit_availability/{candidate.id}</Link></td>
 				<td>
 					<ButtonGroup>
 						{actions.map(makeButtons)}
@@ -59,6 +61,7 @@ const CandidateList: React.FC<IProps> = (props: IProps) => {
 							<th>First Name</th>
 							<th>Last Name</th>
 							<th>Position</th>
+							<th>Availability URL</th>
 							<th>Actions</th>
 						</tr>
 						</thead>

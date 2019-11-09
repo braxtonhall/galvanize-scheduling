@@ -7,9 +7,17 @@ export interface IAuthController {
 }
 
 export default class AuthController implements IAuthController {
+	private static instance: AuthController = null;
+	public static getInstance(): IAuthController {
+		if (this.instance === null) {
+			this.instance = new AuthController();
+		}
+		return this.instance;
+	}
+	
 	private readonly dbc: DynamoDBController;
 
-	constructor() {
+	private constructor() {
 		this.dbc = DynamoDBController.getInstance();
 	}
 

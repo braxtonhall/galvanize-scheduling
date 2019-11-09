@@ -1,6 +1,5 @@
 import AWS from "aws-sdk";
 import {Config, ConfigKey} from "../../Config";
-import {ResourceKind, assertIs} from "../Common";
 import { interfaces } from "adapter";
 type ICandidate = interfaces.ICandidate
 type IRoom = interfaces.IRoom
@@ -9,7 +8,7 @@ export interface IDynamoDBController {
 	getCandidate(id: string): Promise<ICandidate>;
 	getCandidates(): Promise<ICandidate[]>;
 	writeCandidate(candidate: ICandidate): Promise<void>;
-	createCandidate(candidate: ICandidate): Promise<ICandidate>;
+	createCandidateID(): Promise<string>;
 	deleteCandidate(id: string): Promise<void>;
 
 	getRoom(name: string): Promise<IRoom>;
@@ -96,7 +95,7 @@ export class DynamoDBController implements IDynamoDBController {
 
 	private db: AWS.DynamoDB.DocumentClient = null;
 
-	constructor() {
+	private constructor() {
 		console.log("Database instance created");
 	}
 
@@ -109,14 +108,7 @@ export class DynamoDBController implements IDynamoDBController {
 	}
 
 	public async writeCandidate(candidate: ICandidate): Promise<void> {
-		assertIs(ResourceKind.Candidate, candidate);
 		await this.write(DynamoDBController.CANDIDATE_TABLE, candidate);
-	}
-
-	public async createCandidate(candidate: ICandidate): Promise<ICandidate> {
-		candidate.id = await this.getCandidateId();
-		await this.write(DynamoDBController.CANDIDATE_TABLE, candidate);
-		return candidate;
 	}
 
 	public async deleteCandidate(id: string): Promise<void> {
@@ -132,7 +124,6 @@ export class DynamoDBController implements IDynamoDBController {
 	}
 
 	public async writeRoom(room: IRoom): Promise<void> {
-		assertIs(ResourceKind.Room, room);
 		const {name} = room;
 		await this.write(DynamoDBController.ROOM_TABLE, {name});
 	}
@@ -171,7 +162,7 @@ export class DynamoDBController implements IDynamoDBController {
 		return auth;
 	}
 	
-	private async getCandidateId(): Promise<string> {
+	public async createCandidateID(): Promise<string> {
 		const params = {
 			TableName: DynamoDBController.TICKER_TABLE,
 			Key:{

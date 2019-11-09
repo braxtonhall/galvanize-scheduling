@@ -43,7 +43,7 @@ app.post('/callback', async (req, res) => {
             }
         });
         response = await response.json();
-        await new AuthController().saveAuth(response['access_token']);
+        await AuthController.getInstance().saveAuth(response['access_token']);
         res.redirect(config.get(ConfigKey.frontendUrl) + `/auth/${response['access_token']}`);
     } catch (e) {
         res.redirect(config.get(ConfigKey.frontendUrl));
@@ -53,12 +53,12 @@ app.post('/callback', async (req, res) => {
 
 app.post(nodeAdapter.urls.AUTHENTICATE, async (req, res) => {
     const {token} = req.body;
-    const result = await new AuthController().checkAuth(token);
+    const result = await AuthController.getInstance().checkAuth(token);
     res.send(result);
 });
 
 app.get(nodeAdapter.urls.LOGOUT, async (req, res) => {
     const {token} = req.body;
-    const result = await new AuthController().removeAuth(token);
+    const result = await AuthController.getInstance().removeAuth(token);
     res.sendStatus(200);
 });
