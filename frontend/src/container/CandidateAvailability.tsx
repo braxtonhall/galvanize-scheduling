@@ -67,7 +67,7 @@ const CandidateAvailability: React.FC = (props) => {
 								{!submitted ?
 									<React.Fragment>
 										<CardSubtitle>
-											Please submit your available schedule so we can book a time with out interviewers.
+											Please submit your available schedule so we can book a time with our interviewers.
 										</CardSubtitle>
 										<hr/>
 										<AvailableTimes
