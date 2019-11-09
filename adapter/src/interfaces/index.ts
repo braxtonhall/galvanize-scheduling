@@ -39,7 +39,7 @@ export interface IMeeting {
 export type IAvailability = Array<{start: Moment | string, end: Moment | string}>
 
 export interface IGetSchedulesOptions {
-	preferences: Array<{interviewer: IInterviewer, preference: IInterviewer, minutes: number}>;
+	preferences: Array<{interviewer: IInterviewer, preference?: IInterviewer, minutes: number}>;
 	candidate: ICandidate;
 }
 

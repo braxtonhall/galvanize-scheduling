@@ -60,9 +60,11 @@ const Scheduling: React.FC = () => {
 	}
 
 	async function refreshSchedules(v: InterviewSelectionValue): Promise<void> {
-		// TODO: Fill out input for getSchedules()
 		startLoadingProcess();
-		const {success, data, error} = await adapter.getSchedules(token, {});
+		const {success, data, error} = await adapter.getSchedules(token, {
+			preferences: interviewerValue,
+			candidate: selectedCandidate,
+		});
 		if (success) {
 			updateSchedules(data);
 			endLoadingProcess();
