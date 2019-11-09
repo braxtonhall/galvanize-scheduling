@@ -3,8 +3,6 @@ import 'isomorphic-fetch';
 import {interfaces} from "adapter";
 import {Config, ConfigKey} from "../Config";
 
-const config: Config = Config.getInstance();
-
 export default class MSGraphController {
 
     private static getClient(token: string): Client {
@@ -15,9 +13,9 @@ export default class MSGraphController {
         });
     }
 
-    static buildRequest(query) {
-        let url = config.get(ConfigKey.msOAuthAuthority) + config.get(ConfigKey.msOAuthAuthorizeEndpoint) + "?";
-
+    static buildRequest(query: {[key: string]: any}): string {
+    	const cf: Config = Config.getInstance();
+        const url = cf.get(ConfigKey.msOAuthAuthority) + cf.get(ConfigKey.msOAuthAuthorizeEndpoint) + "?";
         return url + encodeURI(Object.entries(query).map(([k, v]) => `${k}=${v}`).join("&"));
     }
 
@@ -29,7 +27,8 @@ export default class MSGraphController {
     }
     
     static async getRooms(token: string): Promise<interfaces.IRoom[]> {
-		return (await (this.getClient(token)).api('/places/microsoft.graph.room')
+		return (await (this.getClient(token))
+			.api('/places/microsoft.graph.room')
 			.version('beta')
 			.get())
 			.value
