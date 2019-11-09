@@ -70,4 +70,18 @@ export default class ResourceFacade implements IResourceFacade {
 				throw new Error("Unsupported Kind");
 		}
 	}
+	
+	public get(token: string, id: string, kind: ResourceKind): Promise<IResource> {
+		// TODO
+		switch (kind) {
+			case ResourceKind.Candidate:
+				return this.cc.get(token, id);
+			case ResourceKind.Interviewer:
+				return this.ic.get(token, id);
+			case ResourceKind.Room:
+				return this.rc.get(token, id);
+			default:
+				throw new Error("Unsupported Kind");
+		}
+	}
 }

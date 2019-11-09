@@ -95,7 +95,7 @@ export class DynamoDBController implements IDynamoDBController {
 
 	private db: AWS.DynamoDB.DocumentClient = null;
 
-	constructor() {
+	private constructor() {
 		console.log("Database instance created");
 	}
 

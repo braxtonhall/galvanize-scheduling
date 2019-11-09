@@ -32,4 +32,8 @@ export default class HybridRoomController extends RoomController {
 	public async exists(id: string): Promise<boolean> {
 		throw  new Error("Unsupported Action - Room Exists?");
 	}
+
+	public get(token: string, id: string): Promise<interfaces.IResource> {
+		throw  new Error("Unsupported Action - Get Room");
+	}
 }

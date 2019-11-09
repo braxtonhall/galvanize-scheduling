@@ -32,6 +32,10 @@ export default class DynamoDBCandidateController extends CandidateController {
 	public async exists(id: string): Promise<boolean> {
 		return typeof (await this.dbc.getCandidate(id)) === "object";
 	}
+
+	public get(token: string, id: string): Promise<interfaces.IResource> {
+		return this.dbc.getCandidate(id);
+	}
 	
 	private hashID(id: string): string {
 		// https://gist.github.com/iperelivskiy/4110988

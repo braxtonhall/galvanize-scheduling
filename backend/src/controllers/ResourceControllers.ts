@@ -6,6 +6,7 @@ export interface IResourceController {
 	create(token: string, resource: interfaces.IResource): Promise<interfaces.IResource>;
 	delete(token: string, id: string): Promise<boolean>;
 	exists(id: string): Promise<boolean>;
+	get(token: string, id: string): Promise<interfaces.IResource>;
 }
 
 export abstract class CandidateController implements IResourceController {
@@ -13,6 +14,7 @@ export abstract class CandidateController implements IResourceController {
 	abstract delete(token: string, id: string): Promise<boolean>;
 	abstract exists(id: string): Promise<boolean>;
 	abstract list(token: string): Promise<interfaces.IResource[]>;
+	abstract get(token: string, id: string): Promise<interfaces.IResource>;
 
 	/**
 	 * Asserts that the given object is of the type ICandidate.
@@ -36,6 +38,7 @@ export abstract class InterviewerController implements IResourceController {
 	abstract delete(token: string, id: string): Promise<boolean>;
 	abstract exists(id: string): Promise<boolean>;
 	abstract list(token: string): Promise<interfaces.IResource[]>;
+	abstract get(token: string, id: string): Promise<interfaces.IResource>;
 
 	/**
 	 * Asserts that the given object is of the type ICandidate.
@@ -59,6 +62,7 @@ export abstract class RoomController implements IResourceController {
 	abstract delete(token: string, id: string): Promise<boolean>;
 	abstract exists(id: string): Promise<boolean>;
 	abstract list(token: string): Promise<interfaces.IResource[]>;
+	abstract get(token: string, id: string): Promise<interfaces.IResource>;
 
 	/**
 	 * Asserts that the given object is of the type IRoom.

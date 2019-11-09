@@ -34,4 +34,8 @@ export default class MSGraphInterviewerController extends InterviewerController 
 	public async exists(id: string): Promise<boolean> {
 		throw  new Error("Unsupported Action - Interviewer Exists?");
 	}
+
+	public get(token: string, id: string): Promise<interfaces.IResource> {
+		throw  new Error("Unsupported Action - Get Interviewer");
+	}
 }
