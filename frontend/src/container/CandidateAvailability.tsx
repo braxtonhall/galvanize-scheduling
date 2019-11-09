@@ -21,7 +21,7 @@ const CandidateAvailability: React.FC = (props) => {
 
 	useEffect(() => {
 		if (!candidateID) {
-			updateContext({error: "this link is invalid, please request a new one from Galvanize."})
+			updateContext({error: "this link is invalid, please request a new one from Galvanize."});
 			return;
 		}
 		startLoadingProcess();
@@ -61,7 +61,7 @@ const CandidateAvailability: React.FC = (props) => {
 				<Card className="mt-4">
 					<CardHeader>Submit Availability</CardHeader>
 					<CardBody>
-						<CardTitle><h5>{candidate.firstName} {candidate.lastName}</h5></CardTitle>
+						{candidate.firstName && <CardTitle><h5>Hello {candidate.firstName},</h5></CardTitle>}
 						{!submitted ?
 							<React.Fragment>
 								<CardSubtitle>

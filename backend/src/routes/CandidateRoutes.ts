@@ -20,7 +20,7 @@ app.get(nodeAdapter.urls.EXISTS_CANDIDATE, async (req, res) => {
 app.get(nodeAdapter.urls.CANDIDATE, async (req, res) => {
 	const token: string = req.header("token");
 	try {
-		const candidate: interfaces.ICandidate = await resourceFacade.get(token, req.params.id, ResourceKind.Candidate);
+		const candidate = await resourceFacade.get(token, req.query.id, ResourceKind.Candidate) as interfaces.ICandidate;
 		let data;
 		if (token && await AuthController.getInstance().checkAuth(token)) {
 			data = candidate;
@@ -29,6 +29,6 @@ app.get(nodeAdapter.urls.CANDIDATE, async (req, res) => {
 		}
 		res.status(200).send(data);
 	} catch(e) {
-		res.status(e.statusCode).send(e.message);
+		res.status(500).send(e.message);
 	}
 });
