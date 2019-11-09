@@ -1,5 +1,5 @@
 import IAPIResponse from "../IAPIResponse";
-import {ICandidate} from "../interfaces";
+import {IAvailability, ICandidate} from "../interfaces";
 import axios from "axios";
 import {fullURLs} from "./urls";
 
@@ -10,6 +10,14 @@ export default {
 			return {success: status === 200, data};
 		} catch {
 			return {success: false};
+		}
+	},
+	submitAvailability: async(candidateID: string, availability: IAvailability): Promise<IAPIResponse> => {
+		try {
+			const {status, data} = await axios.post(fullURLs.UPDATE_AVAILABILITY, {data: {id: candidateID, availability}}, {headers: {"Content-Type": "application/json"}});
+			return {success: status === 200, data};
+		} catch {
+			return {success: false}
 		}
 	},
 }

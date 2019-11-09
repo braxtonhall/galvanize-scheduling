@@ -16,6 +16,7 @@ const urls: {[key: string]: string} = new function() {
 	this.AUTHENTICATE = '/authenticate';
 	
 	this.EXISTS_CANDIDATE = '/exists/candidate';
+	this.UPDATE_AVAILABILITY = '/submitavailability'
 
 } as {[key: string]: string};
 

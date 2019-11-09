@@ -72,7 +72,6 @@ export default class ResourceFacade implements IResourceFacade {
 	}
 	
 	public get(token: string, id: string, kind: ResourceKind): Promise<IResource> {
-		// TODO
 		switch (kind) {
 			case ResourceKind.Candidate:
 				return this.cc.get(token, id);
