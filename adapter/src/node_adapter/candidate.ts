@@ -13,6 +13,9 @@ export default {
 		}
 	},
 	submitAvailability: async(candidateID: string, availability: IAvailability): Promise<IAPIResponse> => {
+		if (!!availability) {
+			return {success: false, error: "Availability was not defined"};
+		}
 		try {
 			const {status, data} = await axios.post(fullURLs.UPDATE_AVAILABILITY, {data: {id: candidateID, availability}}, {headers: {"Content-Type": "application/json"}});
 			return {success: status === 200, data};
