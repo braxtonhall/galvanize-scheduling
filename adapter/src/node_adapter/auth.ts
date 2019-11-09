@@ -13,7 +13,6 @@ async function logout(): Promise<IAPIResponse> {
 async function checkToken(token: string): Promise<IAPIResponse<boolean>> {
     try {
         const {status, data} = await axios.post(fullURLs.AUTHENTICATE, {token});
-        console.log(status, data);
         return {success: status === 200, data}
     } catch {
         return {success: false};

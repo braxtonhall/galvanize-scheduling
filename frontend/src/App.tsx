@@ -12,6 +12,8 @@ import Context from "./services/Context";
 import {Spinner} from "reactstrap";
 import AuthenticationRedirect from "./container/AuthenticationRedirect";
 import Rooms from "./container/Rooms";
+import Fade from 'react-reveal/Fade';
+import About from "./container/About";
 
 const App: React.FC = () => {
 	const {operationsLoading} = useContext(Context);
@@ -30,12 +32,15 @@ const App: React.FC = () => {
 			}}
 		>
 			<Router>
-				<Header/>
+				<Fade top>
+					<Header/>
+				</Fade>
 				<ErrorModal/>
 				<Switch>
 					<AuthenticatedRoute exact path="/candidates" component={CandidateMenu} />
 					<AuthenticatedRoute exact path="/scheduling" component={Scheduling} />
 					<AuthenticatedRoute exact path="/rooms" component={Rooms} />
+					<AuthenticatedRoute exact path="/about" component={About} />
 					<Route exact path="/auth/:token" component={AuthenticationRedirect} />
 					<Route exact path="/login" component={Login} />
 					<Route exact path="/submit_availability/:candidateID" component={CandidateAvailability} />

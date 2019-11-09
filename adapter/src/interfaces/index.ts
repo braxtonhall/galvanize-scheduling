@@ -6,11 +6,11 @@ export interface IResource {
 
 export interface IRoom extends IResource {
 	name: string,
+	eligible: boolean,
 }
 
 export interface ICandidate extends IResource {
-	id?: string,
-	email?: string,
+	email: string,
 	phoneNumber?: string,
 	firstName?: string,
 	lastName?: string,

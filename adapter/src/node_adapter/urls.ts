@@ -14,6 +14,8 @@ const urls: {[key: string]: string} = new function() {
 	this.LOGIN = '/login';
 	this.LOGOUT = '/logout';
 	this.AUTHENTICATE = '/authenticate';
+	
+	this.EXISTS_CANDIDATE = '/exists/candidate';
 
 } as {[key: string]: string};
 

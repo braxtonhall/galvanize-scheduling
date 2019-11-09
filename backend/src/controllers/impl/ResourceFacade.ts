@@ -1,7 +1,7 @@
 import IResourceFacade from "../IResourceFacade";
 import {interfaces} from "adapter";
 import ControllerBuilder from "./ControllerBuilder";
-import {ICandidateController, IInterviewerController, IRoomController} from "../ResourceControllerTypes";
+import {CandidateController, InterviewerController, RoomController} from "../ResourceControllers";
 import {ResourceKind} from "../Common";
 type IResource = interfaces.IResource;
 type ICandidate = interfaces.ICandidate;
@@ -9,9 +9,9 @@ type IInterviewer = interfaces.IInterviewer;
 type IRoom = interfaces.IRoom;
 
 export default class ResourceFacade implements IResourceFacade {
-	private readonly cc: ICandidateController;
-	private readonly ic: IInterviewerController;
-	private readonly rc: IRoomController;
+	private readonly cc: CandidateController;
+	private readonly ic: InterviewerController;
+	private readonly rc: RoomController;
 
 	constructor() {
 		this.cc = ControllerBuilder.getCandidateController();
@@ -32,7 +32,7 @@ export default class ResourceFacade implements IResourceFacade {
 		}
 	}
 
-	public create(token: string, resource: IResource, kind: ResourceKind): Promise<boolean> {
+	public create(token: string, resource: IResource, kind: ResourceKind): Promise<IResource> {
 		switch (kind) {
 			case ResourceKind.Candidate:
 				return this.cc.create(token, resource as ICandidate);
@@ -53,6 +53,19 @@ export default class ResourceFacade implements IResourceFacade {
 				return this.ic.delete(token, id);
 			case ResourceKind.Room:
 				return this.rc.delete(token, id);
+			default:
+				throw new Error("Unsupported Kind");
+		}
+	}
+	
+	public exists(id: string, kind: ResourceKind): Promise<boolean> {
+		switch (kind) {
+			case ResourceKind.Candidate:
+				return this.cc.exists(id);
+			case ResourceKind.Interviewer:
+				return this.ic.exists(id);
+			case ResourceKind.Room:
+				return this.rc.exists(id);
 			default:
 				throw new Error("Unsupported Kind");
 		}

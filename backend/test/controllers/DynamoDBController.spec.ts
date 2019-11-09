@@ -54,17 +54,17 @@ describe("DynamoDBController", () => {
 
 	it("Should list one room", async () => {
 		await dbc.writeRoom(MOCK_ROOMS[0]);
-		expect(await dbc.getRooms()).to.deep.equal([MOCK_ROOMS[0]]);
+		expect(await dbc.getRooms()).to.deep.equal([{name: MOCK_ROOMS[0].name}]);
 	});
 
 	it ("Should list one room with id", async () => {
-		expect(await dbc.getRoom("1")).to.deep.equal(MOCK_ROOMS[0]);
+		expect(await dbc.getRoom("1")).to.deep.equal({name: MOCK_ROOMS[0].name});
 	});
 
 	it ("Should list multiple rooms", async () => {
 		await dbc.writeRoom(MOCK_ROOMS[1]);
 		await dbc.writeRoom(MOCK_ROOMS[2]);
-		expect(await dbc.getRooms()).to.have.deep.members(MOCK_ROOMS);
+		expect(await dbc.getRooms()).to.have.deep.members(MOCK_ROOMS.map(r => ({name: r.name})));
 	});
 
 	it("should return null when getting an unstored room", async() => {
@@ -73,7 +73,7 @@ describe("DynamoDBController", () => {
 
 	it("Should delete a room", async () => {
 		await dbc.deleteRoom(MOCK_ROOMS[0].name);
-		expect(await dbc.getRooms()).to.have.deep.members(MOCK_ROOMS.slice(1,3));
+		expect(await dbc.getRooms()).to.have.deep.members(MOCK_ROOMS.slice(1,3).map(r => ({name: r.name})));
 	});
 
 	it ("Should not throw an error when trying to delete a unstored candidtate", async () => {
@@ -95,5 +95,19 @@ describe("DynamoDBController", () => {
 	it("Should save a token", async () => {
 		await dbc.writeOAuth(MOCK_AUTHS[0].token);
 		expect(await dbc.getOAuth(MOCK_AUTHS[0].token)).to.deep.equal(MOCK_AUTHS[0]);
+	});
+	
+	it("Should create multiple unique candidate IDs", async () => {
+		// @ts-ignore
+		let output = await dbc.getCandidateId();
+		expect(output).to.deep.equal("1");
+		// @ts-ignore
+		output = await dbc.getCandidateId();
+		expect(output).to.deep.equal("2");
+	});
+	
+	it("Should create a new candidate and give it an ID", async () => {
+		const output = await dbc.createCandidate({...MOCK_CANDIDATES, id: undefined});
+		expect(output).to.deep.equal({...MOCK_CANDIDATES, id: "3"});
 	});
 });
