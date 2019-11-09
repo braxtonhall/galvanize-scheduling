@@ -38,7 +38,6 @@ const Rooms: React.FC = () => {
 		return (
 			<tr className={"text-nowrap"} key={"row_" + index}>
 				<th scope="row">{id}</th>
-				<td>{name}</td>
 				<td>{eligible ? "eligible" : "not eligible"}</td>
 				<td>
 					<ButtonGroup>
@@ -72,8 +71,7 @@ const Rooms: React.FC = () => {
 									<Table hover>
 										<thead>
 										<tr>
-											<th>id</th>
-											<th>name</th>
+											<th>room</th>
 											<th>eligible</th>
 											<th>toggle</th>
 										</tr>
