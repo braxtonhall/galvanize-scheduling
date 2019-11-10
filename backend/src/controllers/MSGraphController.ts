@@ -49,7 +49,7 @@ export default class MSGraphController {
                 id: m.id,
                 firstName: m.givenName,
                 lastName: m.surname,
-                email: m.emailAddress
+                email: m.mail
             }));
     }
 
