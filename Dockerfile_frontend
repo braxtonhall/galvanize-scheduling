@@ -2,6 +2,7 @@ FROM node:10.16.3-alpine
 
 ARG SERVER_ADDRESS
 ARG PUBLIC_ADDRESS
+ARG DEFAULT_GROUP
 
 # libraries
 # adapter
@@ -27,6 +28,7 @@ RUN npm install --save ../adapter
 COPY ./frontend ./
 RUN REACT_APP_SERVER_ADDRESS=${SERVER_ADDRESS} \
     PUBLIC_URL=${PUBLIC_ADDRESS} \
+    REACT_APP_DEFAULT_GROUP=${DEFAULT_GROUP}
     npm run build
 
 EXPOSE 8080

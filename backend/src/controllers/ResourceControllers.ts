@@ -37,7 +37,7 @@ export abstract class InterviewerController implements IResourceController {
 	abstract create(token: string, resource: interfaces.IResource): Promise<interfaces.IResource>;
 	abstract delete(token: string, id: string): Promise<boolean>;
 	abstract exists(id: string): Promise<boolean>;
-	abstract list(token: string): Promise<interfaces.IResource[]>;
+	abstract list(token: string, groupName?: string): Promise<interfaces.IResource[]>;
 	abstract get(token: string, id: string): Promise<interfaces.IResource>;
 
 	/**

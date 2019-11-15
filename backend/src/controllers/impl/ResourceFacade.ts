@@ -26,7 +26,7 @@ export default class ResourceFacade implements IResourceFacade {
 			case ResourceKind.Candidate:
 				return this.cc.list(token);
 			case ResourceKind.Interviewer:
-				return this.ic.list(token);
+				return this.ic.list(token, options.groupName);
 			case ResourceKind.Room:
 				return this.rc.list(token)
 					.then((rooms: IRoom[]) => rooms.map((r) => ({

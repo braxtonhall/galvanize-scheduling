@@ -1,16 +1,19 @@
 import {InterviewerController} from "../../ResourceControllers";
 import { interfaces } from "adapter";
 import MSGraphController from "../../MSGraphController";
+import {Config, ConfigKey} from "../../../Config";
 type IInterviewer = interfaces.IInterviewer;
 
 export default class MSGraphInterviewerController extends InterviewerController {
 
-	public async list(token: string): Promise<IInterviewer[]> {
+	public async list(token: string,  groupName?: string): Promise<IInterviewer[]> {
+		groupName = typeof groupName === "string" ? groupName :
+			Config.getInstance().get(ConfigKey.interviewerGroupName);
 		const groups = await MSGraphController.getGroups(token);
 
 		let id;
 		for (let group of groups.value) {
-			if (group.displayName === 'Interviewers') { // TODO make this an environment variable
+			if (group.displayName === groupName) {
 				id = group.id;
 				break;
 			}

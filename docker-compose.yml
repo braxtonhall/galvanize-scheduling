@@ -8,6 +8,7 @@ services:
       args:
         - "SERVER_ADDRESS=http://localhost:8080"
         - "PUBLIC_ADDRESS=http://localhost:3000"
+        - "DEFAULT_GROUP=${INTERVIEWER_GROUP_NAME}"
     container_name: frontend
     environment:
       - "PORT=3000"
