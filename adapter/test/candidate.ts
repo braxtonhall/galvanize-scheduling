@@ -6,71 +6,86 @@ import {ICandidate} from "../dist/interfaces";
 import adapter from "../src/node_adapter";
 
 const candidateTests = (args: any) => () => {
-    let that = args;
-    let mockCandidate: ICandidate = {
+    const that = args;
+    const INVALID_TOKEN = "invalidToken";
+
+    const mockCandidate: ICandidate = {
         email: "admin+tester@ph14solutions.onmicrosoft.com",
         phoneNumber: "17781234567",
         firstName: "Test",
         lastName: "Doe"
     };
-    let nonExistentCandidate = {id: "-1", ...mockCandidate};
+    const candidateWithId = {...mockCandidate};
+
 
     context("createCandidate", () => {
+        it("should fail with invalid authentication", async () => {
+            const {success} = await adapter.createCandidate(INVALID_TOKEN, mockCandidate);
+            expect(success).to.be.false;
+        });
+
         it("should succeed on insert", async () => {
             const {success, data} = await adapter.createCandidate(that.token, mockCandidate);
             expect(success).to.be.true;
             expect(data.id).to.exist;
-            mockCandidate = data; // returns with id attribute
+            candidateWithId.id = data.id;
+        });
+
+        it("should assign candidates unique ids", async () => {
+            const [{success: s1, data: d1}, {success: s2, data: d2}] = await Promise.all([
+                adapter.createCandidate(that.token, mockCandidate),
+                adapter.createCandidate(that.token, mockCandidate)
+            ]);
+            expect(s1).to.be.true;
+            expect(s2).to.be.true;
+            expect(d1.id).to.not.equal(d2.id);
+        });
+
+        it("should fail when inserting an existing candidate", async () => {
+            const {success} = await adapter.createCandidate(that.token, candidateWithId);
+            expect(success).to.be.false;
         });
     });
 
-    context("isValidCandidateID", () => {
-        it("should return true if candidate exists", async () => {
-            const {success, data} = await adapter.isValidCandidateID(mockCandidate.id);
-            expect(success).to.be.true;
-            expect(data).to.be.true;
-        });
-
-        it("should return false if candidate does not exist", async () => {
-            const {success, data} = await adapter.isValidCandidateID(nonExistentCandidate.id);
-            expect(success).to.be.true;
-            expect(data).to.be.false;
-        });
-
-        it("should return false on invalid ID format", async () => {
-            const {success, data} = await adapter.isValidCandidateID("%$&%$@!!");
-            expect(success).to.be.true;
-            expect(data).to.be.false;
-        });
-
-        it("should return false on empty string", async () => {
-            const {success, data} = await adapter.isValidCandidateID("");
-            expect(success).to.be.true;
-            expect(data).to.be.false;
-        })
-    });
+    // isValidCandidateID is unused
 
     context("getCandidates, getCandidateById", () => {
-        it("should return a list with the new candidate", async () => {
+        it("should fail on invalid authentication", async () => {
+            const {success} = await adapter.getCandidates(INVALID_TOKEN);
+            expect(success).to.be.false;
+        });
+
+        it("should return a list with created candidates", async () => {
             const {success, data} = await adapter.getCandidates(that.token);
             expect(success).to.be.true;
             expect(Array.isArray(data)).to.be.true;
-            expect(data).to.deep.include(mockCandidate);
+            expect(data).to.deep.include(candidateWithId);
         });
 
-        it("should find the new candidate when searching by ID", async () => {
-            const {success, data} = await adapter.getCandidateByID(mockCandidate.id);
+        it("should retrieve only public information when searching by ID", async () => {
+            const {success, data} = await adapter.getCandidateByID(candidateWithId.id);
             expect(success).to.be.true;
-            expect(data).to.deep.equals(mockCandidate);
+            expect(data.firstName).to.equal(candidateWithId.firstName);
+            expect(data.email).to.not.be.ok;
+            expect(data.lastName).to.be.undefined;
+            expect(data.phoneNumber).to.be.undefined;
         });
 
         it("should fail if candidate does not exist", async () => {
-            const {success, error} = await adapter.getCandidateByID(nonExistentCandidate.id);
+            const {success} = await adapter.getCandidateByID("0");
             expect(success).to.be.false;
-            expect(error).to.exist;
+        });
+
+        it("should fail if id is malformed", async () => {
+            const [{success: s1}, {success: s2}] = await Promise.all([
+                adapter.getCandidateByID(""),
+                adapter.getCandidateByID("!@#$%^&")
+            ]);
+            expect(s1).to.be.false;
+            expect(s2).to.be.false;
         });
     });
-
+/*
     context("updateCandidate", () => {
         it("should update any personal information", async () => {
             mockCandidate = {
@@ -176,6 +191,7 @@ const candidateTests = (args: any) => () => {
             expect(error).to.exist;
         });
     });
+ */
 };
 
 export default candidateTests;

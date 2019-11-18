@@ -14,7 +14,7 @@ if (!config.get(ConfigKey.production)) {
 				await AuthController.getInstance().saveAuth(token);
 				res.sendStatus(200)
 			} else {
-				res.status(401);
+				res.status(401).end();
 			}
 		} catch (e) {
 			res.status(400).send(e);
