@@ -15,10 +15,12 @@
     "build-backend": "docker-compose build backend",
     "watch-backend": "docker-compose up backend",
     "detatch-backend": "docker-compose up -d backend db",
+    "debug-backend": "npm run stop-backend && docker-compose run -d -p 8080:8080 -p 9229:9229 --name backend-debug backend npm run start-debug && docker-compose up -d db",
+    "remove-debug": "docker-compose rm -fs backend",
     "stop-backend": "docker-compose down",
     "restart-backend": "docker-compose build backend && npm run detatch-backend",
     "test:backend": "npm --prefix ./backend run test",
     "test:adapter": "npm --prefix ./adapter run test",
-    "test:integration": "npm run detatch-backend && REACT_APP_SERVER_ADDRESS=http://localhost:8080 npm run test:adapter && npm run stop-backend"
+    "test:integration": "npm run detatch-backend && npm run test:adapter && npm run stop-backend"
   }
 }

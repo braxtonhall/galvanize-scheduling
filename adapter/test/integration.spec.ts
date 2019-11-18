@@ -1,4 +1,4 @@
-import {createTestToken, deauthTestToken} from "./TestUtils";
+import {createTestToken} from "./TestUtils";
 import candidateTests from "./candidate";
 
 describe("Adapter Integration Tests", () => {
@@ -8,11 +8,6 @@ describe("Adapter Integration Tests", () => {
         args.token = await createTestToken();
     });
 
-    after(async () => {
-       await deauthTestToken(args.token);
-       args.token = null;
-    });
-
-    describe("Candidate Lifecycle", candidateTests(args));
+    context("Candidate Lifecycle", candidateTests(args));
 
 });

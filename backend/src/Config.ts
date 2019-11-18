@@ -70,8 +70,8 @@ export class Config {
 				
 				// Testing
 				[ConfigKey.testSecretKey]: process.env.TEST_SECRET_KEY,
-				[ConfigKey.production]:    typeof process.env.PRODUCTION === "string" &&
-					process.env.PRODUCTION.toLowerCase() === 'true',
+				[ConfigKey.production]: typeof process.env.PRODUCTION === "string" &&
+				process.env.PRODUCTION.toLowerCase() === 'true',
 			};
 			// TODO check for testing scenario and change some of these props
 		} catch (err) {
