@@ -1,22 +1,49 @@
 import axios from 'axios';
-import {v4 as generateUUID} from 'uuid';
 import * as dotenv from 'dotenv';
 dotenv.config({path: "../.env"});
 
+const generateMsToken = async () => {
+    const pe = process.env;
+    const url = pe.OAUTH_HOST + pe.TENANT_ID + pe.OAUTH_TOKEN_ENDPOINT;
+    const params = new URLSearchParams();
+    params.append('client_id', pe.OAUTH_APP_ID);
+    params.append('scope', pe.PERMISSIONS_SCOPE);
+    params.append('client_secret', pe.OAUTH_APP_PASSWORD);
+    params.append('grant_type', pe.GRANT_TYPE);
+
+    let status, data;
+    try {
+        ({status, data} = await axios.post(url, params, {
+            headers: {'content-type': 'application/x-www-form-urlencoded'}
+        }));
+    } catch (error) {
+        const res = error.response;
+        console.error(`MS Response ${res.status}: ${res.statusText}`);
+        console.error(res.data);
+    }
+
+    if (status === 200 && data.access_token) {
+        return data.access_token;
+    }
+    throw "Failed to generate application token.";
+};
+
 const createTestToken = async () => {
     const testSecretKey = process.env.TEST_SECRET_KEY;
-    const msToken = generateUUID();
-    const { status } = await axios.post(
-        "http://localhost:8080/saveauth",
-        {"token": msToken},
-        {headers: {"token": testSecretKey, "Content-Type": "application/json"}}
+    const msToken = await generateMsToken();
+    try {
+        await axios.post(
+            "http://localhost:8080/saveauth",
+            {"token": msToken},
+            {headers: {"token": testSecretKey, "Content-Type": "application/json"}}
         );
-    if (status === 200) {
         return msToken;
-    } else if (status === 401) {
-        throw "Secret does not match backend configuration.";
-    } else {
-        throw "Failed to save test token.";
+    } catch (error) {
+        console.error(`/saveauth error ${error.response.status} ${error.response.statusText}`);
+        if (error.response.status === 401) {
+            throw "Secret does not match backend configuration.";
+        }
+        throw "Failed to save app token.";
     }
 };
 

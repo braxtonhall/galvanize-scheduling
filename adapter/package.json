@@ -21,6 +21,7 @@
     "@types/chai": "^4.2.3",
     "@types/expect": "^1.20.4",
     "@types/mocha": "^5.2.7",
+    "@types/uuid": "^3.4.6",
     "chai": "^4.2.0",
     "dotenv": "^8.2.0",
     "expect": "^24.9.0",

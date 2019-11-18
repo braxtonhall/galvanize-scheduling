@@ -1,5 +1,6 @@
 import "mocha";
 import {expect} from "chai";
+import {v4 as generateUUID} from 'uuid';
 import moment = require("moment");
 
 import {ICandidate} from "../dist/interfaces";
@@ -9,23 +10,24 @@ const candidateTests = (args: any) => () => {
     const that = args;
     const INVALID_TOKEN = "invalidToken";
 
-    const mockCandidate: ICandidate = {
+    const candidateBase: ICandidate = {
         email: "admin+tester@ph14solutions.onmicrosoft.com",
         phoneNumber: "17781234567",
         firstName: "Test",
         lastName: "Doe"
     };
-    const candidateWithId = {...mockCandidate};
+    const candidateNotInDB = {...candidateBase, id: generateUUID()};
+    let candidateWithId: ICandidate = {...candidateBase};
 
 
     context("createCandidate", () => {
         it("should fail with invalid authentication", async () => {
-            const {success} = await adapter.createCandidate(INVALID_TOKEN, mockCandidate);
+            const {success} = await adapter.createCandidate(INVALID_TOKEN, candidateBase);
             expect(success).to.be.false;
         });
 
         it("should succeed on insert", async () => {
-            const {success, data} = await adapter.createCandidate(that.token, mockCandidate);
+            const {success, data} = await adapter.createCandidate(that.token, candidateBase);
             expect(success).to.be.true;
             expect(data.id).to.exist;
             candidateWithId.id = data.id;
@@ -33,8 +35,8 @@ const candidateTests = (args: any) => () => {
 
         it("should assign candidates unique ids", async () => {
             const [{success: s1, data: d1}, {success: s2, data: d2}] = await Promise.all([
-                adapter.createCandidate(that.token, mockCandidate),
-                adapter.createCandidate(that.token, mockCandidate)
+                adapter.createCandidate(that.token, candidateBase),
+                adapter.createCandidate(that.token, candidateBase)
             ]);
             expect(s1).to.be.true;
             expect(s2).to.be.true;
@@ -72,60 +74,84 @@ const candidateTests = (args: any) => () => {
         });
 
         it("should fail if candidate does not exist", async () => {
-            const {success} = await adapter.getCandidateByID("0");
+            const {success} = await adapter.getCandidateByID(candidateNotInDB.id);
             expect(success).to.be.false;
         });
 
-        it("should fail if id is malformed", async () => {
-            const [{success: s1}, {success: s2}] = await Promise.all([
-                adapter.getCandidateByID(""),
-                adapter.getCandidateByID("!@#$%^&")
-            ]);
-            expect(s1).to.be.false;
-            expect(s2).to.be.false;
+        it("should fail if id is empty", async () => {
+            const {success} = await adapter.getCandidateByID("");
+            expect(success).to.be.false;
         });
     });
-/*
+
     context("updateCandidate", () => {
+        it("should fail on invalid authentication", async () => {
+            const {success} = await adapter.updateCandidate(INVALID_TOKEN, candidateWithId);
+            expect(success).to.be.false;
+        });
+
         it("should update any personal information", async () => {
-            mockCandidate = {
-                ...mockCandidate,
+            candidateWithId = {
+                ...candidateWithId,
                 email: "admin+integration@ph14solutions.onmicrosoft.com",
                 firstName: "Jane",
                 phoneNumber: "16041234567",
                 notes: "This is a test account"
             };
-            const {success, data} = await adapter.updateCandidate(that.token, mockCandidate);
+            const {success, data} = await adapter.updateCandidate(that.token, candidateWithId);
             expect(success).to.be.true;
-            expect(data).to.deep.equals(mockCandidate);
+            expect(data).to.deep.equals(candidateWithId);
         });
 
         it("succeed on no changes", async () => {
-            const {success, data} = await adapter.updateCandidate(that.token, mockCandidate);
+            const {success, data} = await adapter.updateCandidate(that.token, candidateWithId);
             expect(success).to.be.true;
-            expect(data).to.deep.equals(mockCandidate);
+            expect(data).to.deep.equals(candidateWithId);
         });
 
-        it("should fail on missing candidate", async () => {
-            const {success, error} = await adapter.updateCandidate(that.token, nonExistentCandidate);
+        it("should create candidates if they don't exist", async () => {
+            // TODO: shouldn't updateCandidate have a check against this? probably a mistake if called this way
+            const id = generateUUID();
+            const {success: existsBefore} = await adapter.getCandidateByID(id);
+            const {success: didUpdate} = await adapter.updateCandidate(that.token, {...candidateBase, id});
+            const {success: existsAfter} = await adapter.getCandidateByID(id);
+            expect(existsBefore).to.be.false;
+            expect(didUpdate).to.be.true;
+            expect(existsAfter).to.be.true;
+        });
+
+        it("should fail if candidate has no id", async () => {
+            const {success} = await adapter.updateCandidate(that.token, candidateBase);
             expect(success).to.be.false;
-            expect(error).to.exist;
         });
     });
 
     context("sendAvailabilityEmail", () => {
-        it("should fail on missing candidate", async () => {
-            const {success, error} = await adapter.sendAvailabilityEmail(that.token, nonExistentCandidate);
+        it("should fail on invalid email", async () => {
+            const {success} = await adapter.sendAvailabilityEmail(that.token, {email: "test test test"});
             expect(success).to.be.false;
-            expect(error).to.exist;
         });
 
-        it("should succeed on existing candidate", async () => {
-            const {success} = await adapter.sendAvailabilityEmail(that.token, mockCandidate);
+        it("should fail on blank email", async () => {
+            const {success} = await adapter.sendAvailabilityEmail(that.token, {email: ""});
+            expect(success).to.be.false;
+        });
+
+        it("should succeed on valid email", async () => {
+            const {success} = await adapter.sendAvailabilityEmail(that.token, candidateWithId);
+            expect(success).to.be.true;
+            // Manually check admin email inbox to confirm sending
+        });
+
+        it("should succeed with a minimal candidate model", async () => {
+            // in case HR does not have other information on file
+            const {success} = await adapter.sendAvailabilityEmail(
+                that.token, {email: "admin+integration2@ph14solutions.onmicrosoft.com"}
+            );
             expect(success).to.be.true;
         });
     });
-
+/*
     context("submitAvailability", () => {
         const sotw = moment().startOf("week");
         const eotw = moment().endOf("week");
@@ -137,17 +163,17 @@ const candidateTests = (args: any) => () => {
         ];
 
         it("should succeed", async () => {
-            const {success} = await adapter.submitAvailability(mockCandidate.id, availabilities);
+            const {success} = await adapter.submitAvailability(candidateBase.id, availabilities);
             expect(success).to.be.true;
-            const {data} = await adapter.getCandidateByID(mockCandidate.id);
+            const {data} = await adapter.getCandidateByID(candidateBase.id);
             expect(data.availability).to.exist;
             expect(data.availability).to.deep.equals(availabilities);
         });
 
         it("should succeed on no availabilities", async () => {
-            const {success} = await adapter.submitAvailability(mockCandidate.id, []);
+            const {success} = await adapter.submitAvailability(candidateBase.id, []);
             expect(success).to.be.true;
-            const {data} = await adapter.getCandidateByID(mockCandidate.id);
+            const {data} = await adapter.getCandidateByID(candidateBase.id);
             expect(data.availability).to.exist;
         });
 
@@ -156,9 +182,9 @@ const candidateTests = (args: any) => () => {
                 ...availabilities,
                 {start: eotw.add(15, "hours"), end: eotw.add(18, "hours")}
             ];
-            const {success} = await adapter.submitAvailability(mockCandidate.id, updatedAvailabilities);
+            const {success} = await adapter.submitAvailability(candidateBase.id, updatedAvailabilities);
             expect(success).to.be.true;
-            const {data} = await adapter.getCandidateByID(mockCandidate.id);
+            const {data} = await adapter.getCandidateByID(candidateBase.id);
             expect(data.availability).to.exist;
             expect(data.availability).to.deep.equals(updatedAvailabilities);
 
@@ -169,9 +195,9 @@ const candidateTests = (args: any) => () => {
                 ...availabilities,
                 {start: eotw, end: sotw}
             ];
-            const {success} = await adapter.submitAvailability(mockCandidate.id, updatedAvailabilities);
+            const {success} = await adapter.submitAvailability(candidateBase.id, updatedAvailabilities);
             expect(success).to.be.false;
-            const {data} = await adapter.getCandidateByID(mockCandidate.id);
+            const {data} = await adapter.getCandidateByID(candidateBase.id);
             expect(data.availability).to.exist;
             expect(data.availability).to.deep.equals(availabilities);
         });
@@ -179,14 +205,14 @@ const candidateTests = (args: any) => () => {
 
     context("deleteCandidate", () => {
         it("should remove the candidate", async () => {
-            const {success} = await adapter.deleteCandidate(that.token, mockCandidate);
+            const {success} = await adapter.deleteCandidate(that.token, candidateBase);
             expect(success).to.be.true;
-            const {success: didFindCandidate} = await adapter.getCandidateByID(mockCandidate.id);
+            const {success: didFindCandidate} = await adapter.getCandidateByID(candidateBase.id);
             expect(didFindCandidate).to.be.false;
         });
 
         it("should fail on missing candidate", async () => {
-            const {success, error} = await adapter.deleteCandidate(that.token, mockCandidate);
+            const {success, error} = await adapter.deleteCandidate(that.token, candidateBase);
             expect(success).to.be.false;
             expect(error).to.exist;
         });
