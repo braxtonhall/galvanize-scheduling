@@ -11,7 +11,7 @@ const candidateTests = (args: any) => () => {
     const INVALID_TOKEN = "invalidToken";
 
     const candidateBase: ICandidate = {
-        email: "admin+tester@ph14solutions.onmicrosoft.com",
+        email: "admin@ph14solutions.onmicrosoft.com",
         phoneNumber: "17781234567",
         firstName: "Test",
         lastName: "Doe"
@@ -93,7 +93,7 @@ const candidateTests = (args: any) => () => {
         it("should update any personal information", async () => {
             candidateWithId = {
                 ...candidateWithId,
-                email: "admin+integration@ph14solutions.onmicrosoft.com",
+                email: "test-integration@ph14solutions.onmicrosoft.com",
                 firstName: "Jane",
                 phoneNumber: "16041234567",
                 notes: "This is a test account"
@@ -140,13 +140,13 @@ const candidateTests = (args: any) => () => {
         it("should succeed on valid email", async () => {
             const {success} = await adapter.sendAvailabilityEmail(that.token, candidateWithId);
             expect(success).to.be.true;
-            // Manually check admin email inbox to confirm sending
+            // Manually check admin email inbox to confirm sending works
         });
 
         it("should succeed with a minimal candidate model", async () => {
-            // in case HR does not have other information on file
+            // TODO: need an ID to generate link, so this call should fail... add validation?
             const {success} = await adapter.sendAvailabilityEmail(
-                that.token, {email: "admin+integration2@ph14solutions.onmicrosoft.com"}
+                that.token, {email: "test-integration@ph14solutions.onmicrosoft.com"}
             );
             expect(success).to.be.true;
         });
