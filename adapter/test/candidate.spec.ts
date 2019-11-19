@@ -6,9 +6,8 @@ import moment = require("moment");
 import {ICandidate} from "../dist/interfaces";
 import adapter from "../src/node_adapter";
 
-const candidateTests = (args: any) => () => {
+const CandidateTests = args => () => {
     const that = args;
-    const INVALID_TOKEN = "invalidToken";
 
     const candidateBase: ICandidate = {
         email: "test-integration@ph14solutions.onmicrosoft.com",
@@ -21,7 +20,7 @@ const candidateTests = (args: any) => () => {
 
     context("createCandidate", () => {
         it("should fail with invalid authentication", async () => {
-            const {success} = await adapter.createCandidate(INVALID_TOKEN, candidateBase);
+            const {success} = await adapter.createCandidate(that.INVALID_TOKEN, candidateBase);
             expect(success).to.be.false;
         });
 
@@ -52,7 +51,7 @@ const candidateTests = (args: any) => () => {
 
     context("getCandidates, getCandidateById", () => {
         it("should fail on invalid authentication", async () => {
-            const {success} = await adapter.getCandidates(INVALID_TOKEN);
+            const {success} = await adapter.getCandidates(that.INVALID_TOKEN);
             expect(success).to.be.false;
         });
 
@@ -85,7 +84,7 @@ const candidateTests = (args: any) => () => {
 
     context("updateCandidate", () => {
         it("should fail on invalid authentication", async () => {
-            const {success} = await adapter.updateCandidate(INVALID_TOKEN, candidateWithId);
+            const {success} = await adapter.updateCandidate(that.INVALID_TOKEN, candidateWithId);
             expect(success).to.be.false;
         });
 
@@ -192,7 +191,7 @@ const candidateTests = (args: any) => () => {
             expect(data.availability).to.deep.equals(updatedAvailabilities.map(toISO));
             availabilities = updatedAvailabilities;
         });
-/*
+
         it("should fail on impossible date range", async () => {
             // TODO: this succeeds, add validation?
             const updatedAvailabilities = [
@@ -205,7 +204,7 @@ const candidateTests = (args: any) => () => {
             expect(data.availability).to.exist;
             expect(data.availability).to.deep.equals(availabilities.map(toISO));
         });
-*/
+
         it("should fail if candidate has no id", async () => {
             const {success} = await adapter.submitAvailability(candidateBase.id, availabilities);
             expect(success).to.be.false;
@@ -219,7 +218,7 @@ const candidateTests = (args: any) => () => {
 
     context("deleteCandidate", () => {
         it("should fail on invalid authentication", async () => {
-            const {success} = await adapter.deleteCandidate(INVALID_TOKEN, candidateWithId);
+            const {success} = await adapter.deleteCandidate(that.INVALID_TOKEN, candidateWithId);
             expect(success).to.be.false;
             const {success: didFindCandidate} = await adapter.getCandidateByID(candidateWithId.id);
             expect(didFindCandidate).to.be.true;
@@ -254,4 +253,4 @@ const candidateTests = (args: any) => () => {
 
 };
 
-export default candidateTests;
+export default CandidateTests;

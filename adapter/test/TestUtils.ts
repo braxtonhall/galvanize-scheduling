@@ -47,4 +47,6 @@ const createTestToken = async () => {
     }
 };
 
-export {createTestToken};
+const configGroupName = process.env.INTERVIEWER_GROUP_NAME;
+
+export {createTestToken, configGroupName};
