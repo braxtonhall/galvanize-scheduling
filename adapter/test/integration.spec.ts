@@ -2,7 +2,10 @@ import {createTestToken} from "./TestUtils";
 import candidateTests from "./candidate";
 
 describe("Adapter Integration Tests", () => {
-    const args: any = {};
+    const args = {
+        token: null,
+        emailTests: false
+    };
 
     before(async () => {
         args.token = await createTestToken();
