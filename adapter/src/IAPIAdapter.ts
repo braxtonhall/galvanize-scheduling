@@ -21,7 +21,7 @@ export default interface IAPIAdapter {
 	getCandidates(token: string): Promise<IAPIResponse<ICandidate[]>>;
 	deleteCandidate(token: string, candidate: ICandidate): Promise<IAPIResponse>;
 	updateCandidate(token: string, candidate: ICandidate): Promise<IAPIResponse>;
-	getInterviewers(token: string): Promise<IAPIResponse<IInterviewer[]>>;
+	getInterviewers(token: string, groupName: string): Promise<IAPIResponse<IInterviewer[]>>;
 	getRooms(token: string): Promise<IAPIResponse<IRoom[]>>;
 	toggleEligibility(token: string, room: IRoom): Promise<IAPIResponse>;
 

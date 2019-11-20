@@ -1,6 +1,6 @@
 import {interfaces} from "adapter";
 import React, {ChangeEventHandler} from "react";
-import {Button, ButtonGroup, Card, CardBody, CardHeader, Input, Table} from "reactstrap";
+import {Button, ButtonGroup, Card, CardBody, CardHeader, CardText, Input, Label, Table} from "reactstrap";
 import cloneDeep from "lodash/cloneDeep"
 
 type IInterviewer = interfaces.IInterviewer;
@@ -14,7 +14,10 @@ export type InterviewSelectionValue = Array<{
 interface IProps {
 	value?: InterviewSelectionValue,
 	onChange?: (v: InterviewSelectionValue) => void,
+	group?: string;
+	onChangeGroup?: (v: string) => void,
 	actions?: Array<{text: string, onClick: (v: InterviewSelectionValue) => void | Promise<void>}>
+	refresh?: () => void,
 }
 
 const allowedMinutes = [0, 15, 30, 45, 60, 75, 90, 105, 120];
@@ -26,7 +29,7 @@ const minuteOptions = (
 
 const InterviewSelection: React.FC<IProps> = (props: IProps) => {
 
-	const {value, onChange, actions} = props;
+	const {value, onChange, actions, group, onChangeGroup, refresh} = props;
 
 	function makeRow(v: { interviewer: IInterviewer, minutes: number, preference?: IInterviewer, }, index: number) {
 		const {interviewer, minutes, preference} = v;
@@ -84,6 +87,10 @@ const InterviewSelection: React.FC<IProps> = (props: IProps) => {
 		)
 	}
 
+	function onChangeGroupWrapper(e): void {
+		onChangeGroup(e.target.value);
+	}
+
 	function makeButton({text, onClick}: {text: string, onClick: (v: InterviewSelectionValue) => void | Promise<void>}, index: number) {
 		function onClickWrapper() {
 			onClick(value);
@@ -96,6 +103,15 @@ const InterviewSelection: React.FC<IProps> = (props: IProps) => {
 		<Card className="mt-4">
 			<CardHeader>Interviewers</CardHeader>
 			<CardBody>
+				<CardText>
+					Please allocate times for each interviewer you want to meet with the candidate. Preferences will try
+					to be accommodated, but cannot be guaranteed based on room availability/schedules. The employees
+					shown are based on which groups they are a part of on Outlook, you may adjust this to view employees
+					from other groups.
+				</CardText>
+				<Label>Outlook Group</Label>
+				<Input value={group} onChange={onChangeGroupWrapper}/>
+				<Button onClick={refresh} color="primary" className="my-3">Refresh Interviewers</Button>
 				<div className="table-responsive">
 					<Table hover>
 						<thead>

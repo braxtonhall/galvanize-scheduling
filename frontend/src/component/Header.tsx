@@ -28,7 +28,7 @@ const Header: React.FC = () => {
 
 	return (
 		<Navbar color="light" light expand="md">
-			<NavbarBrand><img alt="galvanize logo" src="/galvanize-logo.svg"/></NavbarBrand>
+			<NavbarBrand><img alt="galvanize logo" src="/galvanize-logo.svg" style={{width: "50%"}}/></NavbarBrand>
 			{process.env.NODE_ENV === 'development' &&
 			<NavItem className="px-2">Environment: {process.env.NODE_ENV}</NavItem>}
 			{process.env.NODE_ENV === 'development' &&

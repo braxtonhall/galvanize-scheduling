@@ -8,73 +8,146 @@ import AuthController from "../controllers/AuthController";
 
 const resourceFacade: IResourceFacade = new ResourceFacade();
 
-[
-	{
-		multiple: "INTERVIEWERS",
-		single: "INTERVIEWER",
-		kind: ResourceKind.Interviewer
-	},
-	{
-		multiple: "CANDIDATES",
-		single: "CANDIDATE",
-		kind: ResourceKind.Candidate
-	},
-	{
-		multiple: "ROOMS",
-		single: "ROOM",
-		kind: ResourceKind.Room
-	},
-].forEach((resourceType) => {
-	app.get(nodeAdapter.urls[resourceType.multiple], async (req, res) => {
-		const token: string = req.header("token");
-		try {
-			if (await AuthController.getInstance().checkAuth(token)) {
-				const data: IResource[] = await resourceFacade.list(token, resourceType.kind);
-				res.status(200).send(data);
-			} else {
-				res.status(401);
-			}
-		} catch(e) {
-			res.status(e.statusCode).send(e.message);
+// CANDIDATES
+app.get(nodeAdapter.urls.CANDIDATES, async (req, res) => {
+	const token: string = req.header("token");
+	try {
+		if (await AuthController.getInstance().checkAuth(token)) {
+			const data: IResource[] = await resourceFacade.list(token, ResourceKind.Candidate);
+			res.status(200).send(data);
+		} else {
+			res.status(401);
 		}
-	});
+	} catch(e) {
+		res.status(e.statusCode).send(e.message);
+	}
+});
 
-	app.post(nodeAdapter.urls[resourceType.single], async (req, res) => {
-		const token: string = req.header("token");
-		const data = req.body.data;
-		try {
-			if (await AuthController.getInstance().checkAuth(token)) {
-				const result = await resourceFacade.create(token, data, resourceType.kind);
-				res.status(200).send(result);
-			} else {
-				res.status(401);
-			}
-		} catch (e) {
-			res.status(400).send(e);
+app.post(nodeAdapter.urls.CANDIDATE, async (req, res) => {
+	const token: string = req.header("token");
+	const data = req.body.data;
+	try {
+		if (await AuthController.getInstance().checkAuth(token)) {
+			const result = await resourceFacade.create(token, data, ResourceKind.Candidate);
+			res.status(200).send(result);
+		} else {
+			res.status(401);
 		}
-	});
+	} catch (e) {
+		res.status(400).send(e);
+	}
+});
 
-	app.delete(nodeAdapter.urls[resourceType.single], async (req, res) => {
-		const token: string = req.header("token");
-		const id: string = req.body.id;
-		try {
-			if (await AuthController.getInstance().checkAuth(token)) {
-				const result = await resourceFacade.delete(token, id, resourceType.kind);
-				res.status(200).send(result);
-			} else {
-				res.status(401);
-			}
-		} catch (e) {
-			res.status(400).send(e);
+app.delete(nodeAdapter.urls.CANDIDATE, async (req, res) => {
+	const token: string = req.header("token");
+	const id: string = req.body.id;
+	try {
+		if (await AuthController.getInstance().checkAuth(token)) {
+			const result = await resourceFacade.delete(token, id, ResourceKind.Candidate);
+			res.status(200).send(result);
+		} else {
+			res.status(401);
 		}
-	});
+	} catch (e) {
+		res.status(400).send(e);
+	}
+});
+
+// ROOMS
+app.get(nodeAdapter.urls.ROOMS, async (req, res) => {
+	const token: string = req.header("token");
+	try {
+		if (await AuthController.getInstance().checkAuth(token)) {
+			const data: IResource[] = await resourceFacade.list(token, ResourceKind.Room);
+			res.status(200).send(data);
+		} else {
+			res.status(401);
+		}
+	} catch(e) {
+		res.status(e.statusCode).send(e.message);
+	}
+});
+
+app.post(nodeAdapter.urls.ROOM, async (req, res) => {
+	const token: string = req.header("token");
+	const data = req.body.data;
+	try {
+		if (await AuthController.getInstance().checkAuth(token)) {
+			const result = await resourceFacade.create(token, data, ResourceKind.Room);
+			res.status(200).send(result);
+		} else {
+			res.status(401);
+		}
+	} catch (e) {
+		res.status(400).send(e);
+	}
+});
+
+app.delete(nodeAdapter.urls.ROOM, async (req, res) => {
+	const token: string = req.header("token");
+	const id: string = req.body.id;
+	try {
+		if (await AuthController.getInstance().checkAuth(token)) {
+			const result = await resourceFacade.delete(token, id, ResourceKind.Room);
+			res.status(200).send(result);
+		} else {
+			res.status(401);
+		}
+	} catch (e) {
+		res.status(400).send(e);
+	}
+});
+
+// INTERVIEWERS
+app.get(nodeAdapter.urls.INTERVIEWERS, async (req, res) => {
+	const token: string = req.header("token");
+	try {
+		if (await AuthController.getInstance().checkAuth(token)) {
+			const data: IResource[] = await resourceFacade.list(token, ResourceKind.Interviewer, req.query);
+			res.status(200).send(data);
+		} else {
+			res.status(401);
+		}
+	} catch(e) {
+		res.status(e.statusCode).send(e.message);
+	}
+});
+
+app.post(nodeAdapter.urls.INTERVIEWER, async (req, res) => {
+	const token: string = req.header("token");
+	const data = req.body.data;
+	try {
+		if (await AuthController.getInstance().checkAuth(token)) {
+			const result = await resourceFacade.create(token, data, ResourceKind.Interviewer);
+			res.status(200).send(result);
+		} else {
+			res.status(401);
+		}
+	} catch (e) {
+		res.status(400).send(e);
+	}
+});
+
+app.delete(nodeAdapter.urls.INTERVIEWER, async (req, res) => {
+	const token: string = req.header("token");
+	const id: string = req.body.id;
+	try {
+		if (await AuthController.getInstance().checkAuth(token)) {
+			const result = await resourceFacade.delete(token, id, ResourceKind.Interviewer);
+			res.status(200).send(result);
+		} else {
+			res.status(401);
+		}
+	} catch (e) {
+		res.status(400).send(e);
+	}
 });
 
 app.get(nodeAdapter.urls.GET_SCHEDULES, async (req, res) => {
 	const token: string = req.header("token");
 	try {
 		if (await AuthController.getInstance().checkAuth(token)) {
-			const data: any[] = await resourceFacade.list(token, ResourceKind.Schedule, req.query); // TODO
+			const data: any[] = await resourceFacade.list(token, ResourceKind.Schedule, req.query);
 			res.status(200).send(data);
 		} else {
 			res.status(401);
