@@ -64,7 +64,7 @@ export default {
         }
         try {
             if (room.eligible) {
-                const {status, data} = await axios.delete(fullURLs.ROOM, {data: room, headers: {token, "Content-Type": "application/json"}});
+                const {status} = await axios.delete(fullURLs.ROOM, {data: room, headers: {token, "Content-Type": "application/json"}});
                 return {success: status === 200};
             } else {
                 const {status, data} = await axios.post(fullURLs.ROOM, {data: room}, {headers: {token, "Content-Type": "application/json"}});
