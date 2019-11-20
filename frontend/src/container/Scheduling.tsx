@@ -18,6 +18,7 @@ const Scheduling: React.FC = () => {
 	const {token, updateContext, startLoadingProcess, endLoadingProcess} = useContext(Context);
 	const [candidates, updateCandidates] = useState<ICandidate[]>([]);
 	const [interviewerValue, updateInterviewerValue] = useState<InterviewSelectionValue>();
+	const [interviewerGroup, updateInterviewerGroup] = useState<string>(process.env.REACT_APP_DEFAULT_GROUP);
 	const [selectedCandidate, updateSelectedCandidate] = useState<ICandidate>();
 	const [schedules, updateSchedules] = useState<ISchedule[]>();
 	const [selectedSchedule, updateSelectedSchedule] = useState<ISchedule>();
@@ -41,7 +42,7 @@ const Scheduling: React.FC = () => {
 
 	async function refreshInterviewers(): Promise<void> {
 		startLoadingProcess();
-		const {success, data, error} = await adapter.getInterviewers(token);
+		const {success, data, error} = await adapter.getInterviewers(token, interviewerGroup);
 		if (success) {
 			const value: InterviewSelectionValue = data.map((i: IInterviewer) => {
 				return {
@@ -98,6 +99,9 @@ const Scheduling: React.FC = () => {
 								value={interviewerValue}
 								onChange={updateInterviewerValue}
 								actions={[{text: "Generate Schedules", onClick: refreshSchedules}]}
+								group={interviewerGroup}
+								onChangeGroup={updateInterviewerGroup}
+								refresh={refreshInterviewers}
 							/>
 						</Fade>
 					</Col>
