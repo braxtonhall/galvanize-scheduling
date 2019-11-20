@@ -1,5 +1,7 @@
 import axios from 'axios';
 import * as dotenv from 'dotenv';
+import {Moment} from "moment";
+import moment = require("moment");
 dotenv.config({path: "../.env"});
 
 const generateMsToken = async () => {
@@ -47,6 +49,8 @@ const createTestToken = async () => {
     }
 };
 
+const momentThisWeek = (d: number, h: number, m: number): Moment => { return moment().day(d).hour(h).minute(m); };
+
 const configGroupName = process.env.INTERVIEWER_GROUP_NAME;
 
-export {createTestToken, configGroupName};
+export {createTestToken, momentThisWeek, configGroupName};

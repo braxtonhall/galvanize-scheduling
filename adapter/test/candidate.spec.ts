@@ -153,13 +153,11 @@ const CandidateTests = args => () => {
     }
 
     context("submitAvailability", () => {
-        const sotw = moment().startOf("week");
-        const eotw = moment().endOf("week");
         let availabilities = [
-            {start: sotw, end: sotw.add(5, "hours")},
-            {start: sotw.add(3, "days").add(5, "hours"),
-            end: sotw.add(3, "days").add(10, "hours")},
-            {start: eotw, end: eotw.add(45, "minutes")}
+            {start: moment().day(1).hour(10), end: moment().day(1).hour(15)},
+            {start: moment().day(1).hour(16), end: moment().day(1).hour(20)},
+            {start: moment().day(4).hour(8).minutes(45), end: moment().day(4).hour(12).minutes(30)},
+            {start: moment().day(5).startOf('day'), end: moment().day(6).startOf('day')}
         ];
         const toISO = pair => ({ start: pair.start.toISOString(), end: pair.end.toISOString() });
 
@@ -183,7 +181,8 @@ const CandidateTests = args => () => {
         it("should succeed on update", async () => {
             const updatedAvailabilities = [
                 ...availabilities,
-                {start: eotw.add(15, "hours"), end: eotw.add(18, "hours")}
+                {start: moment().day(6).hour(12).minutes(15),
+                    end: moment().day(6).hour(14).minutes(30)}
             ];
             const {success} = await adapter.submitAvailability(candidateWithId.id, updatedAvailabilities);
             expect(success).to.be.true;
@@ -192,17 +191,21 @@ const CandidateTests = args => () => {
             availabilities = updatedAvailabilities;
         });
 
-        it("should fail on impossible date range", async () => {
+        it("should fail on impossible date ranges", async () => {
             // TODO: this succeeds, add validation?
             const updatedAvailabilities = [
                 ...availabilities,
-                {start: eotw, end: sotw}
+                {start: moment().day(4).hour(19), end: moment().day(4).startOf('day')}
             ];
             const {success} = await adapter.submitAvailability(candidateWithId.id, updatedAvailabilities);
             expect(success).to.be.false;
             const {data} = await adapter.getCandidateByID(candidateWithId.id);
             expect(data.availability).to.exist;
             expect(data.availability).to.deep.equals(availabilities.map(toISO));
+        });
+
+        it("should combine overlapping date ranges", async () => {
+            // TODO
         });
 
         it("should fail if candidate has no id", async () => {

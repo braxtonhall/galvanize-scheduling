@@ -53,10 +53,6 @@ const AdminTests = args => () => {
         }
     });
 
-    context("getSchedules", () => {
-
-    });
-
     context("toggleEligibility", () =>{
         const mockRoom = (name = "Integration Test Room", eligible?, id?) => ({id, name, eligible});
 
