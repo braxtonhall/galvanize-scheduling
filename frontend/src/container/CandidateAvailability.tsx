@@ -73,6 +73,7 @@ const CandidateAvailability: React.FC = (props) => {
 										<AvailableTimes
 											onChange={onChange}
 											height="50vh"
+											initialSelections={mapAvailabilityToInitial(candidate.availability)}
 										/>
 										<Button className="mt-3" onClick={submitAvailability} color="primary" disabled={availability.length < 1}>
 											Submit Availability
@@ -93,5 +94,12 @@ const CandidateAvailability: React.FC = (props) => {
 		</Container>
 	);
 };
+
+function mapAvailabilityToInitial(availability: IAvailability): Array<{start: Date, end: Date}> {
+	return availability.map(a => ({
+		start: moment(a.start).toDate(),
+		end: moment(a.end).toDate(),
+	}))
+}
 
 export default CandidateAvailability;
