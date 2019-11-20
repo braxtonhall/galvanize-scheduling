@@ -20,7 +20,7 @@ describe("Adapter Integration Tests", () => {
     });
 
     // describe("Candidate Lifecycle", CandidateTests(args));
-    describe("Administration", AdminTests(args));
-    describe("Schedule Generation", ScheduleTests(args)); // TODO
+    // describe("Administration", AdminTests(args));
+    describe("Schedule Generation", ScheduleTests(args));
 
 });
