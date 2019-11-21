@@ -26,7 +26,7 @@ export default class MSGraphController {
             .get();
     }
 
-    static async getRooms(token: string): Promise<Array<interfaces.IRoom & {email: string, capacity: number}>> {
+    static async getRooms(token: string): Promise<Array<interfaces.IRoom>> {
 		return (await (this.getClient(token))
 			.api('/places/microsoft.graph.room')
 			.version('beta')
@@ -55,7 +55,7 @@ export default class MSGraphController {
 
     public static async getMeetingTimes(
     	token:string,
-		rooms: Array<interfaces.IRoom & {email: string, capacity: number}>,
+		rooms: Array<interfaces.IRoom>,
 		options: interfaces.IGetSchedulesOptions
 	): Promise<any> {
     	rooms.sort((a, b) => a.capacity - b.capacity);

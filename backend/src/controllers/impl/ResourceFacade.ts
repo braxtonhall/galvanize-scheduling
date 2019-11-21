@@ -28,10 +28,7 @@ export default class ResourceFacade implements IResourceFacade {
 			case ResourceKind.Interviewer:
 				return this.ic.list(token);
 			case ResourceKind.Room:
-				return this.rc.list(token)
-					.then((rooms: IRoom[]) => rooms.map((r) => ({
-						id: r.id, name: r.name, eligible: r.eligible
-					})));
+				return this.rc.list(token);
 			case ResourceKind.Schedule:
 				return this.returnSchedules(token, options);
 			default:
@@ -96,7 +93,7 @@ export default class ResourceFacade implements IResourceFacade {
 		if (!!options) {
 			throw new Error("Attempting to schedule without any options!");
 		}
-		const rooms = (await this.rc.list(token)) as Array<interfaces.IRoom & {email: string, capacity: number}>;
+		const rooms = (await this.rc.list(token)) as Array<interfaces.IRoom>;
 		return MSGraphController.getMeetingTimes(token, rooms, options);
 	}
 }
