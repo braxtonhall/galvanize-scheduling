@@ -41,15 +41,16 @@ const createTestToken = async () => {
         );
         return msToken;
     } catch (error) {
-        console.error(`/saveauth error ${error.response.status} ${error.response.statusText}`);
-        if (error.response.status === 401) {
+        if (error.response && error.response.status === 401) {
             throw new Error("Secret does not match backend configuration.");
         }
+        console.error(error.response);
         throw new Error("Failed to save app token.");
     }
 };
 
-const momentThisWeek = (d: number, h: number, m: number): Moment => { return moment().day(d).hour(h).minute(m); };
+const momentThisWeek = (d: number, h: number, m: number): Moment =>
+    moment().day(d).hour(h).minute(m).seconds(0).milliseconds(0);
 
 const configGroupName = process.env.INTERVIEWER_GROUP_NAME;
 
