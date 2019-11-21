@@ -46,3 +46,5 @@ services:
       - $DB_HOST_PERSIST_DIR:/home/dynamodblocal/data
     expose:
       - 8000
+    ports:
+      - 8000:8000
