@@ -12,7 +12,7 @@ describe("Adapter Integration Tests", () => {
         // *** Flip flags below to turn certain tests on and off ***
         TEST_EMAIL: "test-integration@ph14solutions.onmicrosoft.com",
         emailTests: false, // sends availability emails to TEST_EMAIL
-        verifyTestAccounts: false // test for directory-specific msgraph data
+        verifyTestAccounts: true // test for directory-specific msgraph data
     };
 
     before(async () => {
@@ -21,6 +21,6 @@ describe("Adapter Integration Tests", () => {
     });
 
     describe("Candidate Lifecycle", CandidateTests(args));
-    // describe("Administration", AdminTests(args));
+    describe("Administration", AdminTests(args));
     // describe("Schedule Generation", ScheduleTests(args));
 });

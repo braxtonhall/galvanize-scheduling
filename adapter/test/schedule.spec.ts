@@ -85,7 +85,7 @@ const ScheduleTests = args => !args.verifyTestAccounts ? () => {} : () => {
         });
 
         it("should fail multiple preference entries for the same interviewer", async () => {
-           // TODO is this possible from the UI -> valid? or failure case?
+           // TODO is this possible from the UI && valid? or a failure case?
             const dupedInterviews = [...simpleInterviews, ...tripleInterviews];
             const options: IGetSchedulesOptions = {preferences: dupedInterviews, candidate: emptyAvailCandidate};
             const {success} = await adapter.getSchedules(that.token, options);

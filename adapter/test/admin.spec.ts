@@ -27,7 +27,6 @@ const AdminTests = args => () => {
         });
 
         it("should return an array of interviewers on success", async () => {
-            // TODO: bug, returned data does not have email? remove from interface?
             const {success, data} = await adapter.getInterviewers(that.token, that.groupName);
             expect(success).to.be.true;
             expect(data).to.not.be.empty;
@@ -48,7 +47,8 @@ const AdminTests = args => () => {
                 const {success, data} = await adapter.getInterviewers(that.token, that.groupName);
                 expect(success).to.be.true;
                 expect(data).to.be.an('array');
-                expect(data).to.deep.include(perry);
+                const perryData = data.find(i => i.email === perry.email);
+                expect(perryData).to.exist.and.contain(perry);
             });
         }
     });
@@ -61,29 +61,44 @@ const AdminTests = args => () => {
             expect(success).to.be.false;
         });
 
+        it("should fail on bad room input", async () => {
+            const {success: s1} = await adapter.toggleEligibility(that.token, undefined);
+            expect(s1).to.be.false;
+            const {success: s2} = await adapter.toggleEligibility(that.token, null);
+            expect(s2).to.be.false;
+        });
+
         it("should fail if given no eligibility", async () => {
             const {success} = await adapter.toggleEligibility(that.token, mockRoom());
             expect(success).to.be.false;
         });
 
-        it("should fail if given no id", async () => {
-            const fakeRoom = mockRoom("Aperture Science Test Chambers 001", false);
-            const {success} = await adapter.toggleEligibility(that.token, fakeRoom);
-            expect(success).to.be.false;
-        });
-
-        it("should succeed when toggling any room id with any eligibility", async () => {
-            // TODO: should we verify that the room exists in AAD?
+        it("should succeed when toggling any room from either eligibility", async () => {
             const fakeRoom = mockRoom("Aperture Science Test Chambers 002", true, generateUUID());
             const {success: s1} = await adapter.toggleEligibility(that.token, fakeRoom);
             expect(s1).to.be.true;
 
-            const fakeRoom2 = mockRoom("Aperture Science Test Chambers 001", false, generateUUID());
-            const {success: s2, data: d2} = await adapter.toggleEligibility(that.token, fakeRoom2);
+            const fakeRoom2 = mockRoom("Aperture Science Test Chambers 001", false);
+            const {success: s2} = await adapter.toggleEligibility(that.token, fakeRoom2);
             expect(s2).to.be.true;
-            fakeRoom2.eligible = !fakeRoom2.eligible;
-            expect(d2).to.deep.equals(fakeRoom2);
         });
+
+        if (that.verifyTestAccounts) {
+            it("should match on name and not id", async () => {
+                // toggle both to false if they are already true
+                const r2 = mockRoom("Interview Room 2", true, "Interview Room 2");
+                const r3 = mockRoom("Interview Room 3", true, "Interview Room 3");
+                await adapter.toggleEligibility(that.token, r2);
+                await adapter.toggleEligibility(that.token, r3);
+
+                const roomWithBadId = mockRoom("Interview Room 3", false, "Interview Room 2");
+                const {success} = await adapter.toggleEligibility(that.token, roomWithBadId);
+                const {data} = await adapter.getRooms(that.token);
+                expect(success).to.be.true;
+                expect(data).to.deep.include(r3);
+                expect(data).to.not.deep.include(r2);
+            });
+        }
     });
 
     context("getRooms", () => {
@@ -115,7 +130,7 @@ const AdminTests = args => () => {
                expect(roomData).to.have.property('name', testRoom.name);
            });
 
-           it("should contain eligible test room", async () => {
+           it("should contain test room with correct eligibility after toggling", async () => {
                const {success: toggled} = await adapter.toggleEligibility(that.token, testRoom);
                expect(toggled).to.be.true;
                const {success, data} = await adapter.getRooms(that.token);

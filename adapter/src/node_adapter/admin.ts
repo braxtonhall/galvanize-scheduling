@@ -2,7 +2,7 @@ import IAPIResponse from "../IAPIResponse";
 import {fullURLs} from "./urls";
 import axios from "axios";
 import {ICandidate, IGetSchedulesOptions, IInterviewer, IRoom, ISchedule} from "../interfaces";
-import candidateFunc from "./candidate"
+import CandidateOps from "./candidate"
 
 export default {
     getCandidates: async(token: string) : Promise<IAPIResponse<ICandidate[]>> => {
@@ -33,7 +33,7 @@ export default {
         }
     },
     updateCandidate: async(token: string, candidate: ICandidate) : Promise<IAPIResponse> => {
-        const candidateExists = candidate && (await candidateFunc.getCandidateByID(candidate.id)).success;
+        const candidateExists = candidate && (await CandidateOps.getCandidateByID(candidate.id)).success;
         if (!candidateExists) {
             return {success: false};
         }
@@ -61,7 +61,7 @@ export default {
         }
     },
     toggleEligibility: async(token: string, room: IRoom) : Promise<IAPIResponse> => {
-        if (room.eligible === undefined) {
+        if (!room || room.eligible === undefined) {
             return {success: false, error: "Incomplete room object supplied. Field `eligible` required."};
         }
         try {
