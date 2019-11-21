@@ -7,7 +7,7 @@ steps:
     args: ['push', 'gcr.io/galvanize-scheduling-253922/backend-$BRANCH_NAME']
   # admin portal
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/galvanize-scheduling-253922/frontend-$BRANCH_NAME', '--file', './Dockerfile_frontend', '--build-arg', 'SERVER_ADDRESS=https://backend-$BRANCH_NAME-hdd6o2cmfq-uc.a.run.app', '--build-arg', 'PUBLIC_ADDRESS=https://frontend-$BRANCH_NAME-hdd6o2cmfq-uc.a.run.app', '.']
+    args: ['build', '-t', 'gcr.io/galvanize-scheduling-253922/frontend-$BRANCH_NAME', '--file', './Dockerfile_frontend', '--build-arg', 'SERVER_ADDRESS=https://backend-$BRANCH_NAME-hdd6o2cmfq-uc.a.run.app', '--build-arg', 'PUBLIC_ADDRESS=https://frontend-$BRANCH_NAME-hdd6o2cmfq-uc.a.run.app', '--build-arg', 'DEFAULT_GROUP=Interviewers', '.']
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'gcr.io/galvanize-scheduling-253922/frontend-$BRANCH_NAME']
 

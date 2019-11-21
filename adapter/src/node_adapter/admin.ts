@@ -42,9 +42,9 @@ export default {
             return {success: false};
         }
     },
-    getInterviewers: async(token: string) : Promise<IAPIResponse<IInterviewer[]>> => {
+    getInterviewers: async(token: string, groupName: string) : Promise<IAPIResponse<IInterviewer[]>> => {
         try {
-            const {status, data} = await axios.get(fullURLs.INTERVIEWERS, {headers: {token, "Content-Type": "application/json"}});
+            const {status, data} = await axios.get(fullURLs.INTERVIEWERS, {headers: {token, "Content-Type": "application/json"}, params: {groupName}});
             return {success: status === 200, data};
         } catch {
             return {success: false};

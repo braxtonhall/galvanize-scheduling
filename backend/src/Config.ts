@@ -23,6 +23,9 @@ export enum ConfigKey {
 	msOAuthAuthorizeEndpoint = "oAuthAuthorizeEndpoint",
 	msOAuthTokenEndpoint = "oAuthTokenEndpoint",
 	
+	// Internal
+	interviewerGroupName = "interviewerGroupName",
+	
 	// Test
 	testSecretKey = "testSecretKey",
 	production = "production"
@@ -61,6 +64,9 @@ export class Config {
 				[ConfigKey.msOAuthMetaData]: 		  process.env.OAUTH_ID_METADATA,
 				[ConfigKey.msOAuthAuthorizeEndpoint]: process.env.OAUTH_AUTHORIZE_ENDPOINT,
 				[ConfigKey.msOAuthTokenEndpoint]: 	  process.env.OAUTH_TOKEN_ENDPOINT,
+				
+				// Internal
+				[ConfigKey.interviewerGroupName]: process.env.INTERVIEWER_GROUP_NAME,
 				
 				// Testing
 				[ConfigKey.testSecretKey]: process.env.TEST_SECRET_KEY,
