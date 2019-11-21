@@ -169,6 +169,10 @@ const ScheduleTests = args => !args.verifyTestAccounts ? () => {} : () => {
             // TODO inspect contents of data, should be 30 min
         });
     });
+
+    context("confirmSchedules", async () => {
+        // TODO: not sure if this is testable & function not implemented in node_adapter yet
+    });
 };
 
 export default ScheduleTests;

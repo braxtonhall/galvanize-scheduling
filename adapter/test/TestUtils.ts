@@ -27,7 +27,7 @@ const generateMsToken = async () => {
     if (status === 200 && data.access_token) {
         return data.access_token;
     }
-    throw "Failed to generate application token.";
+    throw new Error("Failed to generate application token.");
 };
 
 const createTestToken = async () => {
@@ -43,9 +43,9 @@ const createTestToken = async () => {
     } catch (error) {
         console.error(`/saveauth error ${error.response.status} ${error.response.statusText}`);
         if (error.response.status === 401) {
-            throw "Secret does not match backend configuration.";
+            throw new Error("Secret does not match backend configuration.");
         }
-        throw "Failed to save app token.";
+        throw new Error("Failed to save app token.");
     }
 };
 

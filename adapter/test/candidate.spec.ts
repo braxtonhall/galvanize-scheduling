@@ -1,8 +1,8 @@
 import "mocha";
 import {expect} from "chai";
 import {v4 as generateUUID} from 'uuid';
-import moment = require("moment");
 
+import {momentThisWeek} from "./TestUtils";
 import {ICandidate} from "../dist/interfaces";
 import adapter from "../src/node_adapter";
 
@@ -22,6 +22,13 @@ const CandidateTests = args => () => {
         it("should fail with invalid authentication", async () => {
             const {success} = await adapter.createCandidate(that.INVALID_TOKEN, candidateBase);
             expect(success).to.be.false;
+        });
+
+        it("should fail on undefined insert", async () => {
+            const p1 = adapter.createCandidate(that.token, null);
+            const p2 = adapter.createCandidate(that.token, undefined);
+            expect((await p1).success).to.be.false;
+            expect((await p2).success).to.be.false;
         });
 
         it("should succeed on insert", async () => {
@@ -77,8 +84,12 @@ const CandidateTests = args => () => {
         });
 
         it("should fail if id is empty", async () => {
-            const {success} = await adapter.getCandidateByID("");
-            expect(success).to.be.false;
+            const {success: s1} = await adapter.getCandidateByID("");
+            expect(s1).to.be.false;
+            const {success: s2} = await adapter.getCandidateByID(undefined);
+            expect(s2).to.be.false;
+            const {success: s3} = await adapter.getCandidateByID(null);
+            expect(s3).to.be.false;
         });
     });
 
@@ -91,7 +102,7 @@ const CandidateTests = args => () => {
         it("should update any personal information", async () => {
             candidateWithId = {
                 ...candidateWithId,
-                email: "test-integration@ph14solutions.onmicrosoft.com",
+                email: that.TEST_EMAIL,
                 firstName: "Jane",
                 phoneNumber: "16041234567",
                 notes: "This is a test account"
@@ -107,15 +118,10 @@ const CandidateTests = args => () => {
             expect(data).to.deep.equals(candidateWithId);
         });
 
-        it("should create candidates if they don't exist", async () => {
-            // TODO: shouldn't updateCandidate have a check against this? probably a mistake if called this way
+        it("fail if given candidate does not exist", async () => {
             const id = generateUUID();
-            const {success: existsBefore} = await adapter.getCandidateByID(id);
-            const {success: didUpdate} = await adapter.updateCandidate(that.token, {...candidateBase, id});
-            const {success: existsAfter} = await adapter.getCandidateByID(id);
-            expect(existsBefore).to.be.false;
-            expect(didUpdate).to.be.true;
-            expect(existsAfter).to.be.true;
+            const {success} = await adapter.updateCandidate(that.token, {...candidateBase, id});
+            expect(success).to.be.false;
         });
 
         it("should fail if candidate has no id", async () => {
@@ -142,22 +148,24 @@ const CandidateTests = args => () => {
                 // Manually check admin email inbox to confirm sending works
             });
 
-            it("should succeed with a minimal candidate model", async () => {
-                // TODO: need an ID to generate link, so this call should fail... add validation?
-                const {success} = await adapter.sendAvailabilityEmail(
-                    that.token, {email: "test-integration@ph14solutions.onmicrosoft.com"}
-                );
-                expect(success).to.be.true;
+            it("should fail without a candidate ID", async () => {
+                const {success} = await adapter.sendAvailabilityEmail(that.token, {email: that.TEST_EMAIL});
+                expect(success).to.be.false;
+            });
+
+            it("should fail without a valid candidate ID", async () => {
+                const {success} = await adapter.sendAvailabilityEmail(that.token, candidateNotInDB);
+                expect(success).to.be.false;
             });
         });
     }
 
     context("submitAvailability", () => {
         let availabilities = [
-            {start: moment().day(1).hour(10), end: moment().day(1).hour(15)},
-            {start: moment().day(1).hour(16), end: moment().day(1).hour(20)},
-            {start: moment().day(4).hour(8).minutes(45), end: moment().day(4).hour(12).minutes(30)},
-            {start: moment().day(5).startOf('day'), end: moment().day(6).startOf('day')}
+            {start: momentThisWeek(1, 10, 0), end: momentThisWeek(1, 15, 0)},
+            {start: momentThisWeek(1, 16, 0), end: momentThisWeek(1, 20, 0)},
+            {start: momentThisWeek(4, 8, 45), end: momentThisWeek(4, 12, 30)},
+            {start: momentThisWeek(5, 0, 0), end: momentThisWeek(6, 0, 0)}
         ];
         const toISO = pair => ({ start: pair.start.toISOString(), end: pair.end.toISOString() });
 
@@ -178,11 +186,17 @@ const CandidateTests = args => () => {
             expect(data.availability).to.deep.equals(emptyList);
         });
 
+        it("should fail on undefined availabilities", async () => {
+            const {success: s1} = await adapter.submitAvailability(candidateWithId.id, undefined);
+            expect(s1).to.be.false;
+            const {success: s2} = await adapter.submitAvailability(candidateWithId.id, null);
+            expect(s2).to.be.false;
+        });
+
         it("should succeed on update", async () => {
             const updatedAvailabilities = [
                 ...availabilities,
-                {start: moment().day(6).hour(12).minutes(15),
-                    end: moment().day(6).hour(14).minutes(30)}
+                {start: momentThisWeek(6, 12, 15), end: momentThisWeek(6, 14, 30)}
             ];
             const {success} = await adapter.submitAvailability(candidateWithId.id, updatedAvailabilities);
             expect(success).to.be.true;
@@ -192,20 +206,32 @@ const CandidateTests = args => () => {
         });
 
         it("should fail on impossible date ranges", async () => {
-            // TODO: this succeeds, add validation?
             const updatedAvailabilities = [
                 ...availabilities,
-                {start: moment().day(4).hour(19), end: moment().day(4).startOf('day')}
+                {start: momentThisWeek(4, 19, 0), end: momentThisWeek(4, 0, 0)}
             ];
             const {success} = await adapter.submitAvailability(candidateWithId.id, updatedAvailabilities);
             expect(success).to.be.false;
             const {data} = await adapter.getCandidateByID(candidateWithId.id);
             expect(data.availability).to.exist;
-            expect(data.availability).to.deep.equals(availabilities.map(toISO));
+            expect(data.availability).to.deep.equals(availabilities.map(toISO)); // unchanged
         });
 
         it("should combine overlapping date ranges", async () => {
-            // TODO
+            const overlapping = [
+                {start: momentThisWeek(4, 5, 6), end: momentThisWeek(4,10,25)},
+                {start: momentThisWeek(4, 0, 0), end: momentThisWeek(5, 0, 0)},
+                {start: momentThisWeek(4, 20, 0), end: momentThisWeek(5, 0, 0)},
+                {start: momentThisWeek(4, 0, 0), end: momentThisWeek(4, 2, 59)}
+            ];
+            const simplified = [
+                {start: momentThisWeek(4, 0, 0), end: momentThisWeek(5, 0, 0)}
+            ];
+            const {success} = await adapter.submitAvailability(candidateWithId.id, overlapping);
+            expect(success).to.be.true;
+            const {data} = await adapter.getCandidateByID(candidateWithId.id);
+            expect(data.availability).to.exist;
+            expect(data.availability).to.deep.equals(simplified.map(toISO));
         });
 
         it("should fail if candidate has no id", async () => {
@@ -227,9 +253,13 @@ const CandidateTests = args => () => {
             expect(didFindCandidate).to.be.true;
         });
 
-        it("should fail given candidate with no id", async () => {
-            const {success} = await adapter.deleteCandidate(that.token, candidateBase);
-            expect(success).to.be.false;
+        it("should fail given candidate with no id or no input", async () => {
+            const {success: s1} = await adapter.deleteCandidate(that.token, candidateBase);
+            expect(s1).to.be.false;
+            const {success: s2} = await adapter.deleteCandidate(that.token, undefined);
+            expect(s2).to.be.false;
+            const {success: s3} = await adapter.deleteCandidate(that.token, null);
+            expect(s3).to.be.false;
         });
 
         it("should remove the candidate", async () => {
@@ -239,7 +269,7 @@ const CandidateTests = args => () => {
             expect(didFindCandidate).to.be.false;
         });
 
-        it("should succeed given already deleted candidate", async () => {
+        it("should delete idempotently", async () => {
             const {success} = await adapter.deleteCandidate(that.token, candidateWithId);
             expect(success).to.be.true;
             const {success: didFindCandidate} = await adapter.getCandidateByID(candidateWithId.id);

@@ -2,6 +2,7 @@ import IAPIResponse from "../IAPIResponse";
 import {fullURLs} from "./urls";
 import axios from "axios";
 import {ICandidate, IGetSchedulesOptions, IInterviewer, IRoom, ISchedule} from "../interfaces";
+import candidateFunc from "./candidate"
 
 export default {
     getCandidates: async(token: string) : Promise<IAPIResponse<ICandidate[]>> => {
@@ -13,7 +14,7 @@ export default {
         }
     },
     createCandidate: async(token: string, candidate: ICandidate) : Promise<IAPIResponse<ICandidate>> => {
-        if (typeof candidate.id === "string") {
+        if (!candidate || typeof candidate.id === "string") {
             return {success: false};
         }
         try {
@@ -25,14 +26,15 @@ export default {
     },
     deleteCandidate: async(token: string, candidate: ICandidate) : Promise<IAPIResponse> => {
         try {
-            const {status, data} = await axios.delete(fullURLs.CANDIDATE, {data: {id: candidate.id}, headers: {token, "Content-Type": "application/json"}});
+            const {status} = await axios.delete(fullURLs.CANDIDATE, {data: {id: candidate.id}, headers: {token, "Content-Type": "application/json"}});
             return {success: status === 200};
         } catch (e) {
             return {success: false}
         }
     },
     updateCandidate: async(token: string, candidate: ICandidate) : Promise<IAPIResponse> => {
-        if (typeof candidate.id !== "string") {
+        const candidateExists = candidate && (await candidateFunc.getCandidateByID(candidate.id)).success;
+        if (!candidateExists) {
             return {success: false};
         }
         try {
