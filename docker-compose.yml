@@ -28,14 +28,6 @@ services:
     environment:
       - DB_URL=http://db:8000
       - FRONTEND_URL=http://localhost:3000
-    deploy:
-      resources:
-        limits:
-          cpus: '1'
-          memory: '128mb'
-        reservations:
-          cpus: '1'
-          memory: '128mb'
     ports:
       - 8080:8080
   db:

@@ -2,6 +2,7 @@ import IAPIResponse from "../IAPIResponse";
 import {fullURLs} from "./urls";
 import axios from "axios";
 import {ICandidate, IGetSchedulesOptions, IInterviewer, IRoom, ISchedule} from "../interfaces";
+import CandidateOps from "./candidate"
 
 export default {
     getCandidates: async(token: string) : Promise<IAPIResponse<ICandidate[]>> => {
@@ -13,7 +14,7 @@ export default {
         }
     },
     createCandidate: async(token: string, candidate: ICandidate) : Promise<IAPIResponse<ICandidate>> => {
-        if (typeof candidate.id === "string") {
+        if (!candidate || typeof candidate.id === "string") {
             return {success: false};
         }
         try {
@@ -25,14 +26,15 @@ export default {
     },
     deleteCandidate: async(token: string, candidate: ICandidate) : Promise<IAPIResponse> => {
         try {
-            const {status, data} = await axios.delete(fullURLs.CANDIDATE, {data: {id: candidate.id}, headers: {token, "Content-Type": "application/json"}});
+            const {status} = await axios.delete(fullURLs.CANDIDATE, {data: {id: candidate.id}, headers: {token, "Content-Type": "application/json"}});
             return {success: status === 200};
         } catch (e) {
             return {success: false}
         }
     },
     updateCandidate: async(token: string, candidate: ICandidate) : Promise<IAPIResponse> => {
-        if (typeof candidate.id !== "string") {
+        const candidateExists = candidate && (await CandidateOps.getCandidateByID(candidate.id)).success;
+        if (!candidateExists) {
             return {success: false};
         }
         try {
@@ -59,12 +61,12 @@ export default {
         }
     },
     toggleEligibility: async(token: string, room: IRoom) : Promise<IAPIResponse> => {
-        if (room.eligible === undefined) {
+        if (!room || room.eligible === undefined) {
             return {success: false, error: "Incomplete room object supplied. Field `eligible` required."};
         }
         try {
             if (room.eligible) {
-                const {status, data} = await axios.delete(fullURLs.ROOM, {data: room, headers: {token, "Content-Type": "application/json"}});
+                const {status} = await axios.delete(fullURLs.ROOM, {data: room, headers: {token, "Content-Type": "application/json"}});
                 return {success: status === 200};
             } else {
                 const {status, data} = await axios.post(fullURLs.ROOM, {data: room}, {headers: {token, "Content-Type": "application/json"}});
