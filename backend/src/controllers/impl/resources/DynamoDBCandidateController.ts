@@ -1,6 +1,7 @@
 import {CandidateController} from "../../ResourceControllers";
 import {interfaces} from "adapter";
 import {DynamoDBController, IDynamoDBController} from "../DynamoDBController";
+import {concatenateMoments} from "../../SchedulerUtils";
 
 export default class DynamoDBCandidateController extends CandidateController {
 	private dbc: IDynamoDBController;
@@ -19,6 +20,9 @@ export default class DynamoDBCandidateController extends CandidateController {
 		candidate = this.assertCandidate(candidate);
 		if (typeof candidate.id !== "string") {
 			candidate.id = this.hashID(await this.dbc.createCandidateID());
+		}
+		if (candidate.availability) {
+			candidate.availability = concatenateMoments(candidate.availability);
 		}
 		await this.dbc.writeCandidate(candidate);
 		return candidate;

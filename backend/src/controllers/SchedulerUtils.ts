@@ -5,12 +5,12 @@ export interface IScheduleAvailabilities {
 	interviewers: {interviewer: interfaces.IInterviewer, availability: interfaces.IAvailability}[]
 }
 
-function concatenateMoments(availability: interfaces.IAvailability): interfaces.IAvailability {
+export function concatenateMoments(availability: interfaces.IAvailability): interfaces.IAvailability {
 	if (availability.some(m => typeof m.start !== "string" || typeof m.end !== "string")) {
 		throw new Error("Cannot concatenate non-string Moments");
 	}
 	const output = [];
-	const getMatch = (a, b) => took(a.end as string, b.start as string) < 1000 * 60;
+	const getMatch = (a, b) => Math.abs(took(a.end as string, b.start as string)) < 1000 * 60;
 	while (availability.length > 0) {
 		const moment = availability.pop();
 		const getBefore = () => availability.findIndex(m => getMatch(m, moment));
