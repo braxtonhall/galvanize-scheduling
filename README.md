@@ -42,7 +42,7 @@ You can remotely connect to your local backend service through `chrome://inspect
 - (optional) `npm run build-backend` to update the docker image
 - `npm run debug-backend` to start an instance of the backend and db that does not persist data
 
-In Webstorm, create an attachment run  configuration with `localhost`on port `9229`. This is the default Node inspection port. Add breakpoints and hit debug, the program should now pause when the breakpoint is hit by any external calls.
+In Webstorm, create an attachment run configuration with `localhost`on port `9229`. This is the default Node inspection port. Add breakpoints and hit debug, the program should now pause when the breakpoint is hit by any external calls.
 
 ### Updating Dependencies
 - `sh install_dependencies`
@@ -52,9 +52,13 @@ In Webstorm, create an attachment run  configuration with `localhost`on port `92
 to run tests:
 `npm run test:backend`
 #### Integration Tests
-- Complete the fields marked with `#change` in your `.env` file, using values associated with the app in your instance of Active Directory (done through the AD admin portal)
+- Complete the fields marked with `#change` in your `.env` file, using values associated with the app in your test instance of Active Directory (found in the admin portal)
 - Switch `EMAIL_ENDPOINT` to the value in the comment underneath, if you want to send test emails
 - If you already have an instance of the backend running: `npm run test:adapter`
 - If you would like to do startup + teardown: `npm run test:integration`. You may have to stop existing containers first (`npm run stop-backend`).
 
 Note for devs: `test:integration` does not re-build the image.
+
+##### Customizing the Test Suites
+There are some flags in `integration.spec.ts` that turn certain tests on and off. Some rely the specific integration with the ph14solutions active directory.
+Using a different directory to run tests against would require updating those tests, or you can disabling them by setting the flags to false.

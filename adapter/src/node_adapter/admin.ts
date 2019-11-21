@@ -72,7 +72,7 @@ export default {
                 const {status, data} = await axios.post(fullURLs.ROOM, {data: room}, {headers: {token, "Content-Type": "application/json"}});
                 return {success: status === 200, data};
             }
-        } catch (error) {
+        } catch {
             return {success: false};
         }
     },

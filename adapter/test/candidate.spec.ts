@@ -118,7 +118,7 @@ const CandidateTests = args => () => {
             expect(data).to.deep.equals(candidateWithId);
         });
 
-        it("fail if given candidate does not exist", async () => {
+        it("should fail if given candidate does not exist", async () => {
             const id = generateUUID();
             const {success} = await adapter.updateCandidate(that.token, {...candidateBase, id});
             expect(success).to.be.false;
