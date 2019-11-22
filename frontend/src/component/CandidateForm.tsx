@@ -46,7 +46,7 @@ const CandidateForm: React.FC<IProps> = (props: IProps) => {
 				}
 				<Label className="mt-2">Email</Label>
 				<Input type="email" placeholder="enter email" onChange={createOnChange("email")} value={email} invalid={!validEmail(email)}/>
-				{!validEmail(email) && <FormFeedback invalid>This is an invalid email address, this will not stop submitting the form, but emailing the candidate will be impossible.</FormFeedback>}
+				{!validEmail(email) && <FormFeedback invalid>This is an invalid email address, this will stop submitting the form, because emailing the candidate will be impossible.</FormFeedback>}
 				<Label className="mt-2">First Name</Label>
 				<Input type="text" placeholder="enter first name" onChange={createOnChange("firstName")} value={firstName}/>
 				<Label className="mt-2">Last Name</Label>
