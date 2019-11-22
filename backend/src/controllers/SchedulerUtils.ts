@@ -41,9 +41,9 @@ function clipNonWorkingHours(availability: interfaces.IAvailability): interfaces
 	return availability;
 }
 
-function findOverlappingTime(availA: interfaces.IAvailability, availB: interfaces.IAvailability): interfaces.IAvailability {
-	// TODO Given two availabilities, finds their overlap
-	return availA;
+function findOverlappingTime(...avail: interfaces.IAvailability[]): interfaces.IAvailability {
+	// TODO Given n availabilities, finds their overlap
+	return [];
 }
 
 function findAverageOverlapSum(avail: interfaces.IAvailability, testAvails: interfaces.IAvailability[]): number {
@@ -52,12 +52,22 @@ function findAverageOverlapSum(avail: interfaces.IAvailability, testAvails: inte
 		.reduce((m, n) => m + n, 0) / testAvails.length;
 }
 
-function scoreRoom(room: interfaces.IAvailability, interviewers: interfaces.IAvailability[], numRooms: number): number {
+function scoreRoom(room: interfaces.IAvailability, interviewers: interfaces.IAvailability[], numRooms: number, capacity: number): number {
 	// TODO THIS IS THE HEART OF THIS WHOLE ALGORITHM! THE NUMBERS ARE BETA AND SUBJECT TO CHANGE!
 	/**
 	 * Here are the things that I may want to include in a room score
 	 * - The biggest slot (important because we want to fit as many interviewers as possible back to back)
 	 * - Average overlapping time (important because the higher overlap, the more interviewers can fit in that room)
+	 * - Capacity (the higher, the more can fit in a room at once, but too high and it's a waste of space. Peak at 4? Increase with more interviewers?)
 	 */
 	return 0;
+}
+
+function rankRooms(scheduleAvailabilities: IScheduleAvailabilities): {room: interfaces.IRoom, availability: interfaces.IAvailability}[] {
+	const interviewerAvails = scheduleAvailabilities.interviewers.map(i => i.availability);
+	const rooms = scheduleAvailabilities.rooms;
+	return rooms
+		.map(r => ({...r, score: scoreRoom(r.availability, interviewerAvails, rooms.length, r.room.capacity)}))
+		.sort((r, l) => r.score - l.score)
+		.map(r => ({room: r.room, availability: r.availability}));
 }
