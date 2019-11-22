@@ -41,8 +41,26 @@ export function clipNonWorkingHours(availability: interfaces.IAvailability): int
 }
 
 function findOverlappingTime(...avail: interfaces.IAvailability[]): interfaces.IAvailability {
-	// TODO Given n availabilities, finds their overlap
-	return [];
+	return avail.length > 0 ? avail.slice(1).reduce(findOverlap, avail[0]) : [];
+}
+
+function findOverlap(availA: interfaces.IAvailability, availB: interfaces.IAvailability): interfaces.IAvailability {
+	let overlap = [];
+	for (let timeA of availA) {
+		for (let timeB of availB) {
+			if (timeA.end <= timeB.start // A ends earlier than start of B
+				|| timeB.end <= timeA.start // B ends earlier than start of A
+				|| timeA.start >= timeB.end // A starts after B ends
+				|| timeB.start >= timeA.start) { // B starts after A ends
+				continue;
+			}
+			overlap.push({
+				start: (timeA.start <= timeB.start) ? timeB.start : timeA.start, // if A <= B then B is the start else its A
+				end: (timeA.end <= timeB.end) ? timeA.end : timeB.end // if A ends earlier than B, A is the end else B
+			})
+		}
+	}
+	return overlap; // TODO implement stub
 }
 
 function findAverageOverlapSum(avail: interfaces.IAvailability, testAvails: interfaces.IAvailability[]): number {
