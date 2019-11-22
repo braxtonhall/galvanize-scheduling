@@ -52,20 +52,62 @@ const InterviewSelection: React.FC<IProps> = (props: IProps) => {
 				}
 			}
 			newValues[index].preference = newPreference;
+
 			onChange(newValues);
 		};
 
 		const onMinuteChange: ChangeEventHandler<HTMLInputElement> = (e) => {
 			const newValues: InterviewSelectionValue = cloneDeep(value);
 			newValues[index].minutes = parseFloat(e.target.value);
-			if (newValues[index].preference) {
+
+			function connectedToIndex(i: number, loop: number[] = []): boolean {
+				// have looped
+				if (loop.includes(i)) {
+					return false;
+				}
+
+				// you are the index
+				if (i === index) {
+					return true;
+				}
+
+				// they follow the index
+				if (newValues[i].preference !== undefined && newValues[i].preference.id === newValues[index].interviewer.id) {
+					return true;
+				}
+
+				// the index follows you
+				if (newValues[index].preference !== undefined && newValues[index].preference.id === newValues[i].interviewer.id) {
+					return true;
+				}
+
+				// the person you follow is following you and is not the index
+				const k = getIndexOfInterviewer(newValues[i].preference);
+				if (k < 0 || (newValues[k].preference !== undefined && newValues[k].preference.id === newValues[i].interviewer.id)) {
+					return false;
+				}
+
+				return connectedToIndex(i, [...loop, i]);
+			}
+
+			function getIndexOfInterviewer(interviewer: IInterviewer): number {
+				if (!interviewer) {
+					return -1
+				}
 				for (let i = 0; i < newValues.length; i++) {
-					if (newValues[i].interviewer.id === newValues[index].preference.id) {
-						newValues[i].minutes = newValues[index].minutes;
-						break;
+					if (newValues[i].interviewer.id === interviewer.id) {
+						return i;
 					}
 				}
+				return -1;
 			}
+
+			for (let i = 0; i < newValues.length; i++) {
+				if (connectedToIndex(i)) {
+					newValues[i].minutes = newValues[index].minutes;
+				}
+			}
+
 			onChange(newValues);
 		};
 
