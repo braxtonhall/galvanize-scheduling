@@ -59,10 +59,10 @@ export default class DynamoDBCandidateController extends CandidateController {
 	
 	private getRandomLongString(): string {
 		const stringLength = 32;
-		const charset = "QWERTYUIOPASDFGHJKLZXCVBNM1234567890";
+		const chars = "QWERTYUIOPASDFGHJKLZXCVBNM1234567890";
 		let key = "";
-		for (let i = 0; i < stringLength; i++) {
-			key = key + charset.charAt(Math.floor(Math.random() * charset.length));
+		while (key.length < stringLength) {
+			key += chars.charAt(Math.floor(Math.random() * chars.length));
 		}
 		return key;
 	}
