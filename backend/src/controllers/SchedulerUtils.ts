@@ -33,7 +33,7 @@ export function concatenateMoments(availability: interfaces.IAvailability): inte
 	return output;
 }
 
-function clipNonWorkingHours(availability: interfaces.IAvailability): interfaces.IAvailability {
+export function clipNonWorkingHours(availability: interfaces.IAvailability): interfaces.IAvailability {
 	// TODO trim off any availability times outside of working hours
 	return availability;
 }

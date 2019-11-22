@@ -2,7 +2,7 @@ import {Client} from '@microsoft/microsoft-graph-client';
 import 'isomorphic-fetch';
 import {interfaces} from "adapter";
 import {Config, ConfigKey} from "../Config";
-import {concatenateMoments} from "./SchedulerUtils";
+import {clipNonWorkingHours, concatenateMoments} from "./SchedulerUtils";
 import {IScheduleAvailabilities} from "./Common";
 
 export default class MSGraphController {
@@ -83,7 +83,7 @@ export default class MSGraphController {
 			}));
 
 
-			for (let timeslot of candidate.availability) {
+			for (let timeslot of clipNonWorkingHours(candidate.availability)) {
 				const availabilities = await this.getSchedule(token, this.scheduleRequest(
 					request_array,
 					// @ts-ignore
