@@ -56,6 +56,8 @@ function scoreRoom(room: interfaces.IAvailability, interviewers: interfaces.IAva
 	// TODO THIS IS THE HEART OF THIS WHOLE ALGORITHM! THE NUMBERS ARE BETA AND SUBJECT TO CHANGE!
 	/**
 	 * Here are the things that I may want to include in a room score
+	 * - The biggest slot (important because we want to fit as many interviewers as possible back to back)
+	 * - Average overlapping time (important because the higher overlap, the more interviewers can fit in that room)
 	 */
 	return 0;
 }
