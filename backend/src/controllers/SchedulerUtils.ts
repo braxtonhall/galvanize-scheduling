@@ -12,6 +12,19 @@ const biggestSlot = availability => availability.map(slotLength).reduce((m, n) =
 const averageSlot = availability => sumAvailability(availability) / availability.length;
 const gaussianIsh = (x, b) => Math.max(0, Math.exp(-Math.pow(x - b, 2) / 8));
 
+function tookHuman(start: number): string {
+	const milliseconds = Date.now() - start;
+	const seconds = milliseconds / 1000;
+	if (Math.abs(seconds) >= 1.5) {
+		return Math.round(seconds) + " seconds";
+	} else if (seconds >= 1) {
+		return "1 second";
+	} else {
+		const output = seconds.toFixed(2);
+		return output === '1.00' ? "1 second" : output + " seconds";
+	}
+}
+
 export function concatenateMoments(availability: interfaces.IAvailability): interfaces.IAvailability {
 	if (availability.some(m => typeof m.start !== "string" || typeof m.end !== "string")) {
 		throw new Error("Cannot concatenate non-string Moments");
@@ -145,7 +158,9 @@ function buildGroups(preferences: PreferenceAvail[]): PreferenceAvail[][] {
 }
 
 function makeOneSchedule(candidate: interfaces.ICandidate, rooms: RoomAvail[], groups: PreferenceAvail[][]): CandidateSchedule {
+	const start = Date.now();
 	
-	// TODO implement stub
+	console.log(`Returning schedules. This run took ${tookHuman(start)}.`);
+	// TODO remove stub
 	return {schedule: {candidate, meetings: []}, numChangeOvers: 0, numUnscheduled: 0};
 }
