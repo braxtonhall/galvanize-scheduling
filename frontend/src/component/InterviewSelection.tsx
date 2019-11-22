@@ -1,7 +1,8 @@
 import {interfaces} from "adapter";
 import React, {ChangeEventHandler} from "react";
-import {Button, ButtonGroup, Card, CardBody, CardHeader, CardText, Input, Label, Table} from "reactstrap";
+import {Button, ButtonGroup, Card, CardBody, CardHeader, CardText, FormFeedback, Input, Label, Table} from "reactstrap";
 import cloneDeep from "lodash/cloneDeep"
+import Fade from 'react-reveal/Fade';
 
 type IInterviewer = interfaces.IInterviewer;
 
@@ -31,13 +32,42 @@ const InterviewSelection: React.FC<IProps> = (props: IProps) => {
 
 	const {value, onChange, actions, group, onChangeGroup, refresh} = props;
 
+	// used as util function in determining messages
+	function getIndexOfInterviewer(interviewer: IInterviewer): number {
+		if (!interviewer) {
+			return -1
+		}
+		for (let i = 0; i < value.length; i++) {
+			if (value[i].interviewer.id === interviewer.id) {
+				return i;
+			}
+		}
+
+		return -1;
+	}
+
+	// used as util function in determining messages
+	function getInterviewersWhomPrefer(interviewer: IInterviewer): InterviewSelectionValue {
+		const prefer: InterviewSelectionValue = [];
+		for (let i = 0; i < value.length; i++) {
+			if (value[i].preference && value[i].preference.id === interviewer.id) {
+				prefer.push(value[i]);
+			}
+		}
+		return prefer;
+	}
+
 	function makeRow(v: { interviewer: IInterviewer, minutes: number, preference?: IInterviewer, }, index: number) {
 		const {interviewer, minutes, preference} = v;
 		const {id, firstName, lastName} = interviewer;
+		const preferenceValueIndex = getIndexOfInterviewer(preference);
+		const preferenceValue = preferenceValueIndex ? value[preferenceValueIndex] : undefined;
+		const preferThisInterviewer = getInterviewersWhomPrefer(interviewer);
+		const idsOfPreferThisInterview = preferThisInterviewer.map(i => i.interviewer.id);
 		const preferences = (
 			<React.Fragment>
 				<option value={"Alone"}>Alone</option>
-				{value.map(i => <option key={"preference_" + i.interviewer.id} value={i.interviewer.id}>{i.interviewer.firstName} {i.interviewer.lastName}</option>)}
+				{value.map(i => i.interviewer.id !== id && <option key={"preference_" + i.interviewer.id} value={i.interviewer.id}>{i.interviewer.firstName} {i.interviewer.lastName}</option>)}
 			</React.Fragment>
 		);
 
@@ -58,32 +88,52 @@ const InterviewSelection: React.FC<IProps> = (props: IProps) => {
 		const onMinuteChange: ChangeEventHandler<HTMLInputElement> = (e) => {
 			const newValues: InterviewSelectionValue = cloneDeep(value);
 			newValues[index].minutes = parseFloat(e.target.value);
-			if (newValues[index].preference) {
-				for (let i = 0; i < newValues.length; i++) {
-					if (newValues[i].interviewer.id === newValues[index].preference.id) {
-						newValues[i].minutes = newValues[index].minutes;
-						break;
-					}
-				}
-			}
 			onChange(newValues);
 		};
 
+		// check if preference doesnt have the same time
+		const nonMatchingTimeWithPreference = preferenceValue && preferenceValue.minutes !== minutes;
+
+		// check if preference doesn't prefer them
+		const preferSomeoneWhomDoesntPreferThem = preferenceValue && (!preferenceValue.preference || preferenceValue.preference.id !== interviewer.id);
+
+		// check if preferred and doesn't prefer back
+		const isPreferredButDoesntPreferThem = (!preference && preferThisInterviewer.length > 0)
+			|| preferThisInterviewer.length > 1
+			|| (preferenceValue && preferenceValue.preference && preferThisInterviewer.length > 0 && preference.id !== preferThisInterviewer[0].interviewer.id);
+
+		// const inChain = preferSomeoneWhomDoesntPreferThem && isPreferredButDoesntPreferThem;
+		const inChain = false;
+
 		return (
-			<tr key={"interviewer_" + interviewer.id}>
-				<td>{firstName}</td>
-				<td>{lastName}</td>
-				<td>
-					<Input type="select" value={preference ? preference.id : "Alone"} onChange={onPreferenceChange}>
-						{preferences}
-					</Input>
-				</td>
-				<td>
-					<Input type="select" value={minutes} onChange={onMinuteChange}>
-						{minuteOptions}
-					</Input>
-				</td>
-			</tr>
+			<React.Fragment>
+				<tr key={"interviewer_" + interviewer.id}>
+					<td>{firstName}</td>
+					<td>{lastName}</td>
+					<td>
+						<Input type="select" value={preference ? preference.id : "Alone"} onChange={onPreferenceChange}>
+							{preferences}
+						</Input>
+					</td>
+					<td>
+						<Input type="select" value={minutes} onChange={onMinuteChange}>
+							{minuteOptions}
+						</Input>
+					</td>
+				</tr>
+					{ [nonMatchingTimeWithPreference, preferSomeoneWhomDoesntPreferThem, isPreferredButDoesntPreferThem, inChain].includes(true) &&
+						<tr className="bg-transparent">
+							<td colSpan={4} className="border-top-0 p-0">
+								<p className="text-secondary mx-2 small my-0">
+									{ nonMatchingTimeWithPreference && <Fade><p className="my-0">This interviewer does not have a matching time with their preference. It cannot be guaranteed they will be interviewed for their wanted length.</p></Fade> }
+									{ !inChain && preferSomeoneWhomDoesntPreferThem && <Fade><p className="my-0">This interviewer has a preference for someone that doesn't prefer them, the system will try to book them together if possible.</p></Fade> }
+									{ !inChain && isPreferredButDoesntPreferThem && <Fade><p className="my-0">This interviewer is preferred by someone they are currently not preferring, the system will try to book these people together.</p></Fade> }
+									{ inChain && <Fade><p className="my-0">This interviewer is in a chain of people whom all prefer different people, the system will try to schedule these members together.</p></Fade> }
+								</p>
+							</td>
+						</tr>
+					}
+			</React.Fragment>
 		)
 	}
 
