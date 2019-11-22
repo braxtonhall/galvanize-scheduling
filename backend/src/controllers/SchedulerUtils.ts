@@ -1,6 +1,7 @@
 import { interfaces } from "adapter";
 import {IScheduleAvailabilities, Preference} from "./Common";
 
+type PreferenceAvail = {interviewer: Preference, availability: interfaces.IAvailability};
 
 const took = (start, end) => Date.parse(end) - Date.parse(start);
 const slotLength = m => took(m.start as string, m.end as string);
@@ -95,27 +96,31 @@ function rankRooms(scheduleAvailabilities: IScheduleAvailabilities): {room: inte
 
 export function generateSchedules(scheduleAvailabilities: IScheduleAvailabilities): interfaces.ISchedule[] {
 	const sortedRooms = rankRooms(scheduleAvailabilities);
+	const groupedInterviewers = buildGroups(scheduleAvailabilities.interviewers);
 	return [];
 }
 
-function buildGroups(preferences: Preference[]): Preference[][] {
-	// TODO should take IScheduleAvailibilities
-	const groups: {members: Set<string>, data: Preference[]}[] = [];
+function buildGroups(preferences: PreferenceAvail[]): PreferenceAvail[][] {
+	const groups: {members: Set<string>, data: PreferenceAvail[]}[] = [];
 	preferences.forEach((preference) => {
+		const p = preference.interviewer;
 		for (const group of groups) {
-			if (preference.interviewer.id in group.members && preference.preference) {
-				group.members.add(preference.preference.id);
+			if (group.members.has(p.interviewer.id)) {
+				if (p.preference) {
+					group.members.add(p.preference.id);
+				}
 				group.data.push(preference);
 				return;
-			} else if (preference.preference && preference.preference.id in group.members) {
-				group.members.add(preference.interviewer.id);
+			} else if (p.preference && group.members.has(p.preference.id)) {
+				group.members.add(p.interviewer.id);
 				group.data.push(preference);
 				return;
 			}
 		}
-		const set = new Set(preference.interviewer.id);
-		if (preference) {
-			set.add(preference.preference.id);
+		const set = new Set<string>();
+		set.add(p.interviewer.id);
+		if (p.preference) {
+			set.add(p.preference.id);
 		}
 		groups.push({members: set, data: [preference]});
 	});
