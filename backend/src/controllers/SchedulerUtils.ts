@@ -61,7 +61,7 @@ function findOverlap(availA: interfaces.IAvailability, availB: interfaces.IAvail
 			})
 		}
 	}
-	return overlap; // TODO implement stub
+	return overlap;
 }
 
 function findAverageOverlapSum(avail: interfaces.IAvailability, testAvails: interfaces.IAvailability[]): number {
