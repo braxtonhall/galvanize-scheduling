@@ -84,27 +84,29 @@ export default class MSGraphController {
 
 
 			for (let timeslot of clipNonWorkingHours(candidate.availability)) {
-				const availabilities = await this.getSchedule(token, this.scheduleRequest(
-					request_array,
-					// @ts-ignore
-					timeslot
-				));
+				let floor = Math.floor(request_array.length / 20);
+				for (let i = 0; i < floor+1; i++) {
+					const availabilities = await this.getSchedule(token, this.scheduleRequest(
+						request_array.slice((i * 20), ((i + 1) * 20)),
+						// @ts-ignore
+						timeslot
+					));
+					for (let availability of availabilities) {
+						let date = new Date(timeslot.start.toString());
 
-				for (let availability of availabilities) {
-					let date = new Date(timeslot.start.toString());
-
-					for (let i = 0; i < availability.availabilityView.length; i++) {
-						let time: interfaces.IAvailability = {
-							// @ts-ignore
-							start: this.buildDate(date, 0),
-							end: this.buildDate(date)
-						};
-						if (availability.availabilityView.charAt(i) === '0') {
-							availability_map.set(
-								availability.scheduleId,
+						for (let i = 0; i < availability.availabilityView.length; i++) {
+							let time: interfaces.IAvailability = {
 								// @ts-ignore
-								[...availability_map.get(availability.scheduleId), time]
-							);
+								start: this.buildDate(date, 0),
+								end: this.buildDate(date)
+							};
+							if (availability.availabilityView.charAt(i) === '0') {
+								availability_map.set(
+									availability.scheduleId,
+									// @ts-ignore
+									[...availability_map.get(availability.scheduleId), time]
+								);
+							}
 						}
 					}
 				}
@@ -122,7 +124,7 @@ export default class MSGraphController {
 				}]
 			}
 
-			
+			console.log(scheduleAvailabilities)
 			return scheduleAvailabilities;
 
 		} catch(e) {
@@ -157,3 +159,4 @@ export default class MSGraphController {
             .post(content));
     }
 }
+
