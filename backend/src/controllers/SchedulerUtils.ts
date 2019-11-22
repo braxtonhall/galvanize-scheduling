@@ -1,10 +1,5 @@
 import { interfaces } from "adapter";
 
-export interface IScheduleAvailabilities {
-	rooms: {room: interfaces.IRoom, availability: interfaces.IAvailability}[]
-	interviewers: {interviewer: interfaces.IInterviewer, availability: interfaces.IAvailability}[]
-}
-
 const took = (start, end) => Date.parse(end) - Date.parse(start);
 const slotLength = m => took(m.start as string, m.end as string);
 const sumAvailability: (a) => number = availability => availability.map(slotLength).reduce((m, n) => m + n, 0);

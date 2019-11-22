@@ -2,7 +2,8 @@ import {Client} from '@microsoft/microsoft-graph-client';
 import 'isomorphic-fetch';
 import {interfaces} from "adapter";
 import {Config, ConfigKey} from "../Config";
-import {IScheduleAvailabilities, concatenateMoments} from "./SchedulerUtils";
+import {concatenateMoments} from "./SchedulerUtils";
+import {IScheduleAvailabilities} from "./Common";
 
 export default class MSGraphController {
 	private static readonly HOUR_REGEX = /(?<=T)[0-9]{2}(?=:)/;

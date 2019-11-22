@@ -20,6 +20,7 @@ export default class DynamoDBCandidateController extends CandidateController {
 		candidate = this.assertCandidate(candidate);
 		if (typeof candidate.id !== "string") {
 			candidate.id = this.hashID(await this.dbc.createCandidateID());
+			candidate.id += this.getRandomLongString();
 		}
 		if (candidate.availability) {
 			candidate.availability = concatenateMoments(candidate.availability);
@@ -54,6 +55,16 @@ export default class DynamoDBCandidateController extends CandidateController {
 			}
 		}
 		return String(a);
+	}
+	
+	private getRandomLongString(): string {
+		const stringLength = 32;
+		const charset = "QWERTYUIOPASDFGHJKLZXCVBNM1234567890";
+		let key = "";
+		for (let i = 0; i < stringLength; i++) {
+			key = key + charset.charAt(Math.floor(Math.random() * charset.length));
+		}
+		return key;
 	}
 
 }
