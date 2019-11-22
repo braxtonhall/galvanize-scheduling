@@ -1,6 +1,8 @@
 import { interfaces } from "adapter";
 import {IScheduleAvailabilities} from "./Common";
 
+type Preferences = {interviewer: interfaces.IInterviewer, preference?: interfaces.IInterviewer, minutes: number}[];
+
 const took = (start, end) => Date.parse(end) - Date.parse(start);
 const slotLength = m => took(m.start as string, m.end as string);
 const sumAvailability: (a) => number = availability => availability.map(slotLength).reduce((m, n) => m + n, 0);
@@ -72,4 +74,9 @@ function rankRooms(scheduleAvailabilities: IScheduleAvailabilities): {room: inte
 		.map(r => ({...r, score: scoreRoom(r.availability, interviewerAvails, rooms.length, r.room.capacity)}))
 		.sort((r, l) => r.score - l.score)
 		.map(r => ({room: r.room, availability: r.availability}));
+}
+
+export function generateSchedules(scheduleAvailabilities: IScheduleAvailabilities, preferences: Preferences): interfaces.ISchedule[] {
+	const sortedRooms = rankRooms(scheduleAvailabilities);
+	return [];
 }

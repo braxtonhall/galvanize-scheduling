@@ -2,8 +2,9 @@ import IResourceFacade from "../IResourceFacade";
 import {interfaces} from "adapter";
 import ControllerBuilder from "./ControllerBuilder";
 import {CandidateController, InterviewerController, RoomController} from "../ResourceControllers";
-import {ResourceKind} from "../Common";
+import {IScheduleAvailabilities, ResourceKind} from "../Common";
 import MSGraphController from "../MSGraphController";
+import {generateSchedules} from "../SchedulerUtils";
 
 type IResource = interfaces.IResource;
 type ICandidate = interfaces.ICandidate;
@@ -94,6 +95,7 @@ export default class ResourceFacade implements IResourceFacade {
 			throw new Error("Attempting to schedule without any options!");
 		}
 		const rooms = (await this.rc.list(token)) as Array<interfaces.IRoom>;
-		return MSGraphController.getScheduleWrapper(token, options.candidate, rooms, options.preferences.map(i => i.interviewer));
+		const avails: IScheduleAvailabilities = await MSGraphController.getScheduleWrapper(token, options.candidate, rooms, options.preferences.map(i => i.interviewer));
+		return generateSchedules(avails, options.preferences);
 	}
 }
