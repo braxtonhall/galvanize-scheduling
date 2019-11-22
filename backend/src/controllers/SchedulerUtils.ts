@@ -64,7 +64,7 @@ function scoreRoom(room: interfaces.IAvailability, interviewers: interfaces.IAva
 	// Average slot (important because we have more chances of fitting many back to back if high)
 	const averageSlotScore = averageSlot(room);
 	
-	return 100 * capacityScore + averageOverlapScore + 0.5 * biggestSlotScore + averageSlotScore;
+	return 100 * capacityScore + averageOverlapScore / 5000 + biggestSlotScore / 20000 + averageSlotScore / 10000;
 }
 
 function rankRooms(scheduleAvailabilities: IScheduleAvailabilities): {room: interfaces.IRoom, availability: interfaces.IAvailability}[] {
@@ -72,7 +72,7 @@ function rankRooms(scheduleAvailabilities: IScheduleAvailabilities): {room: inte
 	const rooms = scheduleAvailabilities.rooms;
 	return rooms
 		.map(r => ({...r, score: scoreRoom(r.availability, interviewerAvails, rooms.length, r.room.capacity)}))
-		.sort((r, l) => r.score - l.score)
+		.sort((r, l) =>  l.score - r.score)
 		.map(r => ({room: r.room, availability: r.availability}));
 }
 

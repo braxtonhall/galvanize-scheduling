@@ -72,13 +72,16 @@ export default class MSGraphController {
     	try {
     		let email_type = {};
 			let availability_map = new Map<string, interfaces.IAvailability>();
+			let object_map = new Map<string, interfaces.IResource>();
 			const request_array = rooms.map(r => {
 				email_type[r.email] = 'room';
+				object_map.set(r.email, r);
 				availability_map.set(r.email, []);
 				return r.email;
 			}).concat(interviewers.map(i => {
 				email_type[i.email] = 'interviewer';
 				availability_map.set(i.email, []);
+				object_map.set(i.email, i);
 				return i.email;
 			}));
 
@@ -117,7 +120,7 @@ export default class MSGraphController {
 
 			for (let email of request_array) {
 				scheduleAvailabilities[`${email_type[email]}s`] = [...scheduleAvailabilities[`${email_type[email]}s`], {
-					[email_type[email]]: email,
+					[email_type[email]]: object_map.get(email),
 					availability: concatenateMoments(availability_map.get(email))
 				}]
 			}
