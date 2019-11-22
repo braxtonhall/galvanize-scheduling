@@ -6,9 +6,6 @@ import {clipNonWorkingHours, concatenateMoments} from "./SchedulerUtils";
 import {IScheduleAvailabilities} from "./Common";
 
 export default class MSGraphController {
-	private static readonly HOUR_REGEX = /(?<=T)[0-9]{2}(?=:)/;
-	private static readonly MINUTE_REGEX = /(?<=:)[0-9]{2}(?=:)/;
-
     private static getClient(token: string): Client {
         return Client.init({
             authProvider: (done) => {
