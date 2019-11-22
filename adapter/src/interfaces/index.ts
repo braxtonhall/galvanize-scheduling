@@ -7,6 +7,8 @@ export interface IResource {
 export interface IRoom extends IResource {
 	name: string,
 	eligible?: boolean,
+	email?: string,
+	capacity?: number,
 }
 
 export interface ICandidate extends IResource {

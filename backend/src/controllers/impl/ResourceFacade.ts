@@ -2,8 +2,9 @@ import IResourceFacade from "../IResourceFacade";
 import {interfaces} from "adapter";
 import ControllerBuilder from "./ControllerBuilder";
 import {CandidateController, InterviewerController, RoomController} from "../ResourceControllers";
-import {ResourceKind} from "../Common";
+import {IScheduleAvailabilities, ResourceKind} from "../Common";
 import MSGraphController from "../MSGraphController";
+import {generateSchedules} from "../SchedulerUtils";
 
 type IResource = interfaces.IResource;
 type ICandidate = interfaces.ICandidate;
@@ -28,10 +29,7 @@ export default class ResourceFacade implements IResourceFacade {
 			case ResourceKind.Interviewer:
 				return this.ic.list(token, options.groupName);
 			case ResourceKind.Room:
-				return this.rc.list(token)
-					.then((rooms: IRoom[]) => rooms.map((r) => ({
-						id: r.id, name: r.name, eligible: r.eligible
-					})));
+				return this.rc.list(token);
 			case ResourceKind.Schedule:
 				return this.returnSchedules(token, options);
 			default:
@@ -93,10 +91,11 @@ export default class ResourceFacade implements IResourceFacade {
 
 	
 	private async returnSchedules(token: string, options: interfaces.IGetSchedulesOptions): Promise<any> { // TODO
-		if (!!options) {
+		if (!options) {
 			throw new Error("Attempting to schedule without any options!");
 		}
-		const rooms = (await this.rc.list(token)) as Array<interfaces.IRoom & {email: string, capacity: number}>;
-		return MSGraphController.getMeetingTimes(token, rooms, options);
+		const rooms = (await this.rc.list(token)) as Array<interfaces.IRoom>;
+		const avails: IScheduleAvailabilities = await MSGraphController.getScheduleWrapper(token, options.candidate, rooms, options.preferences.map(i => i.interviewer));
+		return generateSchedules(avails, options.preferences);
 	}
 }

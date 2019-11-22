@@ -95,7 +95,8 @@ const CandidateAvailability: React.FC = (props) => {
 	);
 };
 
-function mapAvailabilityToInitial(availability: IAvailability): Array<{start: Date, end: Date}> {
+function mapAvailabilityToInitial(availability: IAvailability = []): Array<{start: Date, end: Date}> {
+	console.log(availability);
 	return availability.map(a => ({
 		start: moment(a.start).toDate(),
 		end: moment(a.end).toDate(),

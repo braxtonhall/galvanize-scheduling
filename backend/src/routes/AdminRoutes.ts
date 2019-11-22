@@ -147,12 +147,17 @@ app.get(nodeAdapter.urls.GET_SCHEDULES, async (req, res) => {
 	const token: string = req.header("token");
 	try {
 		if (await AuthController.getInstance().checkAuth(token)) {
-			const data: any[] = await resourceFacade.list(token, ResourceKind.Schedule, req.query);
+			let options = {
+				preferences: req.query.preferences.map(p => JSON.parse(p)),
+				candidate: JSON.parse(req.query.candidate)
+			};
+			const data: any[] = await resourceFacade.list(token, ResourceKind.Schedule, options);
 			res.status(200).send(data);
 		} else {
 			res.sendStatus(401);
 		}
 	} catch(e) {
+		console.log(e);
 		res.status(e.statusCode).send(e.message);
 	}
 });
