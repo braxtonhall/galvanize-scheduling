@@ -144,8 +144,8 @@ function buildGroups(preferences: PreferenceAvail[]): PreferenceAvail[][] {
 	return groups.map(g => g.data);
 }
 
-function makeOneSchedule(candidate: interfaces.ICandidate, rooms: RoomAvail[], groups: PreferenceAvail[][]): interfaces.ISchedule {
+function makeOneSchedule(candidate: interfaces.ICandidate, rooms: RoomAvail[], groups: PreferenceAvail[][]): CandidateSchedule {
 	
 	// TODO implement stub
-	return {candidate, meetings: []};
+	return {schedule: {candidate, meetings: []}, numChangeOvers: 0, numUnscheduled: 0};
 }
