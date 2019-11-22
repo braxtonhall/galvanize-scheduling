@@ -37,10 +37,29 @@ app.get(nodeAdapter.urls.CANDIDATE, async (req, res) => {
 
 app.post(nodeAdapter.urls.UPDATE_AVAILABILITY, async (req, res) => {
 	try {
-		const token: string = req.header("token");
 		let {id, availability} = req.body.data;
+		const sanitized = [];
+		availability.sort((a1, a2) => a1.start > a2.start);
+		for (const a of availability) {
+			if (a.end < a.start) {
+				throw new Error("Illegal Input: end time cannot be before start time.");
+			}
+			const idx = sanitized.length - 1;
+			const last = sanitized[idx];
+			if (last && (a.start <= last.end)) { // overlap
+				const latestEnd = last.end > a.end ? last.end : a.end;
+				sanitized[idx] = { start: last.start, end: latestEnd };
+			} else {
+				sanitized.push(a);
+			}
+		}
+		const token: string = req.header("token");
 		if (await resourceFacade.exists(id, ResourceKind.Candidate)) {
-			const candidate = {...await resourceFacade.get(token, id, ResourceKind.Candidate), id, availability};
+			const candidate = {
+				...await resourceFacade.get(token, id, ResourceKind.Candidate),
+				id,
+				availability: sanitized
+			};
 			await resourceFacade.create(token, candidate, ResourceKind.Candidate);
 			res.sendStatus(200);
 		} else {
@@ -55,12 +74,15 @@ app.post(nodeAdapter.urls.SEND_AVAILABILITY, async (req, res) => {
 	const token: string = req.header("token");
 	const candidate: interfaces.ICandidate = req.body.data;
 	const email = {
-		subject: 'Availability Form',
+		subject: 'Your availability for an interview with Galvanize',
 		content: createAvailabilityContent(candidate),
 		recipients: [candidate.email]
 	};
 	try {
 		if (token && await AuthController.getInstance().checkAuth(token)) {
+			const exists = await resourceFacade.exists(candidate.id, ResourceKind.Candidate);
+			if (!exists)
+				throw new Error("Cannot send email, this candidate does not exist.");
 			const result = await MSGraphController.sendAvailabilityEmail(token, createEmail(email));
 			console.log(result);
 			res.status(200).send(result);

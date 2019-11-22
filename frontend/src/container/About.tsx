@@ -61,12 +61,12 @@ const About: React.FC = () => {
 									319 Software Engineering Project</a>&nbsp;
 									at <a href="https://www.ubc.ca/">The University of British Columbia</a> by....
 									<ul>
-										<li><a href="https://github.com/Metroxe">Christopher Powroznik</a></li>
-										<li><a href="https://github.com/braxtonhall">Braxton Hall</a></li>
-										<li><a href="https://github.com/andreatamez">Andrea Tamez</a></li>
-										<li><a href="https://github.com/Cinders-P">Cindy Hsu</a></li>
-										<li><a href="https://github.com/ksyeo1010">Kwangsoo Yeo</a></li>
-										<li><a href="https://github.com/Masahiro-Toyomura">Masahiro Toyomura</a></li>
+										<li><a href="https://github.com/Metroxe" target="-_blank">Christopher Powroznik</a></li>
+										<li><a href="https://github.com/braxtonhall" target="-_blank">Braxton Hall</a></li>
+										<li><a href="https://github.com/andreatamez" target="-_blank">Andrea Tamez</a></li>
+										<li><a href="https://github.com/Cinders-P" target="-_blank">Cindy Hsu</a></li>
+										<li><a href="https://github.com/ksyeo1010" target="-_blank">Kwangsoo Yeo</a></li>
+										<li><a href="https://github.com/Masahiro-Toyomura" target="-_blank">Masahiro Toyomura</a></li>
 									</ul>
 
 								</CardText>

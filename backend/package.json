@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "start": "NODE_ENV=production node dist/index.js",
+    "start-debug": "node --inspect=0.0.0.0 dist/index.js",
     "build": "rm -rf dist/ && tsc",
     "build-docker": "docker build -t galvanize/backend --file ../Dockerfile_backend -e ../.env ../",
     "run-docker": "docker run --cpus=1 --memory=128mb --memory-swap=128mb -p 8080:8080 galvanize/backend",

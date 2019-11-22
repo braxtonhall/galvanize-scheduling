@@ -1,0 +1,24 @@
+version: "3.5"
+
+services:
+  backend:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile_backend
+    container_name: backend
+    restart: always
+    env_file:
+      - .env
+    environment:
+      - DB_URL=http://db:8000
+      - FRONTEND_URL=http://localhost:3000
+    ports:
+      - 8080:8080
+      - 9229:9229
+    command: "npm run start-debug"
+  db:
+    image: amazon/dynamodb-local
+    container_name: db
+    command: -jar DynamoDBLocal.jar
+    expose:
+      - 8000

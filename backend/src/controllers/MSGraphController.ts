@@ -156,7 +156,7 @@ export default class MSGraphController {
 
 	static async sendAvailabilityEmail(token: string, content: any): Promise<any> {
         return (await (this.getClient(token))
-            .api("/me/sendMail")
+            .api(Config.getInstance().get(ConfigKey.msEmailEndpoint))
             .post(content));
     }
 }
