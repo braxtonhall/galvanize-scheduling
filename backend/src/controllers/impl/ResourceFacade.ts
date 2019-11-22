@@ -97,6 +97,6 @@ export default class ResourceFacade implements IResourceFacade {
 		}
 		const rooms = (await this.rc.list(token)) as Array<interfaces.IRoom>;
 		const avails: IScheduleAvailabilities = await MSGraphController.getScheduleWrapper(token, options.candidate, rooms, options.preferences);
-		return generateSchedules(avails);
+		return generateSchedules(options.candidate, avails);
 	}
 }

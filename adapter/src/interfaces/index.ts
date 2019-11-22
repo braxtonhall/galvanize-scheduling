@@ -35,8 +35,8 @@ export interface ISchedule {
 
 export interface IMeeting {
 	interviewers: IInterviewer[],
-	startTime: Moment,
-	endTime: Moment,
+	startTime: Moment | string,
+	endTime: Moment | string,
 	room: IRoom
 }
 

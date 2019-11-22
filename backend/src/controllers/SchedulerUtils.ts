@@ -2,6 +2,8 @@ import { interfaces } from "adapter";
 import {IScheduleAvailabilities, Preference} from "./Common";
 
 type PreferenceAvail = {interviewer: Preference, availability: interfaces.IAvailability};
+type CandidateSchedule = {schedule: interfaces.ISchedule, numChangeOvers: number, numUnscheduled: number};
+type RoomAvail = {room: interfaces.IRoom, availability: interfaces.IAvailability};
 
 const took = (start, end) => Date.parse(end) - Date.parse(start);
 const slotLength = m => took(m.start as string, m.end as string);
@@ -85,7 +87,7 @@ function scoreRoom(room: interfaces.IAvailability, interviewers: interfaces.IAva
 	return 100 * capacityScore + averageOverlapScore / 5000 + biggestSlotScore / 20000 + averageSlotScore / 10000;
 }
 
-function rankRooms(scheduleAvailabilities: IScheduleAvailabilities): {room: interfaces.IRoom, availability: interfaces.IAvailability}[] {
+function rankRooms(scheduleAvailabilities: IScheduleAvailabilities): RoomAvail[] {
 	const interviewerAvails = scheduleAvailabilities.interviewers.map(i => i.availability);
 	const rooms = scheduleAvailabilities.rooms;
 	return rooms
@@ -94,10 +96,25 @@ function rankRooms(scheduleAvailabilities: IScheduleAvailabilities): {room: inte
 		.map(r => ({room: r.room, availability: r.availability}));
 }
 
-export function generateSchedules(scheduleAvailabilities: IScheduleAvailabilities): interfaces.ISchedule[] {
+export function generateSchedules(candidate: interfaces.ICandidate, scheduleAvailabilities: IScheduleAvailabilities): interfaces.ISchedule[] {
 	const sortedRooms = rankRooms(scheduleAvailabilities);
 	const groupedInterviewers = buildGroups(scheduleAvailabilities.interviewers);
-	return [];
+	const schedules: CandidateSchedule[] = [];
+	for (let i = 0; i < 10; i++) {
+		const s: CandidateSchedule = makeOneSchedule(candidate, sortedRooms, groupedInterviewers);
+		if (s.schedule.meetings.length > 1) {
+			schedules.push(s);
+		}
+	}
+	schedules.sort((a , b) => {
+		const unscheduledComp = a.numUnscheduled - b.numUnscheduled;
+		if (unscheduledComp === 0) {
+			return a.numUnscheduled - b.numUnscheduled;
+		} else {
+			return unscheduledComp;
+		}
+	});
+	return schedules.map(s => s.schedule).slice(0, 3);
 }
 
 function buildGroups(preferences: PreferenceAvail[]): PreferenceAvail[][] {
@@ -125,4 +142,10 @@ function buildGroups(preferences: PreferenceAvail[]): PreferenceAvail[][] {
 		groups.push({members: set, data: [preference]});
 	});
 	return groups.map(g => g.data);
+}
+
+function makeOneSchedule(candidate: interfaces.ICandidate, rooms: RoomAvail[], groups: PreferenceAvail[][]): interfaces.ISchedule {
+	
+	// TODO implement stub
+	return {candidate, meetings: []};
 }
