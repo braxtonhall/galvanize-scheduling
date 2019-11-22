@@ -38,7 +38,7 @@ const CandidateList: React.FC<IProps> = (props: IProps) => {
 				<td>{emptyEntry(firstName)}</td>
 				<td>{emptyEntry(lastName)}</td>
 				<td>{emptyEntry(position)}</td>
-				<td><Link to={`/submit_availability/${candidate.id}`}>/submit_availability/{candidate.id}</Link></td>
+				<td><a href={`/submit_availability/${candidate.id}`} target="_blank">/submit_availability/{candidate.id}</a></td>
 				<td>
 					<ButtonGroup>
 						{actions.map(makeButtons)}

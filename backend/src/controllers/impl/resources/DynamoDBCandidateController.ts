@@ -1,6 +1,7 @@
 import {CandidateController} from "../../ResourceControllers";
 import {interfaces} from "adapter";
 import {DynamoDBController, IDynamoDBController} from "../DynamoDBController";
+import {concatenateMoments} from "../../SchedulerUtils";
 
 export default class DynamoDBCandidateController extends CandidateController {
 	private dbc: IDynamoDBController;
@@ -19,6 +20,10 @@ export default class DynamoDBCandidateController extends CandidateController {
 		candidate = this.assertCandidate(candidate);
 		if (typeof candidate.id !== "string") {
 			candidate.id = this.hashID(await this.dbc.createCandidateID());
+			candidate.id += this.getRandomLongString();
+		}
+		if (candidate.availability) {
+			candidate.availability = concatenateMoments(candidate.availability);
 		}
 		await this.dbc.writeCandidate(candidate);
 		return candidate;
@@ -50,6 +55,16 @@ export default class DynamoDBCandidateController extends CandidateController {
 			}
 		}
 		return String(a);
+	}
+	
+	private getRandomLongString(): string {
+		const stringLength = 32;
+		const chars = "QWERTYUIOPASDFGHJKLZXCVBNM1234567890";
+		let key = "";
+		while (key.length < stringLength) {
+			key += chars.charAt(Math.floor(Math.random() * chars.length));
+		}
+		return key;
 	}
 
 }
