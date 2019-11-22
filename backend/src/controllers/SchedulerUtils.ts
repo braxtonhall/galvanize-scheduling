@@ -52,7 +52,7 @@ function findOverlap(availA: interfaces.IAvailability, availB: interfaces.IAvail
 			if (timeA.end <= timeB.start // A ends earlier than start of B
 				|| timeB.end <= timeA.start // B ends earlier than start of A
 				|| timeA.start >= timeB.end // A starts after B ends
-				|| timeB.start >= timeA.start) { // B starts after A ends
+				|| timeB.start >= timeA.end) { // B starts after A ends
 				continue;
 			}
 			overlap.push({
