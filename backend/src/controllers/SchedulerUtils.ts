@@ -1,4 +1,5 @@
 import { interfaces } from "adapter";
+import {IScheduleAvailabilities} from "./Common";
 
 const took = (start, end) => Date.parse(end) - Date.parse(start);
 const slotLength = m => took(m.start as string, m.end as string);
