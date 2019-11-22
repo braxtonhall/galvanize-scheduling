@@ -74,7 +74,7 @@ app.post(nodeAdapter.urls.SEND_AVAILABILITY, async (req, res) => {
 	const token: string = req.header("token");
 	const candidate: interfaces.ICandidate = req.body.data;
 	const email = {
-		subject: 'Availability Form',
+		subject: 'Your availability for an interview with Galvanize',
 		content: createAvailabilityContent(candidate),
 		recipients: [candidate.email]
 	};
