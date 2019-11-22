@@ -3,7 +3,7 @@ import 'isomorphic-fetch';
 import {interfaces} from "adapter";
 import {Config, ConfigKey} from "../Config";
 import {clipNonWorkingHours, concatenateMoments} from "./SchedulerUtils";
-import {IScheduleAvailabilities} from "./Common";
+import {IScheduleAvailabilities, Preference} from "./Common";
 
 export default class MSGraphController {
     private static getClient(token: string): Client {
@@ -64,22 +64,22 @@ export default class MSGraphController {
     	token: string,
     	candidate: interfaces.ICandidate,
 		rooms: Array<interfaces.IRoom>,
-		interviewers: Array<interfaces.IInterviewer>
+		interviewers: Array<Preference>
 	): Promise<IScheduleAvailabilities> {
     	try {
     		let email_type = {};
 			let availability_map = new Map<string, interfaces.IAvailability>();
-			let object_map = new Map<string, interfaces.IResource>();
+			let object_map = new Map<string, any>();
 			const request_array = rooms.map(r => {
 				email_type[r.email] = 'room';
 				object_map.set(r.email, r);
 				availability_map.set(r.email, []);
 				return r.email;
 			}).concat(interviewers.map(i => {
-				email_type[i.email] = 'interviewer';
-				availability_map.set(i.email, []);
-				object_map.set(i.email, i);
-				return i.email;
+				email_type[i.interviewer.email] = 'interviewer';
+				availability_map.set(i.interviewer.email, []);
+				object_map.set(i.interviewer.email, i);
+				return i.interviewer.email;
 			}));
 
 

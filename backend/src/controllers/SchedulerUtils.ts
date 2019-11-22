@@ -1,8 +1,6 @@
 import { interfaces } from "adapter";
-import {IScheduleAvailabilities} from "./Common";
+import {IScheduleAvailabilities, Preference} from "./Common";
 
-type Preferences = {interviewer: interfaces.IInterviewer, preference?: interfaces.IInterviewer, minutes: number}[];
-type InterviewerPreference = {interviewer: interfaces.IInterviewer, preference?: interfaces.IInterviewer, minutes: number};
 
 const took = (start, end) => Date.parse(end) - Date.parse(start);
 const slotLength = m => took(m.start as string, m.end as string);
@@ -95,14 +93,14 @@ function rankRooms(scheduleAvailabilities: IScheduleAvailabilities): {room: inte
 		.map(r => ({room: r.room, availability: r.availability}));
 }
 
-export function generateSchedules(scheduleAvailabilities: IScheduleAvailabilities, preferences: Preferences): interfaces.ISchedule[] {
+export function generateSchedules(scheduleAvailabilities: IScheduleAvailabilities): interfaces.ISchedule[] {
 	const sortedRooms = rankRooms(scheduleAvailabilities);
 	return [];
 }
 
-function buildGroups(preferences: InterviewerPreference[]): InterviewerPreference[][] {
+function buildGroups(preferences: Preference[]): Preference[][] {
 	// TODO should take IScheduleAvailibilities
-	const groups: {members: Set<string>, data: InterviewerPreference[]}[] = [];
+	const groups: {members: Set<string>, data: Preference[]}[] = [];
 	preferences.forEach((preference) => {
 		for (const group of groups) {
 			if (preference.interviewer.id in group.members && preference.preference) {

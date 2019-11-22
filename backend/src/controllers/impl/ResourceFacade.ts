@@ -10,6 +10,7 @@ type IResource = interfaces.IResource;
 type ICandidate = interfaces.ICandidate;
 type IInterviewer = interfaces.IInterviewer;
 type IRoom = interfaces.IRoom;
+type ISchedule = interfaces.ISchedule;
 
 export default class ResourceFacade implements IResourceFacade {
 	private readonly cc: CandidateController;
@@ -22,7 +23,7 @@ export default class ResourceFacade implements IResourceFacade {
 		this.rc = ControllerBuilder.getRoomController();
 	}
 
-	public list(token: string, kind: ResourceKind, options?: any): Promise<IResource[]> {
+	public list(token: string, kind: ResourceKind, options?: any): Promise<any[]> {
 		switch (kind) {
 			case ResourceKind.Candidate:
 				return this.cc.list(token);
@@ -90,12 +91,12 @@ export default class ResourceFacade implements IResourceFacade {
 	}
 
 	
-	private async returnSchedules(token: string, options: interfaces.IGetSchedulesOptions): Promise<any> { // TODO
+	private async returnSchedules(token: string, options: interfaces.IGetSchedulesOptions): Promise<ISchedule[]> { // TODO
 		if (!options) {
 			throw new Error("Attempting to schedule without any options!");
 		}
 		const rooms = (await this.rc.list(token)) as Array<interfaces.IRoom>;
-		const avails: IScheduleAvailabilities = await MSGraphController.getScheduleWrapper(token, options.candidate, rooms, options.preferences.map(i => i.interviewer));
-		return generateSchedules(avails, options.preferences);
+		const avails: IScheduleAvailabilities = await MSGraphController.getScheduleWrapper(token, options.candidate, rooms, options.preferences);
+		return generateSchedules(avails);
 	}
 }
