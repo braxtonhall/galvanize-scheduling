@@ -6,6 +6,7 @@ const slotLength = m => took(m.start as string, m.end as string);
 const sumAvailability: (a) => number = availability => availability.map(slotLength).reduce((m, n) => m + n, 0);
 const biggestSlot = availability => availability.map(slotLength).reduce((m, n) => m > n ? m : n, 0);
 const averageSlot = availability => sumAvailability(availability) / availability.length;
+const gaussianIsh = (x, b) => Math.max(0, Math.exp(-Math.pow(x - b, 2) / 8));
 
 export function concatenateMoments(availability: interfaces.IAvailability): interfaces.IAvailability {
 	if (availability.some(m => typeof m.start !== "string" || typeof m.end !== "string")) {
@@ -49,14 +50,19 @@ function findAverageOverlapSum(avail: interfaces.IAvailability, testAvails: inte
 }
 
 function scoreRoom(room: interfaces.IAvailability, interviewers: interfaces.IAvailability[], numRooms: number, capacity: number): number {
-	// TODO THIS IS THE HEART OF THIS WHOLE ALGORITHM! THE NUMBERS ARE BETA AND SUBJECT TO CHANGE!
-	/**
-	 * Here are the things that I may want to include in a room score
-	 * - The biggest slot (important because we want to fit as many interviewers as possible back to back)
-	 * - Average overlapping time (important because the higher overlap, the more interviewers can fit in that room)
-	 * - Capacity (the higher, the more can fit in a room at once, but too high and it's a waste of space. Peak at 4? Increase with more interviewers?)
-	 */
-	return 0;
+	// THIS IS THE HEART OF THIS WHOLE ALGORITHM! THE NUMBERS ARE BETA AND SUBJECT TO CHANGE!
+	
+	// Capacity (the higher, the more can fit in a room at once, but too high and it's a waste of space.
+	// 		Peak starts at 4, increase with more interviewers)
+	const capacityScore = gaussianIsh(capacity, (interviewers.length / 10) + 4);
+	// Average overlapping time (important because the higher overlap, the more interviewers can fit in that room)
+	const averageOverlapScore = findAverageOverlapSum(room, interviewers) / interviewers.length;
+	// The biggest slot (important because we want to fit as many interviewers as possible back to back)
+	const biggestSlotScore = biggestSlot(room);
+	// Average slot (important because we have more chances of fitting many back to back if high)
+	const averageSlotScore = averageSlot(room);
+	
+	return 100 * capacityScore + averageOverlapScore + 0.5 * biggestSlotScore + averageSlotScore;
 }
 
 function rankRooms(scheduleAvailabilities: IScheduleAvailabilities): {room: interfaces.IRoom, availability: interfaces.IAvailability}[] {
