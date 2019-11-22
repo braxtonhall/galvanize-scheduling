@@ -90,10 +90,10 @@ export default class ResourceFacade implements IResourceFacade {
 
 	
 	private async returnSchedules(token: string, options: interfaces.IGetSchedulesOptions): Promise<any> { // TODO
-		if (!!options) {
+		if (!options) {
 			throw new Error("Attempting to schedule without any options!");
 		}
 		const rooms = (await this.rc.list(token)) as Array<interfaces.IRoom>;
-		return MSGraphController.getMeetingTimes(token, rooms, options);
+		return MSGraphController.getScheduleWrapper(token, options.candidate, rooms, options.preferences.map(i => i.interviewer));
 	}
 }

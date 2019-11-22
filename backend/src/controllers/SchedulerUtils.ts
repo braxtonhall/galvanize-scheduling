@@ -57,4 +57,5 @@ function scoreRoom(room: interfaces.IAvailability, interviewers: interfaces.IAva
 	/**
 	 * Here are the things that I may want to include in a room score
 	 */
+	return 0;
 }

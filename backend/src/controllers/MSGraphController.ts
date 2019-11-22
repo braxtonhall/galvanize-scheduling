@@ -2,8 +2,11 @@ import {Client} from '@microsoft/microsoft-graph-client';
 import 'isomorphic-fetch';
 import {interfaces} from "adapter";
 import {Config, ConfigKey} from "../Config";
+import {IScheduleAvailabilities, concatenateMoments} from "./SchedulerUtils";
 
 export default class MSGraphController {
+	private static readonly HOUR_REGEX = /(?<=T)[0-9]{2}(?=:)/;
+	private static readonly MINUTE_REGEX = /(?<=:)[0-9]{2}(?=:)/;
 
     private static getClient(token: string): Client {
         return Client.init({
@@ -53,96 +56,98 @@ export default class MSGraphController {
             }));
     }
 
-    public static async getMeetingTimes(
-    	token:string,
+	static async getSchedule(token: string, request) {
+		return (await (this.getClient(token))
+			.api('/me/calendar/getSchedule')
+			.post(request)).value;
+	}
+
+    static async getScheduleWrapper(
+    	token: string,
+    	candidate: interfaces.ICandidate,
 		rooms: Array<interfaces.IRoom>,
-		options: interfaces.IGetSchedulesOptions
-	): Promise<any> {
-    	rooms.sort((a, b) => a.capacity - b.capacity);
-    	const {candidate, preferences} = options;
-    	const groups = this.buildGroups(preferences);
-    	const suggestions = [];
-    	const client = this.getClient(token);
-    	for (const room of rooms) {
-			if (room.capacity < 2) {
-				continue;
+		interviewers: Array<interfaces.IInterviewer>
+	): Promise<IScheduleAvailabilities> {
+    	try {
+    		let email_type = {};
+			let availability_map = new Map<string, interfaces.IAvailability>();
+			const request_array = rooms.map(r => {
+				email_type[r.email] = 'room';
+				availability_map.set(r.email, []);
+				return r.email;
+			}).concat(interviewers.map(i => {
+				email_type[i.email] = 'interviewer';
+				availability_map.set(i.email, []);
+				return i.email;
+			}));
+
+
+			for (let timeslot of candidate.availability) {
+				const availabilities = await this.getSchedule(token, this.scheduleRequest(
+					request_array,
+					// @ts-ignore
+					timeslot
+				));
+
+				for (let availability of availabilities) {
+					let date = new Date(timeslot.start.toString());
+
+					for (let i = 0; i < availability.availabilityView.length; i++) {
+						let time: interfaces.IAvailability = {
+							// @ts-ignore
+							start: this.buildDate(date, 0),
+							end: this.buildDate(date)
+						};
+						if (availability.availabilityView.charAt(i) === '0') {
+							availability_map.set(
+								availability.scheduleId,
+								// @ts-ignore
+								[...availability_map.get(availability.scheduleId), time]
+							);
+						}
+					}
+				}
 			}
-			const promises = [];
-			for (const group of groups) {
-				promises.push(client
-					.api('/me/findMeetingTimes')
-					.post(this.buildMeeting(room, group, candidate)));
+
+			let scheduleAvailabilities: IScheduleAvailabilities = {
+				rooms: [],
+				interviewers: []
+			};
+
+			for (let email of request_array) {
+				scheduleAvailabilities[`${email_type[email]}s`] = [...scheduleAvailabilities[`${email_type[email]}s`], {
+					[email_type[email]]: email,
+					availability: concatenateMoments(availability_map.get(email))
+				}]
 			}
-			const results = await Promise.all(promises);
-			console.log(results);
+
+			
+			return scheduleAvailabilities;
+
+		} catch(e) {
+    		console.log(e);
+    		throw new Error(e);
 		}
-    	
 	}
-	
-	private static buildMeeting(room, group: any[], candidate): any {
+
+	static scheduleRequest(request: Array<string>, timeslot: {start: string, end: string}, availabilityViewInterval: number = 15) {
     	return {
-    		attendees: [
-				{
-					type: "resource",
-					emailAddress: {
-						name: room.name,
-						address: room.email,
-					},
-				},
-			].concat(group
-				.map((p) => ({
-					type: "required",
-					emailAddress: {
-						name: `${p.interviewer.firstName} ${p.interviewer.lastName}`,
-						address: p.interviewer.email
-					}}))),
-			timeConstraints: {
-    			activityDomain: "work",
-				timeslots: candidate.availability.map((a) => ({
-					start: {
-						dateTime: a.start,
-						timeZone: "Pacific Standard Time"
-					},
-					end: {
-						dateTime: a.end,
-						timeZone: "Pacific Standard Time"
-					},
-				})),
+			schedules: request,
+			startTime: {
+				dateTime: timeslot.start,
+				timeZone: 'Pacific Standard Time'
 			},
-			isOrganizerOptional: true,
-			meetingDuration: `PTH${Math.floor(group[0].minutes / 60)}M${group[0].minutes % 60}`,
-			returnSuggestionReasons: false,
-			minimumAttendeePercentage: 1 / group.length
-		};
-	}
-	
-	private static buildGroups(preferences: Array<{interviewer: interfaces.IInterviewer, preference?: interfaces.IInterviewer, minutes: number}>)
-		: Array<Array<{interviewer: interfaces.IInterviewer, preference?: interfaces.IInterviewer, minutes: number}>> {
-    	const groups = [];
-		for (const preference of preferences) {
-			let found = false;
-			for (const group of groups) {
-				if (preference.interviewer.id in group.members && preference.preference) {
-					group.members.add(preference.preference.id);
-					group.data.push(preference);
-					found = true;
-					break;
-				} else if (preference.preference && preference.preference.id in group.members) {
-					group.members.add(preference.interviewer.id);
-					group.data.push(preference);
-					found = true;
-					break;
-				}
-			}
-			if (!found) {
-				const set = new Set(preference.interviewer.id);
-				if (preference) {
-					set.add(preference.preference.id);
-				}
-				groups.push({members: set, data: [preference]});
-			}
+			endTime: {
+				dateTime: timeslot.end,
+				timeZone: 'Pacific Standard Time'
+			},
+			availabilityViewInterval
 		}
-		return groups;
+	}
+
+	static buildDate(startDate: Date, offset: number = 15) {
+		startDate.setMinutes(startDate.getMinutes() + offset);
+		return startDate.toISOString();
 	}
 
 	static async sendAvailabilityEmail(token: string, content: any): Promise<any> {
