@@ -8,7 +8,8 @@ const fakeCandidates: ICandidate[] = [
 		firstName: "Christopher",
 		lastName: "Powroznik",
 		position: "Lead Developer",
-		notes: "Possibly the greatest candidate of all time."
+		notes: "Possibly the greatest candidate of all time.",
+		scheduled: false
 	},
 	{
 		id: "2",
@@ -17,7 +18,8 @@ const fakeCandidates: ICandidate[] = [
 		firstName: "Braxton",
 		lastName: "Hall",
 		position: "Musical Programmer",
-		notes: "Very talented at being creative with different mediums."
+		notes: "Very talented at being creative with different mediums.",
+		scheduled: false
 	},
 	{
 		id: "3",
@@ -26,7 +28,8 @@ const fakeCandidates: ICandidate[] = [
 		firstName: "Kwangsoo",
 		lastName: "Yeo",
 		position: "Instructor",
-		notes: "Good with people, excelled in phone interview."
+		notes: "Good with people, excelled in phone interview.",
+		scheduled: false
 	},
 ];
 

@@ -13,6 +13,7 @@ export interface IRoom extends IResource {
 
 export interface ICandidate extends IResource {
 	email: string,
+	scheduled: boolean,
 	phoneNumber?: string,
 	firstName?: string,
 	lastName?: string,
