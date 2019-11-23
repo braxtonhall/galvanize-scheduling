@@ -160,6 +160,10 @@ function buildGroups(preferences: PreferenceAvail[]): PreferenceAvail[][] {
 }
 
 function removeOverlap(availability: interfaces.IAvailability, meetings: interfaces.IMeeting[]): interfaces.IAvailability {
+	/** @kwangsoo: delete all meetings from the avail. For example
+	 * input:  avail = [{start: 1000, end: 1400}], meetings = [{start: 1100, end: 1200}]
+	 * output: avail = [{start: 1000, end: 1100}, {start: 1200, end: 1400}]
+	 */
 	return availability; // TODO implement stub
 }
 
