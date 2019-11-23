@@ -177,11 +177,21 @@ function makeOneSchedule(candidate: interfaces.ICandidate, rooms: RoomAvail[], g
 		let meetingRun = 0;
 		// select a room
 		const room: RoomAvail = rooms[(roomStart + roomIndex) % rooms.length];
-		let timeslotIndex = 0, scheduled = false;
+		let timeslotIndex = 0, scheduled = false, timeStart = 0;
 		const availability: interfaces.IAvailability = removeOverlap(arrayCopy(room.availability), meetings);
+		if (meetings.length > 0) {
+			const candidateTimeStart = availability.findIndex(t => {
+				const lastMeeting = meetings[meetings.length - 1];
+				return (lastMeeting.end <= t.start && took(lastMeeting.end, t.start) < 1000 * 60 * 60 * 8) ||
+					(lastMeeting.start >= t.end && took(t.end, lastMeeting.start) < 1000 * 60 * 60 * 8)
+			});
+			if (candidateTimeStart > 0) {
+				timeStart = 0;
+			}
+		}
 		// while there are timeslots
 		while (timeslotIndex < availability.length && groups.length > 0) {
-			const timeslot: { start: string; end: string; } = objectCopy(availability[timeslotIndex]);
+			const timeslot: { start: string; end: string; } = objectCopy(availability[(timeslotIndex + timeStart) % availability.length]);
 			let groupIndex = 0;
 			// while there are groups
 			while (groupIndex < groups.length) {
@@ -242,6 +252,7 @@ function makeOneSchedule(candidate: interfaces.ICandidate, rooms: RoomAvail[], g
 			numChangeOvers++;
 		}
 	}
+	meetings.sort((a, b) => a.start < b.start ? -1 : 1);
 	console.log(`Returning schedules. This run took ${tookHuman(start)}.`);
 	return {schedule: {candidate, meetings}, numChangeOvers, numUnscheduled};
 }
@@ -250,7 +261,7 @@ function shuffle(array: any[]): any[] {
 	// https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
 	let currentIndex = array.length;
 	// While there remain elements to shuffle...
-	while (0 !== currentIndex) {
+	while (currentIndex > 0) {
 		// Pick a remaining element...
 		const random = Math.floor(Math.random() * currentIndex);
 		currentIndex -= 1;
