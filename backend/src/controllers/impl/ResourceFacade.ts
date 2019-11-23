@@ -95,8 +95,10 @@ export default class ResourceFacade implements IResourceFacade {
 		if (!options) {
 			throw new Error("Attempting to schedule without any options!");
 		}
+		const candidate = options.candidate;
+		const preferences = options.preferences.filter(p => p.minutes > 0);
 		const rooms = (await this.rc.list(token)) as Array<interfaces.IRoom>;
-		const avails: IScheduleAvailabilities = await MSGraphController.getScheduleWrapper(token, options.candidate, rooms, options.preferences);
+		const avails: IScheduleAvailabilities = await MSGraphController.getScheduleWrapper(token, options.candidate, rooms, preferences);
 		return generateSchedules(options.candidate, avails);
 	}
 }

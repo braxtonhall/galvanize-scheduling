@@ -11,6 +11,8 @@ const sumAvailability: (a) => number = availability => availability.map(slotLeng
 const biggestSlot = availability => availability.map(slotLength).reduce((m, n) => m > n ? m : n, 0);
 const averageSlot = availability => sumAvailability(availability) / availability.length;
 const gaussianIsh = (x, b) => Math.max(0, Math.exp(-Math.pow(x - b, 2) / 8));
+const arrayCopy = a => [...a];
+const objectCopy = o => ({...o});
 
 function tookHuman(start: number): string {
 	const milliseconds = Date.now() - start;
@@ -106,7 +108,7 @@ function rankRooms(scheduleAvailabilities: IScheduleAvailabilities): RoomAvail[]
 	return rooms
 		.map(r => ({...r, score: scoreRoom(r.availability, interviewerAvails, rooms.length, r.room.capacity)}))
 		.sort((r, l) =>  l.score - r.score)
-		.map(r => ({room: r.room, availability: r.availability}));
+		.map(r => ({room: r.room, availability: r.availability.sort((a, b) =>  took(b.start, b.end) - took(a.start, a.end))}));
 }
 
 export function generateSchedules(candidate: interfaces.ICandidate, scheduleAvailabilities: IScheduleAvailabilities): interfaces.ISchedule[] {
@@ -114,7 +116,7 @@ export function generateSchedules(candidate: interfaces.ICandidate, scheduleAvai
 	const groupedInterviewers = buildGroups(scheduleAvailabilities.interviewers);
 	const schedules: CandidateSchedule[] = [];
 	for (let i = 0; i < 10; i++) {
-		const s: CandidateSchedule = makeOneSchedule(candidate, sortedRooms, groupedInterviewers);
+		const s: CandidateSchedule = makeOneSchedule(candidate, arrayCopy(sortedRooms), arrayCopy(groupedInterviewers));
 		if (s.schedule.meetings.length > 1) {
 			schedules.push(s);
 		}
@@ -157,10 +159,96 @@ function buildGroups(preferences: PreferenceAvail[]): PreferenceAvail[][] {
 	return groups.map(g => g.data);
 }
 
+function removeOverlap(availability: interfaces.IAvailability, meetings: interfaces.IMeeting[]): interfaces.IAvailability {
+	return availability; // TODO implement stub
+}
+
 function makeOneSchedule(candidate: interfaces.ICandidate, rooms: RoomAvail[], groups: PreferenceAvail[][]): CandidateSchedule {
 	const start = Date.now();
+	groups = shuffle(groups);
+	let roomIndex = 0, numUnscheduled = 0, numChangeOvers = 0, meetings: interfaces.IMeeting[] = [];
 	
+	// while there are rooms and groups
+	while (roomIndex < rooms.length && groups.length > 0) {
+		let meetingRun = 0;
+		// select a room
+		const room = rooms[roomIndex]; let timeslotIndex = 0;
+		const availability = removeOverlap(arrayCopy(room.availability), meetings);
+		// while there are timeslots
+		while (timeslotIndex < availability.length) {
+			const timeslot = objectCopy(availability[timeslotIndex]);
+			let groupIndex = 0;
+			// while there are groups
+			while (groupIndex < groups.length) {
+				// shallow copy the group and shuffle
+				const group = shuffle(groups[groupIndex]);
+				// if time wanted fits in timeslot
+				if (true) { // TODO
+					let preferenceIndex = 0;
+					// while there are members in the group
+					while (preferenceIndex < group.length) {
+						// if can't schedule around beginning of timeslot
+						if (false) { // TODO
+							// kick someone out of the group
+							preferenceIndex++;
+						} else {
+							// add to meetings
+							const start = ""; // TODO
+							const end = ""; // TODO
+							meetings.push({
+								interviewers: group.slice(0, preferenceIndex + 1).map(p => p.interviewer),
+								room: room.room,
+								startTime: start,
+								endTime: end,
+							});
+							// update the timeslot
+							timeslot.start = ""; // TODO
+							// inc meeting run
+							meetingRun += 0; // TODO
+							// if meeting run is over 4 hours
+							if (meetingRun > 14400000) {
+								// set it to 0, add a break to timeslot
+								meetingRun = 0;
+								timeslot.start = ""; // TODO
+							}
+     						groups.splice(groupIndex--, 1);
+							numUnscheduled += preferenceIndex;
+							break;
+						}
+					}
+				}
+				// remove group from groups
+				groupIndex++;
+				// if timeslot has become invalid, new timeslot
+				if (timeslot.start >= timeslot.end) {
+					break;
+				}
+			}
+			// remove the timeslot
+			timeslotIndex++;
+		}
+		roomIndex++;
+		if (meetingRun > 0) {
+			meetingRun = 0;
+			numChangeOvers++;
+		}
+	}
 	console.log(`Returning schedules. This run took ${tookHuman(start)}.`);
-	// TODO remove stub
-	return {schedule: {candidate, meetings: []}, numChangeOvers: 0, numUnscheduled: 0};
+	return {schedule: {candidate, meetings}, numChangeOvers, numUnscheduled};
+}
+
+function shuffle(array: any[]): any[] {
+	// https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
+	let currentIndex = array.length;
+	// While there remain elements to shuffle...
+	while (0 !== currentIndex) {
+		// Pick a remaining element...
+		const random = Math.floor(Math.random() * currentIndex);
+		currentIndex -= 1;
+		// And swap it with the current element.
+		const temp = array[currentIndex];
+		array[currentIndex] = array[random];
+		array[random] = temp;
+	}
+	return array;
 }
