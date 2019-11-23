@@ -36,6 +36,7 @@ export interface ISchedule {
 export interface ITimeslot {
 	start: Moment | string;
 	end: Moment | string;
+	note?: string;
 }
 
 export interface IMeeting extends ITimeslot {
