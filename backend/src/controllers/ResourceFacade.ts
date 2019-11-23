@@ -1,10 +1,9 @@
-import IResourceFacade from "../IResourceFacade";
 import {interfaces} from "adapter";
-import ControllerBuilder from "./ControllerBuilder";
-import {CandidateController, InterviewerController, RoomController} from "../ResourceControllers";
-import {IScheduleAvailabilities, ResourceKind} from "../Common";
-import MSGraphController from "../MSGraphController";
-import {generateSchedules} from "../SchedulerUtils";
+import ControllerBuilder from "./impl/ControllerBuilder";
+import {CandidateController, InterviewerController, RoomController} from "./ResourceControllers";
+import {IScheduleAvailabilities, ResourceKind} from "./Common";
+import MSGraphController from "./MSGraphController";
+import {generateSchedules} from "./SchedulerUtils";
 
 type IResource = interfaces.IResource;
 type ICandidate = interfaces.ICandidate;
@@ -12,7 +11,15 @@ type IInterviewer = interfaces.IInterviewer;
 type IRoom = interfaces.IRoom;
 type ISchedule = interfaces.ISchedule;
 
-export default class ResourceFacade implements IResourceFacade {
+export interface IResourceFacade {
+	list(token: string, kind: ResourceKind, options?: any): Promise<interfaces.IResource[]>;
+	create(token: string, resource: interfaces.IResource, kind: ResourceKind): Promise<interfaces.IResource>;
+	delete(token: string, id: string, kind: ResourceKind): Promise<boolean>;
+	exists(id: string, kind: ResourceKind): Promise<boolean>;
+	get(token: string, id: string, kind: ResourceKind): Promise<interfaces.IResource>;
+}
+
+export class ResourceFacade implements IResourceFacade {
 	private readonly cc: CandidateController;
 	private readonly ic: InterviewerController;
 	private readonly rc: RoomController;
@@ -23,7 +30,7 @@ export default class ResourceFacade implements IResourceFacade {
 		this.rc = ControllerBuilder.getRoomController();
 	}
 
-	public list(token: string, kind: ResourceKind, options?: any): Promise<any[]> {
+	public list(token: string, kind: ResourceKind, options?: any): Promise<IResource[]> {
 		switch (kind) {
 			case ResourceKind.Candidate:
 				return this.cc.list(token);
@@ -46,6 +53,8 @@ export default class ResourceFacade implements IResourceFacade {
 				return this.ic.create(token, resource as IInterviewer);
 			case ResourceKind.Room:
 				return this.rc.create(token, resource as IRoom);
+			case ResourceKind.Schedule:
+				return this.confirmSchedule(token, resource as ISchedule);
 			default:
 				throw new Error("Unsupported Kind");
 		}
@@ -100,5 +109,10 @@ export default class ResourceFacade implements IResourceFacade {
 		const rooms = ((await this.rc.list(token)) as interfaces.IRoom[]).filter(r => r.eligible);
 		const avails: IScheduleAvailabilities = await MSGraphController.getScheduleWrapper(token, options.candidate, rooms, preferences);
 		return generateSchedules(options.candidate, avails);
+	}
+	
+	private async confirmSchedule(token: string, schedule: ISchedule): Promise<ICandidate> {
+		// TODO update the candidate, write it to the database
+		return schedule.candidate;
 	}
 }

@@ -8,10 +8,8 @@ import fakeInterviewers, {fakeSchedules} from "./fakeInterviewers";
 
 const adapter: IAPIAdapter = {
 	submitAvailability: autoFail,
-	isValidCandidateID: async () => ({success: true, data: true}),
 	getCandidateByID: async () => ({success: true, data: fakeCandidates[0]}),
-
-	getTokenFromURL: () => "",
+	
 	createCandidate: autoFail,
 	sendAvailabilityEmail: autoFail,
 	getSchedules: async () => ({success: true, data: fakeSchedules}),
@@ -25,7 +23,6 @@ const adapter: IAPIAdapter = {
 
 	// meta
 	loginRedirectURL: () => "",
-	saveToken: autoFail,
 	checkToken: autoFail,
 	health: autoFail,
 	logout: autoFail,

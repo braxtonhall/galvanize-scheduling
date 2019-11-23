@@ -79,8 +79,7 @@ CandidateForm.defaultProps = {
 		firstName: "",
 		lastName: "",
 		position: "",
-		notes: "",
-		scheduled: false
+		notes: ""
 	},
 	onChange: () => {},
 	buttons: [],

@@ -78,10 +78,18 @@ export default {
     },
     getSchedules: async(token: string, options: IGetSchedulesOptions) : Promise<IAPIResponse<ISchedule[]>> => {
         try {
-            const {status, data} = await axios.get(fullURLs.GET_SCHEDULES, {headers: {token, "Content-Type": "application/json"}, params: options});
+            const {status, data} = await axios.get(fullURLs.SCHEDULES, {headers: {token, "Content-Type": "application/json"}, params: options});
             return {success: status === 200, data};
         } catch {
             return {success: false};
+        }
+    },
+    confirmSchedule: async(token: string, schedule: ISchedule): Promise<IAPIResponse> => {
+        try {
+            const {status, data} = await axios.post(fullURLs.SCHEDULE, {data: schedule}, {headers: {token, "Content-Type": "application/json"}});
+            return {success: status === 200, data};
+        } catch {
+            return {success: false}
         }
     },
 }

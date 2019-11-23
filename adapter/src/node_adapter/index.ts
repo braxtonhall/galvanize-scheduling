@@ -7,7 +7,6 @@ import admin from "./admin";
 import candidate from "./candidate";
 
 const adapter: IAPIAdapter = {
-	...placeholderAdapter,
 	checkToken,
 	logout,
 	loginRedirectURL,

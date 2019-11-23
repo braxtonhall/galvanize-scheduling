@@ -1,10 +1,11 @@
 import {app} from "../index";
-import {nodeAdapter} from "adapter";
-import IResourceFacade from "../controllers/IResourceFacade";
-import ResourceFacade from "../controllers/impl/ResourceFacade";
+import {interfaces, nodeAdapter} from "adapter";
+import {IResourceFacade, ResourceFacade} from "../controllers/ResourceFacade";
 import {ResourceKind} from "../controllers/Common";
 import {IResource} from "adapter/dist/interfaces";
 import AuthController from "../controllers/AuthController";
+import {sendAvailabilityEmail, sendScheduleEmail} from "../controllers/EmailController";
+import MSGraphController from "../controllers/MSGraphController";
 
 const resourceFacade: IResourceFacade = new ResourceFacade();
 
@@ -143,7 +144,7 @@ app.delete(nodeAdapter.urls.INTERVIEWER, async (req, res) => {
 	}
 });
 
-app.get(nodeAdapter.urls.GET_SCHEDULES, async (req, res) => {
+app.get(nodeAdapter.urls.SCHEDULES, async (req, res) => {
 	const token: string = req.header("token");
 	try {
 		if (await AuthController.getInstance().checkAuth(token)) {
@@ -159,5 +160,40 @@ app.get(nodeAdapter.urls.GET_SCHEDULES, async (req, res) => {
 	} catch(e) {
 		console.log(e);
 		res.status(e.statusCode).send(e.message);
+	}
+});
+
+app.post(nodeAdapter.urls.SCHEDULE, async (req, res) => {
+	const token: string = req.header("token");
+	const schedule: interfaces.ISchedule = req.body.data;
+	try {
+		if (await AuthController.getInstance().checkAuth(token)) {
+			await resourceFacade.create(token, schedule, ResourceKind.Schedule);
+			await MSGraphController.bookSchedule(token, schedule);
+			await sendScheduleEmail(token, schedule);
+			res.sendStatus(200);
+		} else {
+			res.sendStatus(401);
+		}
+	} catch (e) {
+		res.status(400).send(e);
+	}
+});
+
+app.post(nodeAdapter.urls.SEND_AVAILABILITY, async (req, res) => {
+	const token: string = req.header("token");
+	const candidate: interfaces.ICandidate = req.body.data;
+	try {
+		if (token && await AuthController.getInstance().checkAuth(token)) {
+			const exists = await resourceFacade.exists(candidate.id, ResourceKind.Candidate);
+			if (!exists)
+				throw new Error("Cannot send email, this candidate does not exist.");
+			await sendAvailabilityEmail(token, candidate);
+			res.sendStatus(200);
+		} else {
+			res.sendStatus(401);
+		}
+	} catch (e) {
+		res.status(400).send(e);
 	}
 });
