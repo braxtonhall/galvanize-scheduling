@@ -13,6 +13,7 @@ const averageSlot = availability => sumAvailability(availability) / availability
 const gaussianIsh = (x, b) => Math.max(0, Math.exp(-Math.pow(x - b, 2) / 8));
 const arrayCopy = a => [...a];
 const objectCopy = o => ({...o});
+const isWorkingHour = date => (date.getDay() >= 1 && date.getDay() <= 5 && date.getHours() >= 8 && date.getHours() <= 17);
 
 function tookHuman(start: number): string {
 	const milliseconds = Date.now() - start;
@@ -54,7 +55,64 @@ export function concatenateMoments(availability: interfaces.IAvailability): inte
 
 export function clipNonWorkingHours(availability: interfaces.IAvailability): interfaces.IAvailability {
 	// TODO trim off any availability times outside of working hours
-	return availability;
+	// if start and end is not a working hour remove
+	let filtered_availability = [];
+	for (let time of availability) {
+		let start = new Date(time.start.toString()),
+			end = new Date(time.end.toString());
+
+		// UTC -> PST for convenience
+		start.setHours(start.getHours() - 8);
+		end.setHours(end.getHours() - 8);
+
+		// remove if start and end is not working hour
+		if (!isWorkingHour(start) && !isWorkingHour(end)) {
+			continue;
+		}
+
+		// if start time not working hour -> nearest start working hour
+		if (!isWorkingHour(start) && isWorkingHour(end)) {
+			// sunday and saturday -> monday
+			if (start.getDay() === 6) {
+				start.setDate(start.getDate() + 1);
+			} else if (start.getDay() === 0) {
+				start.setDate(start.getDate() + 2);
+			}
+
+			if (start.getHours() > 17) {
+				start.setHours(8);
+				start.setDate(start.getDate() + 1);
+			} else if (start.getHours() < 8) {
+				start.setHours(8);
+			}
+		}
+
+		// if end time not working hour -> nearest ending working hour
+		if (isWorkingHour(start) && !isWorkingHour(end)) {
+			// sunday and saturday -> friday
+			if (end.getDay() === 6) {
+				end.setDate(end.getDate() - 1);
+			} else if (end.getDay() === 0) {
+				end.setDate(end.getDate() - 2);
+			}
+
+			if (end.getHours() > 17) {
+				start.setHours(17);
+			} else if (end.getHours() < 8) {
+				end.setDate(end.getDate() - 1);
+				end.setHours(17);
+			}
+		}
+
+		// PST -> UTC
+		start.setHours(start.getHours() + 8);
+		end.setHours((end.getHours() + 8));
+		filtered_availability.push({
+			start: start.toISOString(),
+			end: end.toISOString()
+		});
+	}
+	return filtered_availability;
 }
 
 function findOverlappingTime(...avail: interfaces.IAvailability[]): interfaces.IAvailability {
