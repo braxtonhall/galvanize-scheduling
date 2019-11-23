@@ -172,44 +172,46 @@ function makeOneSchedule(candidate: interfaces.ICandidate, rooms: RoomAvail[], g
 	while (roomIndex < rooms.length && groups.length > 0) {
 		let meetingRun = 0;
 		// select a room
-		const room = rooms[roomIndex]; let timeslotIndex = 0;
-		const availability = removeOverlap(arrayCopy(room.availability), meetings);
+		const room: RoomAvail = rooms[roomIndex]; let timeslotIndex = 0, scheduled = false;
+		const availability: interfaces.IAvailability = removeOverlap(arrayCopy(room.availability), meetings);
 		// while there are timeslots
 		while (timeslotIndex < availability.length) {
-			const timeslot = objectCopy(availability[timeslotIndex]);
+			const timeslot: { start: string; end: string; } = objectCopy(availability[timeslotIndex]);
 			let groupIndex = 0;
 			// while there are groups
 			while (groupIndex < groups.length) {
 				// shallow copy the group and shuffle
-				const group = shuffle(groups[groupIndex]);
+				const group: PreferenceAvail[] = shuffle(groups[groupIndex]);
 				// if time wanted fits in timeslot
-				if (true) { // TODO
+				const milliseconds = group[0].interviewer.minutes * 1000 * 60;
+				if (milliseconds <= took(timeslot.start, timeslot.end)) {
 					let preferenceIndex = 0;
 					// while there are members in the group
 					while (preferenceIndex < group.length) {
 						// if can't schedule around beginning of timeslot
-						if (false) { // TODO
+						if (findOverlappingTime([timeslot], ...group.slice(preferenceIndex).map(p => p.availability))[0].start !== timeslot.start) {
 							// kick someone out of the group
 							preferenceIndex++;
 						} else {
+							scheduled = true;
 							// add to meetings
-							const start = ""; // TODO
-							const end = ""; // TODO
+							const start = timeslot.start;
+							const end = new Date(Date.parse(timeslot.start) + milliseconds).toISOString();
 							meetings.push({
-								interviewers: group.slice(0, preferenceIndex + 1).map(p => p.interviewer),
+								interviewers: group.slice(0, preferenceIndex + 1).map(p => p.interviewer.interviewer),
 								room: room.room,
 								startTime: start,
 								endTime: end,
 							});
 							// update the timeslot
-							timeslot.start = ""; // TODO
+							timeslot.start = end;
 							// inc meeting run
-							meetingRun += 0; // TODO
+							meetingRun += took(start, end);
 							// if meeting run is over 4 hours
 							if (meetingRun > 14400000) {
-								// set it to 0, add a break to timeslot
+								// set it to 0, add a break (30  minutes) to timeslot
 								meetingRun = 0;
-								timeslot.start = ""; // TODO
+								timeslot.start = new Date(Date.parse(timeslot.start) + 1800000).toISOString();
 							}
      						groups.splice(groupIndex--, 1);
 							numUnscheduled += preferenceIndex;
@@ -228,8 +230,8 @@ function makeOneSchedule(candidate: interfaces.ICandidate, rooms: RoomAvail[], g
 			timeslotIndex++;
 		}
 		roomIndex++;
-		if (meetingRun > 0) {
-			meetingRun = 0;
+		meetingRun = 0;
+		if (scheduled) {
 			numChangeOvers++;
 		}
 	}
