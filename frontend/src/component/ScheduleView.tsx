@@ -55,7 +55,8 @@ export function createMeeting(meeting: IMeeting, index: number) {
 	return (
 		<React.Fragment key={"Meeting_" + index }>
 			<CardSubtitle><u>Meeting #{index + 1}</u></CardSubtitle>
-			<CardSubtitle className="small">{startTime.format(formatString)} - {endTime.format(formatString)}</CardSubtitle>
+			{/*<CardSubtitle className="small">{startTime.format(formatString)} - {endTime.format(formatString)}</CardSubtitle>*/}
+			<CardSubtitle className="small">{startTime} - {endTime}</CardSubtitle>
 			<CardSubtitle className="small">{name}</CardSubtitle>
 			{interviewersElement}
 			<br/>
