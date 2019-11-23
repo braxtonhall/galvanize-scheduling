@@ -98,7 +98,6 @@ export class ResourceFacade implements IResourceFacade {
 				throw new Error("Unsupported Kind");
 		}
 	}
-
 	
 	private async returnSchedules(token: string, options: interfaces.IGetSchedulesOptions): Promise<ISchedule[]> {
 		if (!options) {
@@ -111,8 +110,13 @@ export class ResourceFacade implements IResourceFacade {
 		return generateSchedules(options.candidate, avails);
 	}
 	
-	private async confirmSchedule(token: string, schedule: ISchedule): Promise<ICandidate> {
-		// TODO update the candidate, write it to the database
-		return schedule.candidate;
+	private confirmSchedule(token: string, schedule: ISchedule): Promise<IResource> {
+		const candidate: interfaces.ICandidate = schedule.candidate;
+		candidate.schedule = schedule.meetings.map(m => ({
+			start: m.start,
+			end: m.end,
+			notes: m.room.name
+		}));
+		return this.cc.create(token, candidate);
 	}
 }

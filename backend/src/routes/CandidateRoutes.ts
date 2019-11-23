@@ -20,11 +20,11 @@ app.get(nodeAdapter.urls.CANDIDATE, async (req, res) => {
 	const token: string = req.header("token");
 	try {
 		const candidate = await resourceFacade.get(token, req.query.id, ResourceKind.Candidate) as interfaces.ICandidate;
-		let data;
+		let data: interfaces.ICandidate;
 		if (token && await AuthController.getInstance().checkAuth(token)) {
 			data = candidate;
 		} else {
-			data = {email: "", firstName: candidate.firstName, availability: candidate.availability};
+			data = {email: "", firstName: candidate.firstName, availability: candidate.availability, schedule: candidate.schedule};
 		}
 		res.status(200).send(data);
 	} catch(e) {
