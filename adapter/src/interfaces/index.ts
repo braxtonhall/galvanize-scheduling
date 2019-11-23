@@ -33,14 +33,17 @@ export interface ISchedule {
 	meetings: IMeeting[]
 }
 
-export interface IMeeting {
+export interface ITimeslot {
+	start: Moment | string;
+	end: Moment | string;
+}
+
+export interface IMeeting extends ITimeslot {
 	interviewers: IInterviewer[],
-	startTime: Moment | string,
-	endTime: Moment | string,
 	room: IRoom
 }
 
-export type IAvailability = Array<{start: Moment | string, end: Moment | string}>
+export type IAvailability = Array<ITimeslot>
 
 export interface IGetSchedulesOptions {
 	preferences: Array<{interviewer: IInterviewer, preference?: IInterviewer, minutes: number}>;

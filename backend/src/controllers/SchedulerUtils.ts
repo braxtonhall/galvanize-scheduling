@@ -204,8 +204,8 @@ function makeOneSchedule(candidate: interfaces.ICandidate, rooms: RoomAvail[], g
 							meetings.push({
 								interviewers: group.slice(0, preferenceIndex + 1).map(p => p.interviewer.interviewer),
 								room: room.room,
-								startTime: start,
-								endTime: end,
+								start: start,
+								end: end,
 							});
 							// update the timeslot
 							timeslot.start = end;

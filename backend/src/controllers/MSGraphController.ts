@@ -124,7 +124,7 @@ export default class MSGraphController {
 				}]
 			}
 
-			console.log(scheduleAvailabilities)
+			console.log(scheduleAvailabilities);
 			return scheduleAvailabilities;
 
 		} catch(e) {

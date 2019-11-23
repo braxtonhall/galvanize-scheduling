@@ -47,7 +47,7 @@ const ScheduleView: React.FC<IProps> = (props: IProps) => {
 };
 
 export function createMeeting(meeting: IMeeting, index: number) {
-	const {startTime, endTime, room, interviewers} = meeting;
+	const {start, end, room, interviewers} = meeting;
 	const {name} = room;
 	const interviewersElement = interviewers.map((i, k) => {
 		return <CardSubtitle className="small" key={"interviewers_" + k}>{i.firstName} {i.lastName}</CardSubtitle>
@@ -56,7 +56,7 @@ export function createMeeting(meeting: IMeeting, index: number) {
 		<React.Fragment key={"Meeting_" + index }>
 			<CardSubtitle><u>Meeting #{index + 1}</u></CardSubtitle>
 			{/*<CardSubtitle className="small">{startTime.format(formatString)} - {endTime.format(formatString)}</CardSubtitle>*/}
-			<CardSubtitle className="small">{startTime} - {endTime}</CardSubtitle>
+			<CardSubtitle className="small">{start} - {end}</CardSubtitle>
 			<CardSubtitle className="small">{name}</CardSubtitle>
 			{interviewersElement}
 			<br/>
