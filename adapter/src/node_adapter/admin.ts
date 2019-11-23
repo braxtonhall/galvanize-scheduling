@@ -3,6 +3,7 @@ import {fullURLs} from "./urls";
 import axios from "axios";
 import {ICandidate, IGetSchedulesOptions, IInterviewer, IRoom, ISchedule} from "../interfaces";
 import CandidateOps from "./candidate"
+import moment from "moment";
 
 export default {
     getCandidates: async(token: string) : Promise<IAPIResponse<ICandidate[]>> => {
@@ -79,8 +80,12 @@ export default {
     getSchedules: async(token: string, options: IGetSchedulesOptions) : Promise<IAPIResponse<ISchedule[]>> => {
         try {
             const {status, data} = await axios.get(fullURLs.SCHEDULES, {headers: {token, "Content-Type": "application/json"}, params: options});
+            for (let i = 0; i < data.length; i++) {
+                data[i].meetings = data[i].meetings.map(m => ({...m, start: moment(m.start), end: moment(m.end)}));
+            }
             return {success: status === 200, data};
-        } catch {
+        } catch (error) {
+            console.log("big err", error);
             return {success: false};
         }
     },
