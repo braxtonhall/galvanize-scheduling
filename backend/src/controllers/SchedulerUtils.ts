@@ -117,7 +117,7 @@ export function generateSchedules(candidate: interfaces.ICandidate, scheduleAvai
 	const schedules: CandidateSchedule[] = [];
 	for (let i = 0; i < 10; i++) {
 		const s: CandidateSchedule = makeOneSchedule(candidate, arrayCopy(sortedRooms), arrayCopy(groupedInterviewers));
-		if (s.schedule.meetings.length > 1) {
+		if (s.schedule.meetings.length > 0) {
 			schedules.push(s);
 		}
 	}
@@ -179,7 +179,7 @@ function makeOneSchedule(candidate: interfaces.ICandidate, rooms: RoomAvail[], g
 		const room: RoomAvail = rooms[roomIndex]; let timeslotIndex = 0, scheduled = false;
 		const availability: interfaces.IAvailability = removeOverlap(arrayCopy(room.availability), meetings);
 		// while there are timeslots
-		while (timeslotIndex < availability.length) {
+		while (timeslotIndex < availability.length && groups.length > 0) {
 			const timeslot: { start: string; end: string; } = objectCopy(availability[timeslotIndex]);
 			let groupIndex = 0;
 			// while there are groups
@@ -188,12 +188,14 @@ function makeOneSchedule(candidate: interfaces.ICandidate, rooms: RoomAvail[], g
 				const group: PreferenceAvail[] = shuffle(groups[groupIndex]);
 				// if time wanted fits in timeslot
 				const milliseconds = group[0].interviewer.minutes * 1000 * 60;
-				if (milliseconds <= took(timeslot.start, timeslot.end)) {
+				if (milliseconds <= took(timeslot.start, timeslot.end) && room.room.capacity > 1) {
 					let preferenceIndex = 0;
 					// while there are members in the group
 					while (preferenceIndex < group.length) {
 						// if can't schedule around beginning of timeslot
-						if (findOverlappingTime([timeslot], ...group.slice(preferenceIndex).map(p => p.availability))[0].start !== timeslot.start) {
+						if (findOverlappingTime([timeslot], ...group.slice(preferenceIndex).map(p => p.availability))[0].start !== timeslot.start &&
+							room.room.capacity > group.length - groupIndex
+						) {
 							// kick someone out of the group
 							preferenceIndex++;
 						} else {
@@ -202,7 +204,7 @@ function makeOneSchedule(candidate: interfaces.ICandidate, rooms: RoomAvail[], g
 							const start = timeslot.start;
 							const end = new Date(Date.parse(timeslot.start) + milliseconds).toISOString();
 							meetings.push({
-								interviewers: group.slice(0, preferenceIndex + 1).map(p => p.interviewer.interviewer),
+								interviewers: group.slice(preferenceIndex).map(p => p.interviewer.interviewer),
 								room: room.room,
 								start: start,
 								end: end,
@@ -235,7 +237,7 @@ function makeOneSchedule(candidate: interfaces.ICandidate, rooms: RoomAvail[], g
 		}
 		roomIndex++;
 		meetingRun = 0;
-		if (scheduled) {
+		if (scheduled && groups.length > 0) {
 			numChangeOvers++;
 		}
 	}
