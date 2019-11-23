@@ -4,6 +4,7 @@ import {CandidateController, InterviewerController, RoomController} from "./Reso
 import {IScheduleAvailabilities, ResourceKind} from "./Common";
 import MSGraphController from "./MSGraphController";
 import {generateSchedules} from "./SchedulerUtils";
+import {info} from "../Log";
 
 type IResource = interfaces.IResource;
 type ICandidate = interfaces.ICandidate;
@@ -99,6 +100,7 @@ export class ResourceFacade implements IResourceFacade {
 		}
 	}
 	
+	@info
 	private async returnSchedules(token: string, options: interfaces.IGetSchedulesOptions): Promise<ISchedule[]> {
 		if (!options) {
 			throw new Error("Attempting to schedule without any options!");

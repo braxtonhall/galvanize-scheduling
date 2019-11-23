@@ -1,5 +1,6 @@
 import { interfaces } from "adapter";
 import {IScheduleAvailabilities, Preference} from "./Common";
+import Log from "../Log";
 
 type PreferenceAvail = {interviewer: Preference, availability: interfaces.IAvailability};
 type CandidateSchedule = {schedule: interfaces.ISchedule, numChangeOvers: number, numUnscheduled: number};
@@ -311,7 +312,7 @@ function makeOneSchedule(candidate: interfaces.ICandidate, rooms: RoomAvail[], g
 		}
 	}
 	meetings.sort((a, b) => a.start < b.start ? -1 : 1);
-	console.log(`Returning schedules. This run took ${tookHuman(start)}.`);
+	Log.trace(`Returning schedules. This run took ${tookHuman(start)}.`);
 	return {schedule: {candidate, meetings}, numChangeOvers, numUnscheduled};
 }
 

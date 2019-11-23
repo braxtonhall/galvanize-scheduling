@@ -123,8 +123,7 @@ export default class MSGraphController {
 					availability: concatenateMoments(availability_map.get(email))
 				}]
 			}
-
-			console.log(scheduleAvailabilities);
+			
 			return scheduleAvailabilities;
 
 		} catch(e) {
