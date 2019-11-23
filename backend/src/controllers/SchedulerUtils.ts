@@ -116,7 +116,7 @@ export function generateSchedules(candidate: interfaces.ICandidate, scheduleAvai
 	const groupedInterviewers = buildGroups(scheduleAvailabilities.interviewers);
 	const schedules: CandidateSchedule[] = [];
 	for (let i = 0; i < 10; i++) {
-		const s: CandidateSchedule = makeOneSchedule(candidate, arrayCopy(sortedRooms), arrayCopy(groupedInterviewers));
+		const s: CandidateSchedule = makeOneSchedule(candidate, arrayCopy(sortedRooms), arrayCopy(groupedInterviewers), i);
 		if (s.schedule.meetings.length > 0) {
 			schedules.push(s);
 		}
@@ -167,7 +167,7 @@ function removeOverlap(availability: interfaces.IAvailability, meetings: interfa
 	return availability; // TODO implement stub
 }
 
-function makeOneSchedule(candidate: interfaces.ICandidate, rooms: RoomAvail[], groups: PreferenceAvail[][]): CandidateSchedule {
+function makeOneSchedule(candidate: interfaces.ICandidate, rooms: RoomAvail[], groups: PreferenceAvail[][], roomStart): CandidateSchedule {
 	const start = Date.now();
 	groups = shuffle(groups);
 	let roomIndex = 0, numUnscheduled = 0, numChangeOvers = 0, meetings: interfaces.IMeeting[] = [];
@@ -176,7 +176,8 @@ function makeOneSchedule(candidate: interfaces.ICandidate, rooms: RoomAvail[], g
 	while (roomIndex < rooms.length && groups.length > 0) {
 		let meetingRun = 0;
 		// select a room
-		const room: RoomAvail = rooms[roomIndex]; let timeslotIndex = 0, scheduled = false;
+		const room: RoomAvail = rooms[(roomStart + roomIndex) % rooms.length];
+		let timeslotIndex = 0, scheduled = false;
 		const availability: interfaces.IAvailability = removeOverlap(arrayCopy(room.availability), meetings);
 		// while there are timeslots
 		while (timeslotIndex < availability.length && groups.length > 0) {
