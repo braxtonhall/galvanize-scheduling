@@ -20,7 +20,7 @@ describe("Adapter Integration Tests", () => {
         args.groupName = configGroupName;
     });
 
-    describe("Candidate Lifecycle", CandidateTests(args));
-    describe("Administration", AdminTests(args));
-    // describe("Schedule Generation", ScheduleTests(args));
+    // describe("Candidate Lifecycle", CandidateTests(args));
+    // describe("Administration", AdminTests(args));
+    describe("Schedule Generation", ScheduleTests(args));
 });

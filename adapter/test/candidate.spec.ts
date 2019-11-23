@@ -3,14 +3,16 @@ import {expect} from "chai";
 import {v4 as generateUUID} from 'uuid';
 
 import {momentThisWeek} from "./TestUtils";
-import {ICandidate} from "../dist/interfaces";
+import {IAvailability, ICandidate} from "../src/interfaces";
 import adapter from "../src/node_adapter";
+import {Moment} from "moment";
 
 const CandidateTests = args => () => {
     const that = args;
 
     const candidateBase: ICandidate = {
         email: "test-integration@ph14solutions.onmicrosoft.com",
+        scheduled: false,
         phoneNumber: "17781234567",
         firstName: "Test",
         lastName: "Doe"
@@ -133,12 +135,14 @@ const CandidateTests = args => () => {
     if (args.emailTests) {
         context("sendAvailabilityEmail", () => {
             it("should fail on invalid email", async () => {
-                const {success} = await adapter.sendAvailabilityEmail(that.token, {email: "test test test"});
+                const candidate = {email: "test test test", scheduled: false};
+                const {success} = await adapter.sendAvailabilityEmail(that.token, candidate);
                 expect(success).to.be.false;
             });
 
             it("should fail on blank email", async () => {
-                const {success} = await adapter.sendAvailabilityEmail(that.token, {email: ""});
+                const candidate = {email: "", scheduled: false};
+                const {success} = await adapter.sendAvailabilityEmail(that.token, candidate);
                 expect(success).to.be.false;
             });
 
@@ -149,7 +153,8 @@ const CandidateTests = args => () => {
             });
 
             it("should fail without a candidate ID", async () => {
-                const {success} = await adapter.sendAvailabilityEmail(that.token, {email: that.TEST_EMAIL});
+                const candidate = {email: that.TEST_EMAIL, scheduled: false};
+                const {success} = await adapter.sendAvailabilityEmail(that.token, candidate);
                 expect(success).to.be.false;
             });
 
@@ -161,20 +166,23 @@ const CandidateTests = args => () => {
     }
 
     context("submitAvailability", () => {
+        const sortAscending = (aSet: IAvailability) =>
+            aSet.sort((a, b) => (b.start as Moment).diff(a.start));
+        const toISO = pair => ({ start: pair.start.toISOString(), end: pair.end.toISOString() });
         let availabilities = [
             {start: momentThisWeek(1, 10, 0), end: momentThisWeek(1, 15, 0)},
             {start: momentThisWeek(1, 16, 0), end: momentThisWeek(1, 20, 0)},
             {start: momentThisWeek(4, 8, 45), end: momentThisWeek(4, 12, 30)},
             {start: momentThisWeek(5, 0, 0), end: momentThisWeek(6, 0, 0)}
         ];
-        const toISO = pair => ({ start: pair.start.toISOString(), end: pair.end.toISOString() });
+        const getSortedIso = () => sortAscending(availabilities).map(toISO);
 
-        it("should succeed", async () => {
+        it("should succeed and sort by ascending time", async () => {
             const {success} = await adapter.submitAvailability(candidateWithId.id, availabilities);
             expect(success).to.be.true;
             const {data} = await adapter.getCandidateByID(candidateWithId.id);
             expect(data.availability).to.exist;
-            expect(data.availability).to.deep.equals(availabilities.map(toISO));
+            expect(data.availability).to.deep.equals(getSortedIso());
         });
 
         it("should succeed on no availabilities", async () => {
@@ -201,8 +209,8 @@ const CandidateTests = args => () => {
             const {success} = await adapter.submitAvailability(candidateWithId.id, updatedAvailabilities);
             expect(success).to.be.true;
             const {data} = await adapter.getCandidateByID(candidateWithId.id);
-            expect(data.availability).to.deep.equals(updatedAvailabilities.map(toISO));
             availabilities = updatedAvailabilities;
+            expect(data.availability).to.deep.equals(getSortedIso());
         });
 
         it("should fail on impossible date ranges", async () => {
@@ -214,7 +222,7 @@ const CandidateTests = args => () => {
             expect(success).to.be.false;
             const {data} = await adapter.getCandidateByID(candidateWithId.id);
             expect(data.availability).to.exist;
-            expect(data.availability).to.deep.equals(availabilities.map(toISO)); // unchanged
+            expect(data.availability).to.deep.equals(getSortedIso()); // unchanged
         });
 
         it("should combine overlapping date ranges", async () => {
@@ -231,7 +239,7 @@ const CandidateTests = args => () => {
             expect(success).to.be.true;
             const {data} = await adapter.getCandidateByID(candidateWithId.id);
             expect(data.availability).to.exist;
-            expect(data.availability).to.deep.equals(simplified.map(toISO));
+            expect(data.availability).to.deep.equals(sortAscending(simplified).map(toISO));
         });
 
         it("should fail if candidate has no id", async () => {
