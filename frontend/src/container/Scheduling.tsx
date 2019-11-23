@@ -30,7 +30,7 @@ const Scheduling: React.FC = () => {
 		startLoadingProcess();
 		const {success, data, error} = await adapter.getCandidates(token);
 		if (success) {
-			const onlyWithAvailabilities = data.filter(c => c.availability !== undefined);
+			const onlyWithAvailabilities = data.filter(c => c.availability !== undefined && c.schedule === undefined);
 			updateCandidates(onlyWithAvailabilities);
 			endLoadingProcess();
 		} else if (error) {

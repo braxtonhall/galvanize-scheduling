@@ -17,7 +17,7 @@ const CandidateList: React.FC<IProps> = (props: IProps) => {
 	const {candidates, actions, selected} = props;
 
 	function makeRow(candidate: ICandidate, index: number): JSX.Element {
-		const {id, email, phoneNumber, firstName, lastName, position} = candidate;
+		const {id, email, phoneNumber, firstName, lastName, position, schedule} = candidate;
 
 		function makeButtons({text, onClick, color}: { text: string, color: string, onClick: (candidate: ICandidate) => (void | Promise<void>) }, k: number) {
 
@@ -38,7 +38,7 @@ const CandidateList: React.FC<IProps> = (props: IProps) => {
 				<td>{emptyEntry(firstName)}</td>
 				<td>{emptyEntry(lastName)}</td>
 				<td>{emptyEntry(position)}</td>
-				<td><a href={`/submit_availability/${candidate.id}`} target="_blank">/submit_availability/{candidate.id}</a></td>
+				<td><a href={`/submit_availability/${candidate.id}`} target="_blank">{schedule ? "View Schedule" : "Submit Availability"}</a></td>
 				<td>
 					<ButtonGroup>
 						{actions.map(makeButtons)}
@@ -61,7 +61,7 @@ const CandidateList: React.FC<IProps> = (props: IProps) => {
 							<th>First Name</th>
 							<th>Last Name</th>
 							<th>Position</th>
-							<th>Availability URL</th>
+							<th>Candidate URL</th>
 							<th>Actions</th>
 						</tr>
 						</thead>
