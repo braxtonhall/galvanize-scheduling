@@ -11,6 +11,7 @@ const ScheduleTests = args => !args.verifyTestAccounts ? () => {} : () => {
     const that = args;
     let candidateBase: ICandidate = {
         email: "test-integration@ph14solutions.onmicrosoft.com",
+        scheduled: false,
         firstName: "Test",
         lastName: "Scheduling",
         notes: "This is a test account"
@@ -48,7 +49,7 @@ const ScheduleTests = args => !args.verifyTestAccounts ? () => {} : () => {
 
     const generatePreferences = async () => {
         const {data: interviewers} = await adapter.getInterviewers(that.token, that.groupName);
-        const [i0, i1, i2] = interviewers.slice(0, 2); // modify to select specific interviewers
+        const [i0, i1, i2] = interviewers.slice(0, 3); // modify to select specific interviewers
         simpleInterviews = [makePreferenceItem(i0, 30), makePreferenceItem(i1, 45)];
         pairedInterviews = [
             makePreferenceItem(i0, 45, i1),
@@ -64,9 +65,17 @@ const ScheduleTests = args => !args.verifyTestAccounts ? () => {} : () => {
         mismatchedInterviews = [makePreferenceItem(i0, 15, i1), makePreferenceItem(i1, 30)];
     };
 
-    before(async () => await Promise.all([defineCandidates(), generatePreferences()]));
+    const toggleRooms = async () => {
+        const {data} = await adapter.getRooms(that.token);
+        const roomsLength = Math.min(data.length, 3);
+        for (let i = 0; i < roomsLength; i++) {
+            await adapter.toggleEligibility(that.token, {...data[i], eligible: false});
+        }
+    };
 
-    context("getSchedules", () => {
+    before(async () => await Promise.all([defineCandidates(), generatePreferences(), toggleRooms()]));
+
+    context("getSchedules", () => { /*
         it("should fail on invalid authentication", async () => {
             const options: IGetSchedulesOptions = {preferences: [], candidate: emptyAvailCandidate};
             const {success} = await adapter.getSchedules(that.INVALID_TOKEN, options);
@@ -74,18 +83,19 @@ const ScheduleTests = args => !args.verifyTestAccounts ? () => {} : () => {
         });
 
         it("should fail if required fields are missing", async () => {
-            const p1 = await adapter.getSchedules(that.token, undefined);
-            const p2 = await adapter.getSchedules(that.token, {preferences: [], candidate: undefined});
-            const p3 = await adapter.getSchedules(that.token, {preferences: undefined, candidate: fullAvailCandidate});
-            const p4 = await adapter.getSchedules(that.token, {preferences: undefined, candidate: undefined});
-            expect(p1).to.be.false;
-            expect(p2).to.be.false;
-            expect(p3).to.be.false;
-            expect(p4).to.be.false;
+            const [p1, p2, p3, p4] = await Promise.all([
+                adapter.getSchedules(that.token, undefined),
+                adapter.getSchedules(that.token, {preferences: [], candidate: undefined}),
+                adapter.getSchedules(that.token, {preferences: undefined, candidate: fullAvailCandidate}),
+                adapter.getSchedules(that.token, {preferences: undefined, candidate: undefined})
+            ]);
+            expect(p1.success).to.be.false;
+            expect(p2.success).to.be.false;
+            expect(p3.success).to.be.false;
+            expect(p4.success).to.be.false;
         });
 
         it("should fail multiple preference entries for the same interviewer", async () => {
-           // TODO is this possible from the UI && valid? or a failure case?
             const dupedInterviews = [...simpleInterviews, ...tripleInterviews];
             const options: IGetSchedulesOptions = {preferences: dupedInterviews, candidate: emptyAvailCandidate};
             const {success} = await adapter.getSchedules(that.token, options);
@@ -113,14 +123,14 @@ const ScheduleTests = args => !args.verifyTestAccounts ? () => {} : () => {
             expect(success).to.be.true;
             expect(data).to.be.an('array').that.is.not.empty;
         });
-
+*/
         it("should return schedules that do not conflict with the interviewers'", async () => {
             const options: IGetSchedulesOptions = {preferences: simpleInterviews, candidate: fullAvailCandidate};
             const {success, data} = await adapter.getSchedules(that.token, options);
             expect(success).to.be.true;
             expect(data).to.be.an('array').that.is.length(2);
         });
-
+/*
         it("should return schedules that fit both the interviewers' and candidates'", async () => {
             const options: IGetSchedulesOptions = {preferences: simpleInterviews, candidate: partialAvailCandidate};
             const {success, data} = await adapter.getSchedules(that.token, options);
@@ -167,7 +177,7 @@ const ScheduleTests = args => !args.verifyTestAccounts ? () => {} : () => {
             expect(success).to.be.true;
             expect(data).to.be.an('array').that.is.length(1);
             // TODO inspect contents of data, should be 30 min
-        });
+        });*/
     });
 
     context("confirmSchedules", async () => {

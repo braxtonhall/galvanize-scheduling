@@ -158,6 +158,6 @@ app.get(nodeAdapter.urls.GET_SCHEDULES, async (req, res) => {
 		}
 	} catch(e) {
 		console.log(e);
-		res.status(e.statusCode).send(e.message);
+		res.status(400).send(e.message);
 	}
 });
