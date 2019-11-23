@@ -1,6 +1,7 @@
 import {Button, Card, CardBody, CardHeader, CardSubtitle, CardText, CardTitle, Col, Row} from "reactstrap";
 import React from "react";
 import { interfaces } from "adapter";
+import {Moment} from "moment";
 
 type ISchedule = interfaces.ISchedule;
 type IMeeting = interfaces.IMeeting;
@@ -55,8 +56,8 @@ export function createMeeting(meeting: IMeeting, index: number) {
 	return (
 		<React.Fragment key={"Meeting_" + index }>
 			<CardSubtitle><u>Meeting #{index + 1}</u></CardSubtitle>
-			{/*<CardSubtitle className="small">{startTime.format(formatString)} - {endTime.format(formatString)}</CardSubtitle>*/}
-			<CardSubtitle className="small">{start} - {end}</CardSubtitle>
+			<CardSubtitle className="small"><b>{(start as Moment).format("MMM Do")}</b></CardSubtitle>
+			<CardSubtitle className="small">{(start as Moment).format(formatString)} - {(end as Moment).format(formatString)}</CardSubtitle>
 			<CardSubtitle className="small">{name}</CardSubtitle>
 			{interviewersElement}
 			<br/>
@@ -64,7 +65,7 @@ export function createMeeting(meeting: IMeeting, index: number) {
 	)
 }
 
-const formatString = "MMM Do h:mm a";
+const formatString = "h:mm a";
 
 ScheduleView.defaultProps = {
 	schedules: [],
