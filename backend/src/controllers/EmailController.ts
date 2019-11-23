@@ -1,5 +1,6 @@
-import {interfaces} from "adapter/dist";
+import {interfaces} from "adapter";
 import {Config, ConfigKey} from "../Config";
+import MSGraphController from "./MSGraphController";
 
 
 const createAvailabilityContent = (candidate: interfaces.ICandidate): string => {
@@ -26,8 +27,6 @@ interface IEmail {
 }
 
 const createEmail = (email: IEmail) => {
-
-
     return {
         message: {
             subject: email.subject,
@@ -40,5 +39,17 @@ const createEmail = (email: IEmail) => {
     }
 };
 
-export {createAvailabilityContent};
-export default createEmail;
+const sendAvailabilityEmail = (token, candidate: interfaces.ICandidate) => {
+    const email = {
+        subject: 'Your availability for an interview with Galvanize',
+        content: createAvailabilityContent(candidate),
+        recipients: [candidate.email]
+    };
+    return MSGraphController.sendEmail(token, createEmail(email));
+};
+
+const sendScheduleEmail = (token, schedule: interfaces.ISchedule) => {
+    // TODO for every
+};
+
+export {sendAvailabilityEmail, sendScheduleEmail};

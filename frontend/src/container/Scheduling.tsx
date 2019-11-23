@@ -26,6 +26,20 @@ const Scheduling: React.FC = () => {
 	useEffect(() => {refreshCandidates().then()}, []);
 	useEffect(() => {selectedCandidate && refreshInterviewers().then()}, [JSON.stringify(selectedCandidate)]);
 
+	async function confirmSchedule(schedule): Promise<void> {
+		startLoadingProcess();
+		const {success, data, error} = await adapter.confirmSchedule(token, schedule);
+		if (success) {
+			endLoadingProcess();
+			await refreshCandidates();
+			// TODO success?
+		} else if (error) {
+			endLoadingProcess({error});
+		} else {
+			endLoadingProcess({error: "There was an error scheduling the meetings."})
+		}
+	}
+	
 	async function refreshCandidates(): Promise<void> {
 		startLoadingProcess();
 		const {success, data, error} = await adapter.getCandidates(token);
@@ -123,7 +137,7 @@ const Scheduling: React.FC = () => {
 						<Fade right>
 							<ScheduleActions
 								schedule={selectedSchedule}
-								actions={[{text: "Schedule & Send Emails", onClick: () => {alert("feature not yet available.")}}]}
+								actions={[{text: "Schedule & Send Emails", onClick: confirmSchedule}]}
 							/>
 						</Fade>
 					</Col>

@@ -28,8 +28,8 @@ export abstract class CandidateController implements IResourceController {
 			throw new Error("Candidate must contain an email");
 		}
 		// TODO heavy dependency on the type. Perhaps not the cleanest way to do this.
-		const {id, email, phoneNumber, firstName, lastName, position, notes, availability, scheduled} = object;
-		return {id, email, phoneNumber, firstName, lastName, position, notes, availability, scheduled};
+		const {id, email, phoneNumber, firstName, lastName, position, notes, availability} = object;
+		return {id, email, phoneNumber, firstName, lastName, position, notes, availability};
 	}
 }
 

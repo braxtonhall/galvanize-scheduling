@@ -13,13 +13,13 @@ export interface IRoom extends IResource {
 
 export interface ICandidate extends IResource {
 	email: string,
-	scheduled: boolean,
 	phoneNumber?: string,
 	firstName?: string,
 	lastName?: string,
 	position?: string,
 	notes?: string,
 	availability?: IAvailability
+	schedule?: IAvailability
 }
 
 export interface IInterviewer extends IResource {
@@ -28,7 +28,7 @@ export interface IInterviewer extends IResource {
 	lastName: string,
 }
 
-export interface ISchedule {
+export interface ISchedule extends IResource {
 	candidate: ICandidate
 	meetings: IMeeting[]
 }

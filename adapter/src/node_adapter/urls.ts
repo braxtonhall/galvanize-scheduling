@@ -10,6 +10,9 @@ const urls: {[key: string]: string} = new function() {
 
 	this.ROOM =  "/resource/room";
 	this.ROOMS = "/resource/rooms";
+	
+	this.SCHEDULE = '/resource/schedule';
+	this.SCHEDULES = '/resource/schedules';
 
 	this.LOGIN = '/login';
 	this.LOGOUT = '/logout';
@@ -18,7 +21,6 @@ const urls: {[key: string]: string} = new function() {
 	this.EXISTS_CANDIDATE = '/exists/candidate';
 	this.UPDATE_AVAILABILITY = '/submitavailability';
 	this.SEND_AVAILABILITY = '/sendavailability';
-	this.GET_SCHEDULES = '/schedules';
 
 } as {[key: string]: string};
 

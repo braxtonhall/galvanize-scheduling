@@ -123,14 +123,17 @@ export default class MSGraphController {
 					availability: concatenateMoments(availability_map.get(email))
 				}]
 			}
-
-			console.log(scheduleAvailabilities);
+			
 			return scheduleAvailabilities;
 
 		} catch(e) {
     		console.log(e);
     		throw new Error(e);
 		}
+	}
+	
+	static bookSchedule(token: string, schedule: interfaces.ISchedule) {
+    	// TODO for every room, interviewer in the schedule, add the meeting
 	}
 
 	static scheduleRequest(request: Array<string>, timeslot: {start: string, end: string}, availabilityViewInterval: number = 15) {
@@ -153,7 +156,7 @@ export default class MSGraphController {
 		return startDate.toISOString();
 	}
 
-	static async sendAvailabilityEmail(token: string, content: any): Promise<any> {
+	static async sendEmail(token: string, content: any): Promise<string> {
         return (await (this.getClient(token))
             .api(Config.getInstance().get(ConfigKey.msEmailEndpoint))
             .post(content));

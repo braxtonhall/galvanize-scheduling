@@ -72,8 +72,7 @@ const CandidateMenu: React.FC = () => {
 			firstName: "",
 			lastName: "",
 			position: "",
-			notes: "",
-			scheduled: false
+			notes: ""
 		});
 		updateButtons([{text: "Create", onClick: createNewCandidate}])
 	}
