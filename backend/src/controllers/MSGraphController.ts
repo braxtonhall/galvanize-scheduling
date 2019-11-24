@@ -132,7 +132,7 @@ export default class MSGraphController {
 		}
 	}
 	
-	static async bookSchedule(token: string, schedule: interfaces.ISchedule) {
+	static async bookSchedule(token: string, schedule: interfaces.ISchedule): Promise<string[]> {
     	const client: Client = this.getClient(token);
     	const promises = schedule.meetings.map(m => {
 			return client
@@ -167,9 +167,19 @@ export default class MSGraphController {
 						},
 						"type": "required"
 					}])
-				});
+				})
+				.then(e => e.id);
 		});
     	return Promise.all(promises);
+	}
+	
+	static async deleteSchedule(token: string, events: string[]) {
+		const client: Client = this.getClient(token);
+    	return Promise.all(events.map(e => {
+			return client
+				.api(`/me/events/${""}`)
+				.delete();
+		}))
 	}
 
 	static scheduleRequest(request: Array<string>, timeslot: {start: string, end: string}, availabilityViewInterval: number = 15) {
