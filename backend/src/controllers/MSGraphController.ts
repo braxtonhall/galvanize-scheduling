@@ -132,8 +132,54 @@ export default class MSGraphController {
 		}
 	}
 	
-	static bookSchedule(token: string, schedule: interfaces.ISchedule) {
-    	// TODO for every room, interviewer in the schedule, add the meeting
+	static async bookSchedule(token: string, schedule: interfaces.ISchedule): Promise<string[]> {
+    	const client: Client = this.getClient(token);
+    	const promises = schedule.meetings.map(m => {
+			return client
+				.api(`/me/events`)
+				.post({
+					"subject": `Interview with ${schedule.candidate.firstName ? schedule.candidate.firstName : schedule.candidate.email}`,
+					"body": {
+						"contentType": "HTML",
+						"content": `Be ready to join ${schedule.candidate.firstName} in an interview for ${schedule.candidate.position ? schedule.candidate.position : "Galvanize"}.`
+					},
+					"start": {
+						"dateTime": typeof m.start === "string" ? m.start : m.start.toISOString(),
+						"timeZone": "UTC"
+					},
+					"end": {
+						"dateTime": typeof m.end === "string" ? m.end : m.end.toISOString(),
+						"timeZone": "UTC"
+					},
+					"location":{
+						"displayName": m.room.name
+					},
+					"attendees": m.interviewers.map(i => ({
+						"emailAddress": {
+							"address": i.email,
+							"name": `${i.firstName} ${i.lastName}`
+						},
+						"type": "required"
+					})).concat([{
+						"emailAddress": {
+							"address": m.room.email,
+							"name": m.room.name
+						},
+						"type": "required"
+					}])
+				})
+				.then(e => e.id);
+		});
+    	return Promise.all(promises);
+	}
+	
+	static async deleteSchedule(token: string, events: string[]) {
+		const client: Client = this.getClient(token);
+    	return Promise.all(events.map(e => {
+			return client
+				.api(`/me/events/${""}`)
+				.delete();
+		}))
 	}
 
 	static scheduleRequest(request: Array<string>, timeslot: {start: string, end: string}, availabilityViewInterval: number = 15) {

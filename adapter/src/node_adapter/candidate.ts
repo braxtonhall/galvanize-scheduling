@@ -2,12 +2,15 @@ import IAPIResponse from "../IAPIResponse";
 import {IAvailability, ICandidate} from "../interfaces";
 import axios from "axios";
 import {fullURLs} from "./urls";
-import {Moment} from "moment";
+import moment, {Moment} from "moment";
 
 export default {
 	getCandidateByID: async(candidateID: string): Promise<IAPIResponse<ICandidate>> => {
 		try {
 			const {status, data} = await axios.get(fullURLs.CANDIDATE, {headers: {"Content-Type": "application/json"}, params: {id: candidateID}});
+			if (data.schedule) {
+				data.schedule = data.schedule.map(t => ({...t, start: moment(t.start), end: moment(t.end)}))
+			}
 			return {success: status === 200, data};
 		} catch {
 			return {success: false};
