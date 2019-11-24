@@ -96,4 +96,12 @@ export default {
             return {success: false}
         }
     },
+    cancelSchedule: async(token: string, candidate: ICandidate): Promise<IAPIResponse> => {
+        try {
+            const {status} = await axios.delete(fullURLs.SCHEDULE, {data: {id: candidate.id}, headers: {token, "Content-Type": "application/json"}});
+            return {success: status === 200};
+        } catch (e) {
+            return {success: false}
+        }
+    }
 }

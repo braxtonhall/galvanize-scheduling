@@ -37,6 +37,7 @@ export interface ITimeslot {
 	start: Moment | string;
 	end: Moment | string;
 	note?: string;
+	id?: string;
 }
 
 export interface IMeeting extends ITimeslot {

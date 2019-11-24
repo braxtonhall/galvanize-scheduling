@@ -69,6 +69,8 @@ export class ResourceFacade implements IResourceFacade {
 				return this.ic.delete(token, id);
 			case ResourceKind.Room:
 				return this.rc.delete(token, id);
+			case ResourceKind.Schedule:
+				return this.removeSchedule(token, id);
 			default:
 				throw new Error("Unsupported Kind");
 		}
@@ -110,6 +112,16 @@ export class ResourceFacade implements IResourceFacade {
 		const rooms = ((await this.rc.list(token)) as interfaces.IRoom[]).filter(r => r.eligible);
 		const avails: IScheduleAvailabilities = await MSGraphController.getScheduleWrapper(token, candidate, rooms, preferences);
 		return generateSchedules(options.candidate, avails);
+	}
+	
+	private async removeSchedule(token, id): Promise<boolean> {
+		const candidate: ICandidate = await this.cc.get(token, id) as ICandidate;
+		if (candidate.schedule) {
+			delete candidate.schedule;
+			return !!(await this.cc.create(token, candidate));
+		} else {
+			return false;
+		}
 	}
 	
 	private confirmSchedule(token: string, schedule: ISchedule): Promise<IResource> {

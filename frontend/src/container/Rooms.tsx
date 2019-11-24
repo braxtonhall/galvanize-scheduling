@@ -9,7 +9,7 @@ type IRoom = interfaces.IRoom;
 const Rooms: React.FC = () => {
 	const {token, startLoadingProcess, endLoadingProcess} = useContext(Context);
 
-	const [rooms, updateRooms] = useState<IRoom[]>([]);
+	const [rooms, updateRooms] = useState<IRoom[]>();
 	useEffect(() => {getRooms().then()}, []);
 
 	async function getRooms(): Promise<void> {
@@ -46,6 +46,10 @@ const Rooms: React.FC = () => {
 				</td>
 			</tr>
 		)
+	}
+
+	if (!rooms) {
+		return null;
 	}
 
 	return (

@@ -17,6 +17,29 @@ const objectCopy = o => ({...o});
 const isWorkingHour = date => (date.getDay() >= 1 && date.getDay() <= 5 && date.getHours() >= 8 && date.getHours() <= 17);
 const createSlot = (a,b) => ({start: a, end: b});
 
+const DEFAULT_WORKING_HOURS = {
+	"daysOfWeek": [
+		"monday",
+		"tuesday",
+		"wednesday",
+		"thursday",
+		"friday"
+	],
+	"startTime": "09:00:00.0000000",
+	"endTime": "17:00:00.0000000",
+	"timeZone": {
+		"name": "Pacific Standard Time"
+	}
+};
+
+const WEEKDAYS = {
+	monday: 0,
+	tuesday: 1,
+	wednesday: 2,
+	thursday: 3,
+	friday: 4
+};
+
 function tookHuman(start: number): string {
 	const milliseconds = Date.now() - start;
 	const seconds = milliseconds / 1000;
@@ -55,66 +78,44 @@ export function concatenateMoments(availability: interfaces.IAvailability): inte
 	return output;
 }
 
-export function clipNonWorkingHours(availability: interfaces.IAvailability): interfaces.IAvailability {
+export function clipNonWorkingHours(availability: interfaces.IAvailability, workingHours = DEFAULT_WORKING_HOURS): interfaces.IAvailability {
 	// TODO trim off any availability times outside of working hours
-	// if start and end is not a working hour remove
-	let filtered_availability = [];
+	let workingDay = workingHours.daysOfWeek.map(w => WEEKDAYS[w]);
+	let dates = new Set();
+
 	for (let time of availability) {
-		let start = new Date(time.start.toString()),
-			end = new Date(time.end.toString());
-
-		// UTC -> PST for convenience
-		start.setHours(start.getHours() - 8);
-		end.setHours(end.getHours() - 8);
-
-		// remove if start and end is not working hour
-		if (!isWorkingHour(start) && !isWorkingHour(end)) {
+		let now = new Date();
+		// earlier date now or start?
+		let startTime = (time.start > now.toISOString()) ? new Date(time.start.toString()) : now;
+		let endTime = new Date(time.end.toString());
+		// if start > end continue;
+		if (startTime.toISOString() > endTime.toISOString()) {
 			continue;
 		}
-
-		// if start time not working hour -> nearest start working hour
-		if (!isWorkingHour(start) && isWorkingHour(end)) {
-			// sunday and saturday -> monday
-			if (start.getDay() === 6) {
-				start.setDate(start.getDate() + 1);
-			} else if (start.getDay() === 0) {
-				start.setDate(start.getDate() + 2);
-			}
-
-			if (start.getHours() > 17) {
-				start.setHours(8);
-				start.setDate(start.getDate() + 1);
-			} else if (start.getHours() < 8) {
-				start.setHours(8);
-			}
+		// add initial time to set
+		if (workingDay.includes(startTime.getDay())) {
+			dates.add(`${startTime.getFullYear()}-${startTime.getMonth()+1}-${startTime.getDate()}`)
 		}
-
-		// if end time not working hour -> nearest ending working hour
-		if (isWorkingHour(start) && !isWorkingHour(end)) {
-			// sunday and saturday -> friday
-			if (end.getDay() === 6) {
-				end.setDate(end.getDate() - 1);
-			} else if (end.getDay() === 0) {
-				end.setDate(end.getDate() - 2);
-			}
-
-			if (end.getHours() > 17) {
-				start.setHours(17);
-			} else if (end.getHours() < 8) {
-				end.setDate(end.getDate() - 1);
-				end.setHours(17);
-			}
+		// add end time to set -> if end time is in there -> set does not add
+		if (workingDay.includes(endTime.getDay())) {
+			dates.add(`${endTime.getFullYear()}-${endTime.getMonth()+1}-${endTime.getDate()}`)
 		}
+	}
 
-		// PST -> UTC
+	let availableSlots = [];
+	// create array of times
+	for (let date of dates) {
+		let start = new Date(`${date}T${workingHours.startTime}`);
 		start.setHours(start.getHours() + 8);
-		end.setHours((end.getHours() + 8));
-		filtered_availability.push({
+		let end = new Date(`${date}T${workingHours.endTime}`);
+		end.setHours(end.getHours() + 8);
+		availableSlots.push({
 			start: start.toISOString(),
 			end: end.toISOString()
-		});
+		})
 	}
-	return availability;
+	// find and return overlapping times
+	return findOverlappingTime([...availability, ...availableSlots]);
 }
 
 function findOverlappingTime(...avail: interfaces.IAvailability[]): interfaces.IAvailability {
