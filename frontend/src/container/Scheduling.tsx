@@ -28,18 +28,21 @@ const Scheduling: React.FC = () => {
 
 	async function confirmSchedule(schedule): Promise<void> {
 		startLoadingProcess();
-		const {success, data, error} = await adapter.confirmSchedule(token, schedule);
+		const {success, error} = await adapter.confirmSchedule(token, schedule);
 		if (success) {
-			endLoadingProcess();
+			updateInterviewerValue(undefined);
+			updateSchedules(undefined);
+			updateSelectedCandidate(undefined);
+			updateSelectedSchedule(undefined);
 			await refreshCandidates();
-			// TODO success?
+			setTimeout(endLoadingProcess, 200);
 		} else if (error) {
 			endLoadingProcess({error});
 		} else {
 			endLoadingProcess({error: "There was an error scheduling the meetings."})
 		}
 	}
-	
+
 	async function refreshCandidates(): Promise<void> {
 		startLoadingProcess();
 		const {success, data, error} = await adapter.getCandidates(token);
