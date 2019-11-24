@@ -156,7 +156,7 @@ const InterviewSelection: React.FC<IProps> = (props: IProps) => {
 		}
 
 		function createPreferSomeoneWithDifferentTime(v: any): JSX.Element {
-			if (v.minutes === minutes && v.preference && v.preference.id === v.interviewer.id) {
+			if (v.minutes === minutes) {
 				return null;
 			}
 			return (
