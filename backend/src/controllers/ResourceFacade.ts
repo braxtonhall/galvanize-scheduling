@@ -117,7 +117,7 @@ export class ResourceFacade implements IResourceFacade {
 		candidate.schedule = schedule.meetings.map(m => ({
 			start: m.start,
 			end: m.end,
-			notes: m.room.name
+			note: m.room.name
 		}));
 		return this.cc.create(token, candidate);
 	}

@@ -174,7 +174,7 @@ app.post(nodeAdapter.urls.SCHEDULE, async (req, res) => {
 	try {
 		if (await AuthController.getInstance().checkAuth(token)) {
 			await resourceFacade.create(token, schedule, ResourceKind.Schedule);
-			await MSGraphController.bookSchedule(token, schedule);
+			const result = await MSGraphController.bookSchedule(token, schedule);
 			await sendScheduleEmail(token, schedule);
 			res.sendStatus(200);
 		} else {
