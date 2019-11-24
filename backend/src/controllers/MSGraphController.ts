@@ -132,7 +132,7 @@ export default class MSGraphController {
 		}
 	}
 	
-	static async bookSchedule(token: string, schedule: interfaces.ISchedule): Promise<string[]> {
+	static async bookSchedule(token: string, schedule: interfaces.ISchedule): Promise<interfaces.ISchedule> {
     	const client: Client = this.getClient(token);
     	const promises = schedule.meetings.map(m => {
 			return client
@@ -168,9 +168,10 @@ export default class MSGraphController {
 						"type": "required"
 					}])
 				})
-				.then(e => e.id);
+				.then(e => ({...m, id: e.id}));
 		});
-    	return Promise.all(promises);
+		schedule.meetings = await Promise.all(promises);
+		return schedule;
 	}
 	
 	static async deleteSchedule(token: string, events: string[]) {

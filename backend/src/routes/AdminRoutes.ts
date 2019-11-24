@@ -4,7 +4,7 @@ import {IResourceFacade, ResourceFacade} from "../controllers/ResourceFacade";
 import {ResourceKind} from "../controllers/Common";
 import {IResource} from "adapter/dist/interfaces";
 import AuthController from "../controllers/AuthController";
-import {sendAvailabilityEmail, sendScheduleEmail} from "../controllers/EmailController";
+import {sendAvailabilityEmail, sendScheduleEmail, sendCancellationEmail} from "../controllers/EmailController";
 import MSGraphController from "../controllers/MSGraphController";
 
 const resourceFacade: IResourceFacade = new ResourceFacade();
@@ -144,6 +144,8 @@ app.delete(nodeAdapter.urls.INTERVIEWER, async (req, res) => {
 	}
 });
 
+
+// SCHEDULES
 app.get(nodeAdapter.urls.SCHEDULES, async (req, res) => {
 	const token: string = req.header("token");
 	try {
@@ -165,13 +167,31 @@ app.get(nodeAdapter.urls.SCHEDULES, async (req, res) => {
 
 app.post(nodeAdapter.urls.SCHEDULE, async (req, res) => {
 	const token: string = req.header("token");
-	const schedule: interfaces.ISchedule = req.body.data;
+	let schedule: interfaces.ISchedule = req.body.data;
 	try {
 		if (await AuthController.getInstance().checkAuth(token)) {
+			schedule = await MSGraphController.bookSchedule(token, schedule);
 			await resourceFacade.create(token, schedule, ResourceKind.Schedule);
-			const result = await MSGraphController.bookSchedule(token, schedule);
 			await sendScheduleEmail(token, schedule);
 			res.sendStatus(200);
+		} else {
+			res.sendStatus(401);
+		}
+	} catch (e) {
+		res.status(400).send(e);
+	}
+});
+
+app.delete(nodeAdapter.urls.SCHEDULE, async (req, res) => {
+	const token: string = req.header("token");
+	const id: string = req.body.id;
+	try {
+		if (await AuthController.getInstance().checkAuth(token)) {
+			const candidate: interfaces.ICandidate = await resourceFacade.get(token, id, ResourceKind.Candidate) as interfaces.ICandidate;
+			await MSGraphController.deleteSchedule(token, candidate.schedule.filter(t => !!t.id).map(t => t.id));
+			const result = await resourceFacade.delete(token, id, ResourceKind.Schedule);
+			await sendCancellationEmail(token, candidate);
+			res.status(200).send(result);
 		} else {
 			res.sendStatus(401);
 		}
