@@ -1,5 +1,6 @@
 import * as dotenv from 'dotenv';
 dotenv.config({path: "../.env"});
+import Log from "./Log"
 
 
 export enum ConfigKey {
@@ -23,10 +24,10 @@ export enum ConfigKey {
 	msOAuthAuthorizeEndpoint = "oAuthAuthorizeEndpoint",
 	msOAuthTokenEndpoint = "oAuthTokenEndpoint",
 	msEmailEndpoint = "emailEndpoint",
+	msScheduleEndpoint = "getScheduleEndpoint",
 	
 	// Internal
 	interviewerGroupName = "interviewerGroupName",
-	logLevel = "logLevel",
 	
 	// Test
 	testSecretKey = "testSecretKey",
@@ -67,10 +68,10 @@ export class Config {
 				[ConfigKey.msOAuthAuthorizeEndpoint]: process.env.OAUTH_AUTHORIZE_ENDPOINT,
 				[ConfigKey.msOAuthTokenEndpoint]: 	  process.env.OAUTH_TOKEN_ENDPOINT,
 				[ConfigKey.msEmailEndpoint]:		  process.env.EMAIL_ENDPOINT,
+				[ConfigKey.msScheduleEndpoint]:		  process.env.GET_SCHEDULE_ENDPOINT,
 				
 				// Internal
 				[ConfigKey.interviewerGroupName]: process.env.INTERVIEWER_GROUP_NAME,
-				[ConfigKey.logLevel]:             process.env.LOG_LEVEL,
 				
 				// Testing
 				[ConfigKey.testSecretKey]: process.env.TEST_SECRET_KEY,
@@ -87,13 +88,13 @@ export class Config {
 		if (this.config[key] !== null && this.config[key] !== undefined) {
 			return this.config[key];
 		} else {
-			console.warn(`Config Key "${key}" was not set, yet accessed.`);
+			Log.warn(`Config Key "${key}" was not set, yet accessed.`);
 			return null;
 		}
 	}
 	
 	public set(key: ConfigKey, value: any): void {
-		console.warn(`WARNING: Config setting ${key} to ${value}. ` +
+		Log.warn(`WARNING: Config setting ${key} to ${value}. ` +
 			`This should NOT occur in production. TEST ONLY`);
 		this.config[key] = value;
 	}

@@ -49,9 +49,9 @@ const createTestToken = async () => {
     }
 };
 
-const momentThisWeek = (d: number, h: number, m: number): Moment =>
-    moment().day(d).hour(h).minute(m).seconds(0).milliseconds(0);
+const momentNextWeek = (d: number, h: number, m: number): Moment =>
+    moment().day(d).hour(h).minute(m).seconds(0).milliseconds(0).add(1, "week");
 
 const configGroupName = process.env.INTERVIEWER_GROUP_NAME;
 
-export {createTestToken, momentThisWeek, configGroupName};
+export {createTestToken, momentNextWeek, configGroupName};

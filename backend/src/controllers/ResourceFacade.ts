@@ -110,7 +110,7 @@ export class ResourceFacade implements IResourceFacade {
 		const candidate = options.candidate;
 		const preferences = options.preferences.filter(p => p.minutes > 0);
 		const rooms = ((await this.rc.list(token)) as interfaces.IRoom[]).filter(r => r.eligible);
-		const avails: IScheduleAvailabilities = await MSGraphController.getScheduleWrapper(token, options.candidate, rooms, preferences);
+		const avails: IScheduleAvailabilities = await MSGraphController.getScheduleWrapper(token, candidate, rooms, preferences);
 		return generateSchedules(options.candidate, avails);
 	}
 	

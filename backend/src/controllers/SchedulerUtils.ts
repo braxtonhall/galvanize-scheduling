@@ -281,16 +281,15 @@ function makeOneSchedule(candidate: interfaces.ICandidate, rooms: RoomAvail[], g
 					while (preferenceIndex < group.length) {
 						// if can't schedule around beginning of timeslot
 						const overlap = findOverlappingTime([timeslot], ...group.slice(preferenceIndex).map(p => p.availability));
-						if (overlap.length === 0 || overlap[0].start !== timeslot.start ||
-							room.room.capacity < group.length - groupIndex + 1
+						if (overlap.length !== 0 &&
+							(overlap[0].start === timeslot.start || meetingRun === 0) &&
+							room.room.capacity > group.length - groupIndex &&
+							milliseconds <= took(overlap[0].start, overlap[0].end)
 						) {
-							// kick someone out of the group
-							preferenceIndex++;
-						} else {
 							scheduled = true;
 							// add to meetings
-							const start = timeslot.start;
-							const end = new Date(Date.parse(timeslot.start) + milliseconds).toISOString();
+							const start: string = overlap[0].start as string;
+							const end = new Date(Date.parse(start) + milliseconds).toISOString();
 							meetings.push({
 								interviewers: group.slice(preferenceIndex).map(p => p.interviewer.interviewer),
 								room: room.room,
@@ -310,6 +309,9 @@ function makeOneSchedule(candidate: interfaces.ICandidate, rooms: RoomAvail[], g
      						groups.splice(groupIndex--, 1);
 							numUnscheduled += preferenceIndex;
 							break;
+						} else {
+							// kick someone out of the group
+							preferenceIndex++;
 						}
 					}
 				}

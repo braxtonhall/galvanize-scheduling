@@ -95,8 +95,8 @@ const AdminTests = args => () => {
                 const {success} = await adapter.toggleEligibility(that.token, roomWithBadId);
                 const {data} = await adapter.getRooms(that.token);
                 expect(success).to.be.true;
-                expect(data).to.deep.include(r3);
-                expect(data).to.not.deep.include(r2);
+                expect(data.find(r => r.name === r3.name)).to.deep.include(r3);
+                expect(data.find(r => r.name === r2.name)).to.not.deep.include(r2);
             });
         }
     });
@@ -137,7 +137,7 @@ const AdminTests = args => () => {
                expect(success).to.be.true;
                expect(data).to.not.deep.include(testRoom);
                testRoom.eligible = !testRoom.eligible;
-               expect(data).to.deep.include(testRoom);
+               expect(data.find(r => r.name === testRoom.id)).to.deep.include(testRoom);
            });
         }
     });

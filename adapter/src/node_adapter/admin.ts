@@ -85,7 +85,6 @@ export default {
             }
             return {success: status === 200, data};
         } catch (error) {
-            console.log("big err", error);
             return {success: false};
         }
     },

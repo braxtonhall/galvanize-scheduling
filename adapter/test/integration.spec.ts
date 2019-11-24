@@ -2,6 +2,7 @@ import {createTestToken, configGroupName} from "./TestUtils";
 import CandidateTests from "./candidate.spec";
 import AdminTests from "./admin.spec";
 import ScheduleTests from "./schedule.spec";
+import {Config, ConfigKey} from "../../backend/src/Config";
 
 describe("Adapter Integration Tests", () => {
     const args = {
@@ -22,5 +23,5 @@ describe("Adapter Integration Tests", () => {
 
     describe("Candidate Lifecycle", CandidateTests(args));
     describe("Administration", AdminTests(args));
-    // describe("Schedule Generation", ScheduleTests(args));
+    describe("Schedule Generation", ScheduleTests(args));
 });

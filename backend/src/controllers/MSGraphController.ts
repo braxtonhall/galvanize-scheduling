@@ -4,6 +4,7 @@ import {interfaces} from "adapter";
 import {Config, ConfigKey} from "../Config";
 import {clipNonWorkingHours, concatenateMoments} from "./SchedulerUtils";
 import {IScheduleAvailabilities, Preference} from "./Common";
+import Log from "../Log";
 
 export default class MSGraphController {
     private static getClient(token: string): Client {
@@ -56,7 +57,7 @@ export default class MSGraphController {
 
 	static async getSchedule(token: string, request) {
 		return (await (this.getClient(token))
-			.api('/me/calendar/getSchedule')
+			.api(Config.getInstance().get(ConfigKey.msScheduleEndpoint))
 			.post(request)).value;
 	}
 
@@ -127,7 +128,7 @@ export default class MSGraphController {
 			return scheduleAvailabilities;
 
 		} catch(e) {
-    		console.log(e);
+    		Log.error(e);
     		throw new Error(e);
 		}
 	}

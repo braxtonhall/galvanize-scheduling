@@ -53,7 +53,6 @@ to run tests:
 `npm run test:backend`
 #### Integration Tests
 - Complete the fields marked with `#change` in your `.env` file, using values associated with the app in your test instance of Active Directory (found in the admin portal)
-- Switch `EMAIL_ENDPOINT` to the value in the comment underneath, if you want to send test emails
 - If you already have an instance of the backend running: `npm run test:adapter`
 - If you would like to do startup + teardown: `npm run test:integration`. You may have to stop existing containers first (`npm run stop-backend`).
 
