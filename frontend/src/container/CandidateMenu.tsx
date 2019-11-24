@@ -31,9 +31,9 @@ const CandidateMenu: React.FC = () => {
 	const [deleteCandidateSelected, updateDeleteCandidateSelected] = useState<ICandidate>();
 	const [description, updateDescription] = useState<string>();
 	const [buttons, updateButtons] = useState<Array<{text: string, onClick: (candidate: ICandidate) => (void | Promise<void>)}>>();
-	const actions: Array<{text: string, color: string, onClick: (candidate: ICandidate) => (void | Promise<void>)}> = [
+	const actions: Array<{text: string, color: string, onClick: (candidate: ICandidate) => (void | Promise<void>), disabled?: (candidate: ICandidate) => boolean}> = [
 		{text: "Select", onClick: selectCandidate, color: "primary"},
-		{text: "Send Availability", onClick: sendAvailabilityEmail, color: "primary"},
+		{text: "Send Availability", onClick: sendAvailabilityEmail, color: "primary", disabled: (c) => c.schedule !== undefined},
 		{text: "Delete", onClick: selectDeleteCandidate, color: "danger"},
 	];
 

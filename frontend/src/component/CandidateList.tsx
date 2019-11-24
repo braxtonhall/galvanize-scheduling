@@ -8,7 +8,7 @@ type ICandidate = interfaces.ICandidate;
 
 interface IProps {
 	candidates?: ICandidate[],
-	actions?: Array<{ text: string, color: string, onClick: (candidate: ICandidate) => (void | Promise<void>) }>
+	actions?: Array<{ text: string, color: string, onClick: (candidate: ICandidate) => (void | Promise<void>), disabled?: (candidate: ICandidate) => boolean }>
 	selected?: ICandidate,
 }
 
@@ -19,14 +19,16 @@ const CandidateList: React.FC<IProps> = (props: IProps) => {
 	function makeRow(candidate: ICandidate, index: number): JSX.Element {
 		const {id, email, phoneNumber, firstName, lastName, position, schedule} = candidate;
 
-		function makeButtons({text, onClick, color}: { text: string, color: string, onClick: (candidate: ICandidate) => (void | Promise<void>) }, k: number) {
+		function makeButtons({text, onClick, color, disabled}: { text: string, color: string, onClick: (candidate: ICandidate) => (void | Promise<void>), disabled?: (candidate: ICandidate) => boolean }, k: number) {
 
 			function onClickWrapper() {
 				onClick(candidate);
 			}
 
+			const _disabled = disabled ? disabled(candidate) : false;
+
 			return (
-				<Button onClick={onClickWrapper} size="sm" color={color} key={"candidate_button_" + k}>{text}</Button>)
+				<Button onClick={onClickWrapper} size="sm" color={color} key={"candidate_button_" + k} disabled={_disabled}>{text}</Button>)
 		}
 
 		const isSelected = selected ? selected.id === id : false;
