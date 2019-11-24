@@ -2,7 +2,7 @@ import "mocha";
 import {expect} from "chai";
 import {v4 as generateUUID} from 'uuid';
 
-import {momentThisWeek} from "./TestUtils";
+import {momentNextWeek} from "./TestUtils";
 import {IAvailability, ICandidate} from "../src/interfaces";
 import adapter from "../src/node_adapter";
 import {Moment} from "moment";
@@ -169,10 +169,10 @@ const CandidateTests = args => () => {
             aSet.sort((a, b) => (b.start as Moment).diff(a.start));
         const toISO = pair => ({ start: pair.start.toISOString(), end: pair.end.toISOString() });
         let availabilities = [
-            {start: momentThisWeek(1, 10, 0), end: momentThisWeek(1, 15, 0)},
-            {start: momentThisWeek(1, 16, 0), end: momentThisWeek(1, 20, 0)},
-            {start: momentThisWeek(4, 8, 45), end: momentThisWeek(4, 12, 30)},
-            {start: momentThisWeek(5, 0, 0), end: momentThisWeek(6, 0, 0)}
+            {start: momentNextWeek(1, 10, 0), end: momentNextWeek(1, 15, 0)},
+            {start: momentNextWeek(1, 16, 0), end: momentNextWeek(1, 20, 0)},
+            {start: momentNextWeek(4, 8, 45), end: momentNextWeek(4, 12, 30)},
+            {start: momentNextWeek(5, 0, 0), end: momentNextWeek(6, 0, 0)}
         ];
         const getSortedIso = () => sortAscending(availabilities).map(toISO);
 
@@ -203,7 +203,7 @@ const CandidateTests = args => () => {
         it("should succeed on update", async () => {
             const updatedAvailabilities = [
                 ...availabilities,
-                {start: momentThisWeek(6, 12, 15), end: momentThisWeek(6, 14, 30)}
+                {start: momentNextWeek(6, 12, 15), end: momentNextWeek(6, 14, 30)}
             ];
             const {success} = await adapter.submitAvailability(candidateWithId.id, updatedAvailabilities);
             expect(success).to.be.true;
@@ -215,7 +215,7 @@ const CandidateTests = args => () => {
         it("should fail on impossible date ranges", async () => {
             const updatedAvailabilities = [
                 ...availabilities,
-                {start: momentThisWeek(4, 19, 0), end: momentThisWeek(4, 0, 0)}
+                {start: momentNextWeek(4, 19, 0), end: momentNextWeek(4, 0, 0)}
             ];
             const {success} = await adapter.submitAvailability(candidateWithId.id, updatedAvailabilities);
             expect(success).to.be.false;
@@ -226,13 +226,13 @@ const CandidateTests = args => () => {
 
         it("should combine overlapping date ranges", async () => {
             const overlapping = [
-                {start: momentThisWeek(4, 5, 6), end: momentThisWeek(4,10,25)},
-                {start: momentThisWeek(4, 0, 0), end: momentThisWeek(5, 0, 0)},
-                {start: momentThisWeek(4, 20, 0), end: momentThisWeek(5, 0, 0)},
-                {start: momentThisWeek(4, 0, 0), end: momentThisWeek(4, 2, 59)}
+                {start: momentNextWeek(4, 5, 6), end: momentNextWeek(4,10,25)},
+                {start: momentNextWeek(4, 0, 0), end: momentNextWeek(5, 0, 0)},
+                {start: momentNextWeek(4, 20, 0), end: momentNextWeek(5, 0, 0)},
+                {start: momentNextWeek(4, 0, 0), end: momentNextWeek(4, 2, 59)}
             ];
             const simplified = [
-                {start: momentThisWeek(4, 0, 0), end: momentThisWeek(5, 0, 0)}
+                {start: momentNextWeek(4, 0, 0), end: momentNextWeek(5, 0, 0)}
             ];
             const {success} = await adapter.submitAvailability(candidateWithId.id, overlapping);
             expect(success).to.be.true;

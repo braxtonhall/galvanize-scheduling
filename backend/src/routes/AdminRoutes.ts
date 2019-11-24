@@ -156,6 +156,14 @@ app.get(nodeAdapter.urls.SCHEDULES, async (req, res) => {
 			for (const p of options.preferences) {
 				if (interviewers.includes(p.interviewer.email))
 					throw new Error("Interviewers should only have a maximum of one preference designation.");
+
+				const partner = options.preferences
+					.find(p2 => p2.preference && (p2.preference.id === p.interviewer.id));
+				if (partner) {
+					const maxLength = Math.max(p.minutes, partner.minutes);
+					partner.minutes = maxLength;
+					p.minutes = maxLength;
+				}
 				interviewers.push(p.interviewer.email);
 			}
 			const data: any[] = await resourceFacade.list(token, ResourceKind.Schedule, options);
