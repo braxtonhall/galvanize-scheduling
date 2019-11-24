@@ -5,7 +5,7 @@ import {
 	NavbarToggler,
 	NavbarBrand,
 	Nav,
-	NavItem,
+	NavItem, Button,
 } from 'reactstrap';
 import adapter from "../services/Adapter";
 import Context from '../services/Context';
@@ -26,6 +26,10 @@ const Header: React.FC = () => {
 		}
 	}
 
+	function corruptToken() {
+		updateContext({token: Math.random().toString()})
+	}
+
 	return (
 		<Navbar color="light" light expand="md">
 			<NavbarBrand><img alt="galvanize logo" src="/galvanize-logo.svg" style={{width: "50%"}}/></NavbarBrand>
@@ -33,6 +37,8 @@ const Header: React.FC = () => {
 			<NavItem className="px-2">Environment: {process.env.NODE_ENV}</NavItem>}
 			{process.env.NODE_ENV === 'development' &&
 			<NavItem className="px-2">Operations Loading: {operationsLoading}</NavItem>}
+			{process.env.NODE_ENV === 'development' &&
+			<NavItem className="px-2"><Button onClick={corruptToken}>Corrupt Token</Button></NavItem>}
 
 			{
 				token &&

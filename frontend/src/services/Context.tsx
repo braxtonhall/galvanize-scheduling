@@ -1,6 +1,6 @@
 import React, {useState, createContext, useRef} from "react";
 import App from "../App";
-import {interfaces} from "adapter";
+import adapter from "../services/Adapter";
 
 export interface IContext {
 	token?: string,
@@ -10,6 +10,7 @@ export interface IContext {
 	startLoadingProcess: (context?: Partial<IContext>) => void
 	endLoadingProcess: (context?: Partial<IContext>) => void
 	scrollToBottom: () => void;
+	authenticateAndLogout: () => void;
 }
 
 const Context = createContext<IContext>({
@@ -18,6 +19,7 @@ const Context = createContext<IContext>({
 	startLoadingProcess: () => {},
 	endLoadingProcess: () => {},
 	scrollToBottom: () => {},
+	authenticateAndLogout: () => {},
 });
 
 export const ContextProvider = Context.Provider;
@@ -34,6 +36,7 @@ export const Root: React.FC = () => {
 		startLoadingProcess: () => {},
 		endLoadingProcess: () => {},
 		scrollToBottom: () => {},
+		authenticateAndLogout: () => {},
 	});
 
 	const newFunc = (c: Partial<IContext>): void => {
@@ -61,13 +64,28 @@ export const Root: React.FC = () => {
 		bottom.current.scrollIntoView({behavior: "smooth"})
 	};
 
+	const authenticateAndLogout = () => {
+		if (context.token) {
+			adapter.checkToken(context.token)
+				.then(({data, success}) => {
+					if (!data) {
+						newFunc( {
+							error: "Your session has expired, please login in again.",
+							token: undefined,
+						})
+					}
+				});
+		}
+	};
+
 	return (
 		<ContextProvider value={{
 			...context,
 			updateContext: newFunc,
 			startLoadingProcess,
 			endLoadingProcess,
-			scrollToBottom
+			scrollToBottom,
+			authenticateAndLogout
 		}}>
 			<App/>
 			<div ref={bottom} />

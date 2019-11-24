@@ -1,7 +1,7 @@
 import AWS from "aws-sdk";
 import {Config, ConfigKey} from "../../Config";
 import { interfaces } from "adapter";
-import Log, {trace} from "../../Log";
+import Log, {info, trace} from "../../Log";
 type ICandidate = interfaces.ICandidate
 type IRoom = interfaces.IRoom
 
@@ -133,6 +133,7 @@ export class DynamoDBController implements IDynamoDBController {
 		await this.delete(DynamoDBController.ROOM_TABLE, {name});
 	}
 
+	@trace
 	public async writeOAuth(token: string): Promise<void> {
 		if (!token) {
 			throw new Error("Required fields in user are missing. Cannot save to database");
@@ -150,11 +151,13 @@ export class DynamoDBController implements IDynamoDBController {
 		const auth = await this.get(DynamoDBController.OAUTH_TABLE, {token});
 		// If the auth wasn't in the database return undefined
 		if (!auth) {
+			Log.trace("Provided auth token was not found in the database");
 			return auth;
 		}
 		// If the auth was in the database but is expired, return undefined
 		// The auth will automatically be deleted at a later time
 		if (auth["ttl"] < Math.round(Date.now() / 1000)) {
+			Log.trace("Provided auth token has expired");
 			return undefined;
 		}
 		// Remove ttl so it's not seen by the user. For DDBC use only
@@ -283,6 +286,7 @@ export class DynamoDBController implements IDynamoDBController {
 		return this.db;
 	}
 
+	@info
 	private async initDatabase(): Promise<void> {
 		const cf: Config = Config.getInstance();
 		AWS.config.update({

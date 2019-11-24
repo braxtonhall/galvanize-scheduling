@@ -26,7 +26,7 @@ const Rooms: React.FC = () => {
 	}
 
 	function makeRow(room: IRoom, index: number): JSX.Element {
-		const {id, name, eligible} = room;
+		const {id, name, eligible, capacity} = room;
 
 		async function onClickWrapper() {
 			startLoadingProcess();
@@ -38,6 +38,7 @@ const Rooms: React.FC = () => {
 		return (
 			<tr className={"text-nowrap"} key={"row_" + index}>
 				<th scope="row">{id}</th>
+				<td>{capacity}</td>
 				<td>{eligible ? "eligible" : "not eligible"}</td>
 				<td>
 					<ButtonGroup>
@@ -76,6 +77,7 @@ const Rooms: React.FC = () => {
 										<thead>
 										<tr>
 											<th>Room</th>
+											<th>Capacity</th>
 											<th>Eligible</th>
 											<th>Toggle</th>
 										</tr>

@@ -27,7 +27,6 @@ export abstract class CandidateController implements IResourceController {
 		if (!(typeof object["email"] === "string" && EMAIL_REGEX.test(object["email"]))) {
 			throw new Error("Candidate must contain an email");
 		}
-		// TODO heavy dependency on the type. Perhaps not the cleanest way to do this.
 		const {id, email, phoneNumber, firstName, lastName, position, notes, availability, schedule} = object;
 		return {id, email, phoneNumber, firstName, lastName, position, notes, availability, schedule};
 	}
