@@ -26,6 +26,7 @@ export enum ConfigKey {
 	
 	// Internal
 	interviewerGroupName = "interviewerGroupName",
+	logLevel = "logLevel",
 	
 	// Test
 	testSecretKey = "testSecretKey",
@@ -69,6 +70,7 @@ export class Config {
 				
 				// Internal
 				[ConfigKey.interviewerGroupName]: process.env.INTERVIEWER_GROUP_NAME,
+				[ConfigKey.logLevel]:             process.env.LOG_LEVEL,
 				
 				// Testing
 				[ConfigKey.testSecretKey]: process.env.TEST_SECRET_KEY,
