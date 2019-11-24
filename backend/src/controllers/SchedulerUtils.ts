@@ -175,35 +175,50 @@ export function generateSchedules(candidate: interfaces.ICandidate, scheduleAvai
 	const sortedRooms = rankRooms(scheduleAvailabilities);
 	const groupedInterviewers = buildGroups(scheduleAvailabilities.interviewers);
 	const schedules: CandidateSchedule[] = [];
-	for (let i = 0; i < 10; i++) {
+	for (let i = 0; i < 9; i++) {
 		const s: CandidateSchedule = makeOneSchedule(candidate, arrayCopy(sortedRooms), arrayCopy(groupedInterviewers), i);
 		if (s.schedule.meetings.length > 0) {
 			schedules.push(s);
 		}
 	}
+	// Add a wildcard with randomly sorted everything
 	const wildcard = makeOneSchedule(candidate, 
 		shuffle([...sortedRooms.map(r => ({...r, availability: shuffle(r.availability)}))]),
 		arrayCopy(groupedInterviewers), 0);
+	if (wildcard.schedule.meetings.length > 0) {
+		schedules.push(wildcard);
+	}
 	const output: CandidateSchedule[] = [];
 	// Sort by number of change overs. Return most densely packed schedule
 	if (schedules.length > 0) {
-		schedules.sort((a, b) => a.numChangeOvers - b.numChangeOvers);
+		schedules.sort((a, b) => {
+			const change = a.numChangeOvers - b.numChangeOvers;
+			return change === 0 ? a.numUnscheduled - b.numUnscheduled : change;
+		});
 		output.push(schedules[0]);
 	}
 	// Sort by number of unscheduled. Return most highly scheduled
 	if (schedules.length > 1) {
-		schedules.sort((a, b) => a.numUnscheduled - b.numUnscheduled);
+		schedules.sort((a, b) => {
+			const unsched = a.numUnscheduled - b.numUnscheduled;
+			return unsched === 0 ? a.numChangeOvers - b.numChangeOvers : unsched;
+		});
 		if (schedules[0] === output[0]) {
 			output.push(schedules[1]);
 		} else {
 			output.push(schedules[0]);
 		}
 	}
-	// Add the wildcard with randomly sorted everything to the schedules
-	if (wildcard.schedule.meetings.length > 0) {
-		output.push(wildcard);
-	} else if (schedules.length > 2) {
-		output.push(schedules[2])
+	// Optimize for both
+	if (schedules.length > 2) {
+		schedules.sort((a, b) => (a.numUnscheduled + a.numChangeOvers) - (b.numUnscheduled + b.numChangeOvers));
+		if (!output.includes(schedules[0])) {
+			output.push(schedules[0]);
+		} else if (!output.includes(schedules[1])) {
+			output.push(schedules[1]);
+		} else {
+			output.push(schedules[2]);
+		}
 	}
 	Log.trace(`Returning all schedules. ${schedules.length} schedules were found. All runs + overhead took ${tookHuman(start)}.`);
 	return output.map(s => s.schedule);
