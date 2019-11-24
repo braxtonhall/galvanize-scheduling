@@ -28,7 +28,7 @@ const Scheduling: React.FC = () => {
 
 	function selectSchedule(schedule) {
 		updateSelectedSchedule(schedule);
-		setTimeout(scrollToBottom, 200);
+		// setTimeout(scrollToBottom, 200);
 	}
 
 	async function confirmSchedule(schedule): Promise<void> {
@@ -92,7 +92,7 @@ const Scheduling: React.FC = () => {
 			updateSelectedSchedule(undefined);
 			updateSchedules(data);
 			endLoadingProcess();
-			scrollToBottom();
+			// scrollToBottom();
 		} else if (error) {
 			endLoadingProcess({error});
 		} else {
@@ -153,6 +153,14 @@ const Scheduling: React.FC = () => {
 					</Col>
 				}
 			</Row>
+			{
+				!selectedSchedule &&
+					<React.Fragment>
+						<br/>
+							<div className="p-5"/>
+						<br/>
+					</React.Fragment>
+			}
 		</Container>
 	);
 };
