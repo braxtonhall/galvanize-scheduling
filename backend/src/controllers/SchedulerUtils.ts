@@ -1,6 +1,6 @@
 import { interfaces } from "adapter";
 import {IScheduleAvailabilities, Preference} from "./Common";
-import Log from "../Log";
+import Log, {trace} from "../Log";
 
 type PreferenceAvail = {interviewer: Preference, availability: interfaces.IAvailability};
 type CandidateSchedule = {schedule: interfaces.ISchedule, numChangeOvers: number, numUnscheduled: number};
@@ -170,24 +170,58 @@ function rankRooms(scheduleAvailabilities: IScheduleAvailabilities): RoomAvail[]
 }
 
 export function generateSchedules(candidate: interfaces.ICandidate, scheduleAvailabilities: IScheduleAvailabilities): interfaces.ISchedule[] {
+	const start = Date.now();
+	Log.trace("SchedulerUtils::generateSchedules(..) - Starting");
 	const sortedRooms = rankRooms(scheduleAvailabilities);
 	const groupedInterviewers = buildGroups(scheduleAvailabilities.interviewers);
 	const schedules: CandidateSchedule[] = [];
-	for (let i = 0; i < 10; i++) {
+	for (let i = 0; i < 9; i++) {
 		const s: CandidateSchedule = makeOneSchedule(candidate, arrayCopy(sortedRooms), arrayCopy(groupedInterviewers), i);
 		if (s.schedule.meetings.length > 0) {
 			schedules.push(s);
 		}
 	}
-	schedules.sort((a , b) => {
-		const unscheduledComp = a.numUnscheduled - b.numUnscheduled;
-		if (unscheduledComp === 0) {
-			return a.numUnscheduled - b.numUnscheduled;
+	// Add a wildcard with randomly sorted everything
+	const wildcard = makeOneSchedule(candidate, 
+		shuffle([...sortedRooms.map(r => ({...r, availability: shuffle(r.availability)}))]),
+		arrayCopy(groupedInterviewers), 0);
+	if (wildcard.schedule.meetings.length > 0) {
+		schedules.push(wildcard);
+	}
+	const output: CandidateSchedule[] = [];
+	// Sort by number of change overs. Return most densely packed schedule
+	if (schedules.length > 0) {
+		schedules.sort((a, b) => {
+			const change = a.numChangeOvers - b.numChangeOvers;
+			return change === 0 ? a.numUnscheduled - b.numUnscheduled : change;
+		});
+		output.push(schedules[0]);
+	}
+	// Sort by number of unscheduled. Return most highly scheduled
+	if (schedules.length > 1) {
+		schedules.sort((a, b) => {
+			const unsched = a.numUnscheduled - b.numUnscheduled;
+			return unsched === 0 ? a.numChangeOvers - b.numChangeOvers : unsched;
+		});
+		if (schedules[0] === output[0]) {
+			output.push(schedules[1]);
 		} else {
-			return unscheduledComp;
+			output.push(schedules[0]);
 		}
-	});
-	return schedules.map(s => s.schedule).slice(0, 3);
+	}
+	// Optimize for both
+	if (schedules.length > 2) {
+		schedules.sort((a, b) => (a.numUnscheduled + a.numChangeOvers) - (b.numUnscheduled + b.numChangeOvers));
+		if (!output.includes(schedules[0])) {
+			output.push(schedules[0]);
+		} else if (!output.includes(schedules[1])) {
+			output.push(schedules[1]);
+		} else {
+			output.push(schedules[2]);
+		}
+	}
+	Log.trace(`Returning all schedules. ${schedules.length} schedules were found. All runs + overhead took ${tookHuman(start)}.`);
+	return output.map(s => s.schedule);
 }
 
 function buildGroups(preferences: PreferenceAvail[]): PreferenceAvail[][] {
@@ -243,7 +277,6 @@ function removeOverlap(availability: interfaces.IAvailability, meetings: interfa
 }
 
 function makeOneSchedule(candidate: interfaces.ICandidate, rooms: RoomAvail[], groups: PreferenceAvail[][], roomStart): CandidateSchedule {
-	const start = Date.now();
 	groups = shuffle(groups);
 	let roomIndex = 0, numUnscheduled = 0, numChangeOvers = 0, meetings: interfaces.IMeeting[] = [];
 	
@@ -282,7 +315,7 @@ function makeOneSchedule(candidate: interfaces.ICandidate, rooms: RoomAvail[], g
 						const overlap = findOverlappingTime([timeslot], ...group.slice(preferenceIndex).map(p => p.availability));
 						if (overlap.length !== 0 &&
 							(overlap[0].start === timeslot.start || meetingRun === 0) &&
-							room.room.capacity > group.length - groupIndex &&
+							room.room.capacity > group.length - preferenceIndex &&
 							milliseconds <= took(overlap[0].start, overlap[0].end)
 						) {
 							scheduled = true;
@@ -331,7 +364,7 @@ function makeOneSchedule(candidate: interfaces.ICandidate, rooms: RoomAvail[], g
 		}
 	}
 	meetings.sort((a, b) => a.start < b.start ? -1 : 1);
-	Log.trace(`Returning schedules. This run took ${tookHuman(start)}.`);
+	Log.trace(`Returning schedule that had ${numChangeOvers} change overs and ${numUnscheduled} unscheduled interviewers`);
 	return {schedule: {candidate, meetings}, numChangeOvers, numUnscheduled};
 }
 
