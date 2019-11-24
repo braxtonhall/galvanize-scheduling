@@ -181,16 +181,32 @@ export function generateSchedules(candidate: interfaces.ICandidate, scheduleAvai
 			schedules.push(s);
 		}
 	}
-	schedules.sort((a , b) => {
-		const unscheduledComp = a.numUnscheduled - b.numUnscheduled;
-		if (unscheduledComp === 0) {
-			return a.numUnscheduled - b.numUnscheduled;
+	const wildcard = makeOneSchedule(candidate, 
+		shuffle([...sortedRooms.map(r => ({...r, availability: shuffle(r.availability)}))]),
+		arrayCopy(groupedInterviewers), 0);
+	const output: CandidateSchedule[] = [];
+	// Sort by number of change overs. Return most densely packed schedule
+	if (schedules.length > 0) {
+		schedules.sort((a, b) => a.numChangeOvers - b.numChangeOvers);
+		output.push(schedules[0]);
+	}
+	// Sort by number of unscheduled. Return most highly scheduled
+	if (schedules.length > 1) {
+		schedules.sort((a, b) => a.numUnscheduled - b.numUnscheduled);
+		if (schedules[0] === output[0]) {
+			output.push(schedules[1]);
 		} else {
-			return unscheduledComp;
+			output.push(schedules[0]);
 		}
-	});
+	}
+	// Add the wildcard with randomly sorted everything to the schedules
+	if (wildcard.schedule.meetings.length > 0) {
+		output.push(wildcard);
+	} else if (schedules.length > 2) {
+		output.push(schedules[2])
+	}
 	Log.trace(`Returning all schedules. ${schedules.length} schedules were found. All runs + overhead took ${tookHuman(start)}.`);
-	return schedules.map(s => s.schedule).slice(0, 3);
+	return output.map(s => s.schedule);
 }
 
 function buildGroups(preferences: PreferenceAvail[]): PreferenceAvail[][] {
@@ -284,7 +300,7 @@ function makeOneSchedule(candidate: interfaces.ICandidate, rooms: RoomAvail[], g
 						const overlap = findOverlappingTime([timeslot], ...group.slice(preferenceIndex).map(p => p.availability));
 						if (overlap.length !== 0 &&
 							(overlap[0].start === timeslot.start || meetingRun === 0) &&
-							room.room.capacity > group.length - groupIndex &&
+							room.room.capacity > group.length - preferenceIndex &&
 							milliseconds <= took(overlap[0].start, overlap[0].end)
 						) {
 							scheduled = true;
