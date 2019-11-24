@@ -4,6 +4,7 @@ import {interfaces} from "adapter";
 import {Config, ConfigKey} from "../Config";
 import {clipNonWorkingHours, concatenateMoments} from "./SchedulerUtils";
 import {IScheduleAvailabilities, Preference} from "./Common";
+import Log from "../Log";
 
 export default class MSGraphController {
     private static getClient(token: string): Client {
@@ -127,6 +128,7 @@ export default class MSGraphController {
 			return scheduleAvailabilities;
 
 		} catch(e) {
+    		Log.error(e);
     		throw new Error(e);
 		}
 	}
