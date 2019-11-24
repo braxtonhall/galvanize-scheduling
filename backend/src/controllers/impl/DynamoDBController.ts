@@ -1,6 +1,7 @@
 import AWS from "aws-sdk";
 import {Config, ConfigKey} from "../../Config";
 import { interfaces } from "adapter";
+import Log, {trace} from "../../Log";
 type ICandidate = interfaces.ICandidate
 type IRoom = interfaces.IRoom
 
@@ -96,7 +97,7 @@ export class DynamoDBController implements IDynamoDBController {
 	private db: AWS.DynamoDB.DocumentClient = null;
 
 	private constructor() {
-		console.log("Database instance created");
+		Log.info("Database instance created")
 	}
 
 	public async getCandidate(id: string): Promise<ICandidate> {
@@ -298,7 +299,7 @@ export class DynamoDBController implements IDynamoDBController {
 				await this.createTable(dynamoDB, scheme);
 			} catch (err) {
 				if (err.code === "ResourceInUseException") {
-					console.warn("While initing the database, table was already in use");
+					Log.warn("While initing the database, table was already in use");
 				} else {
 					throw new Error("Unable to allocate resource in DB");
 				}
@@ -311,8 +312,8 @@ export class DynamoDBController implements IDynamoDBController {
 				TimeToLiveSpecification: {Enabled: true, AttributeName: "ttl"}
 			});
 		} catch (err) {
-			console.error(err);
-			console.warn("Error setting the time to live of the database. Ignoring");
+			Log.error(err);
+			Log.warn("Error setting the time to live of the database. Ignoring");
 		}
 		
 		this.db = new AWS.DynamoDB.DocumentClient();
@@ -339,7 +340,7 @@ export class DynamoDBController implements IDynamoDBController {
 				if (err) {
 					reject(err);
 				} else {
-					console.log("Created table. Table description JSON:", JSON.stringify(data, null, 2));
+					Log.info("Created table. Table description JSON:", JSON.stringify(data, null, 2));
 					resolve();
 				}
 			});
