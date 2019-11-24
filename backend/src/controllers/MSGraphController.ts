@@ -141,7 +141,7 @@ export default class MSGraphController {
 					"subject": `Interview with ${schedule.candidate.firstName ? schedule.candidate.firstName : schedule.candidate.email}`,
 					"body": {
 						"contentType": "HTML",
-						"content": `Be ready to join ${schedule.candidate.firstName} in an interview for ${schedule.candidate.position ? schedule.candidate.position : "Galvanize"}.`
+						"content": `Be ready ${schedule.candidate.firstName ? `to join ${schedule.candidate.firstName} in` : "for"} an interview for ${schedule.candidate.position ? schedule.candidate.position : "Galvanize"}.`
 					},
 					"start": {
 						"dateTime": typeof m.start === "string" ? m.start : m.start.toISOString(),
