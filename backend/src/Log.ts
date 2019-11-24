@@ -55,11 +55,19 @@ export function trace(target: Object, propertyName: string, propertyDescriptor: 
 	return apply(target, propertyName, propertyDescriptor, Log.trace);
 }
 
+export function traceReturn(target: Object, propertyName: string, propertyDescriptor: PropertyDescriptor): PropertyDescriptor {
+	return apply(target, propertyName, propertyDescriptor, Log.trace, true);
+}
+
 export function info(target: Object, propertyName: string, propertyDescriptor: PropertyDescriptor): PropertyDescriptor {
 	return apply(target, propertyName, propertyDescriptor, Log.info);
 }
 
-function apply(target: Object, propertyName: string, propertyDescriptor: PropertyDescriptor, log): PropertyDescriptor {
+export function infoReturn(target: Object, propertyName: string, propertyDescriptor: PropertyDescriptor): PropertyDescriptor {
+	return apply(target, propertyName, propertyDescriptor, Log.info, true);
+}
+
+function apply(target: Object, propertyName: string, propertyDescriptor: PropertyDescriptor, log, ret=false): PropertyDescriptor {
 	const method = propertyDescriptor.value;
 	propertyDescriptor.value = function (...args: any[]) {
 		const name = `${target.constructor.name}::${method.name}(..)`;
@@ -73,10 +81,17 @@ function apply(target: Object, propertyName: string, propertyDescriptor: Propert
 		}
 		if (result instanceof Promise) {
 			return result
-				.then((v) => {log(`${name} - End`); return v})
-				.catch((e) => {Log.error(`${name} threw the error:`, e); throw e; });
+				.then((v) => {
+					if (ret) log(`${name} - Resolving:`, v);
+					else log(`${name} - Resolving`);
+					return v
+				}).catch((e) => {
+					Log.error(`${name} rejected with the error:`, e);
+					throw e;
+				});
 		} else {
-			log(`${name} - End`);
+			if (ret) log(`${name} - Returning:`, result);
+			else log(`${name} - End`);
 			return result;
 		}
 	};

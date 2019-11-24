@@ -2,6 +2,7 @@ import {CandidateController} from "../../ResourceControllers";
 import {interfaces} from "adapter";
 import {DynamoDBController, IDynamoDBController} from "../DynamoDBController";
 import {concatenateMoments} from "../../SchedulerUtils";
+import Log from "../../../Log";
 
 export default class DynamoDBCandidateController extends CandidateController {
 	private dbc: IDynamoDBController;
@@ -16,9 +17,9 @@ export default class DynamoDBCandidateController extends CandidateController {
 	}
 
 	public async create(token: string, candidate: interfaces.ICandidate): Promise<interfaces.ICandidate> {
-		// TODO validation?
 		candidate = this.assertCandidate(candidate);
 		if (typeof candidate.id !== "string") {
+			Log.trace("Candidate", candidate.email, "did not have an id. Creating");
 			candidate.id = this.hashID(await this.dbc.createCandidateID());
 			candidate.id += this.getRandomLongString();
 		}

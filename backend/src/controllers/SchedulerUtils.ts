@@ -1,6 +1,6 @@
 import { interfaces } from "adapter";
 import {IScheduleAvailabilities, Preference} from "./Common";
-import Log from "../Log";
+import Log, {trace} from "../Log";
 
 type PreferenceAvail = {interviewer: Preference, availability: interfaces.IAvailability};
 type CandidateSchedule = {schedule: interfaces.ISchedule, numChangeOvers: number, numUnscheduled: number};
@@ -170,6 +170,8 @@ function rankRooms(scheduleAvailabilities: IScheduleAvailabilities): RoomAvail[]
 }
 
 export function generateSchedules(candidate: interfaces.ICandidate, scheduleAvailabilities: IScheduleAvailabilities): interfaces.ISchedule[] {
+	const start = Date.now();
+	Log.trace("SchedulerUtils::generateSchedules(..) - Starting");
 	const sortedRooms = rankRooms(scheduleAvailabilities);
 	const groupedInterviewers = buildGroups(scheduleAvailabilities.interviewers);
 	const schedules: CandidateSchedule[] = [];
@@ -187,6 +189,7 @@ export function generateSchedules(candidate: interfaces.ICandidate, scheduleAvai
 			return unscheduledComp;
 		}
 	});
+	Log.trace(`Returning all schedules. ${schedules.length} schedules were found. All runs + overhead took ${tookHuman(start)}.`);
 	return schedules.map(s => s.schedule).slice(0, 3);
 }
 
@@ -243,7 +246,6 @@ function removeOverlap(availability: interfaces.IAvailability, meetings: interfa
 }
 
 function makeOneSchedule(candidate: interfaces.ICandidate, rooms: RoomAvail[], groups: PreferenceAvail[][], roomStart): CandidateSchedule {
-	const start = Date.now();
 	groups = shuffle(groups);
 	let roomIndex = 0, numUnscheduled = 0, numChangeOvers = 0, meetings: interfaces.IMeeting[] = [];
 	
@@ -331,7 +333,7 @@ function makeOneSchedule(candidate: interfaces.ICandidate, rooms: RoomAvail[], g
 		}
 	}
 	meetings.sort((a, b) => a.start < b.start ? -1 : 1);
-	Log.trace(`Returning schedules. This run took ${tookHuman(start)}.`);
+	Log.trace(`Returning schedule that had ${numChangeOvers} change overs and ${numUnscheduled} unscheduled interviewers`);
 	return {schedule: {candidate, meetings}, numChangeOvers, numUnscheduled};
 }
 

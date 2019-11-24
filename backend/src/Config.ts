@@ -2,7 +2,6 @@ import * as dotenv from 'dotenv';
 dotenv.config({path: "../.env"});
 import Log from "./Log"
 
-
 export enum ConfigKey {
 	// Basic
 	backendPort = "port",
