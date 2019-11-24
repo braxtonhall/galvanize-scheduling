@@ -93,7 +93,7 @@ const CandidateMenu: React.FC = () => {
 	async function cancelMeetings(): Promise<void> {
 		startLoadingProcess();
 		// incase context is loss, prevents double pressing
-		const temp: ICandidate = {...deleteCandidateSelected};
+		const temp: ICandidate = {...cancelMeetingsCandidate};
 		updateDeleteCandidateSelected(undefined);
 		const {success, error} = await adapter.cancelSchedule(token, temp);
 		if (success) {
