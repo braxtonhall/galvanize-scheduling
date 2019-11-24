@@ -83,7 +83,7 @@ export default class MSGraphController {
 			}));
 
 
-			for (let timeslot of clipNonWorkingHours(candidate.availability)) {
+			for (let timeslot of candidate.availability) {
 				let floor = Math.floor(request_array.length / 20);
 				for (let i = 0; i < floor+1; i++) {
 					const availabilities = await this.getSchedule(token, this.scheduleRequest(
@@ -95,19 +95,19 @@ export default class MSGraphController {
 						let date = new Date(timeslot.start.toString());
 
 						for (let i = 0; i < availability.availabilityView.length; i++) {
-							let time: interfaces.IAvailability = {
-								// @ts-ignore
+							let time: interfaces.ITimeslot = {
 								start: this.buildDate(date, 0),
 								end: this.buildDate(date)
 							};
 							if (availability.availabilityView.charAt(i) === '0') {
-								availability_map.set(
-									availability.scheduleId,
-									// @ts-ignore
-									[...availability_map.get(availability.scheduleId), time]
-								);
+							   availability_map.get(availability.scheduleId).push(time);
 							}
 						}
+
+						availability_map.set(
+							availability.scheduleId,
+							clipNonWorkingHours(concatenateMoments(availability_map.get(availability.scheduleId)), availability.workingHours)
+						)
 					}
 				}
 			}
@@ -120,7 +120,7 @@ export default class MSGraphController {
 			for (let email of request_array) {
 				scheduleAvailabilities[`${email_type[email]}s`] = [...scheduleAvailabilities[`${email_type[email]}s`], {
 					[email_type[email]]: object_map.get(email),
-					availability: concatenateMoments(availability_map.get(email))
+					availability: availability_map.get(email)
 				}]
 			}
 			
