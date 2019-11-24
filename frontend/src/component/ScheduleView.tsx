@@ -26,7 +26,6 @@ const ScheduleView: React.FC<IProps> = (props: IProps) => {
 				<CardTitle><h5>Option #{index + 1}</h5></CardTitle>
 				{schedule.meetings.map(createMeeting)}
 				<Button onClick={select} color="primary">Select</Button>
-				{index !== schedules.length - 1 && <hr/>}
 			</Col>
 		)
 	}
@@ -57,15 +56,13 @@ export function createMeeting(meeting: IMeeting, index: number) {
 		<React.Fragment key={"Meeting_" + index }>
 			<CardSubtitle><u>Meeting #{index + 1}</u></CardSubtitle>
 			<CardSubtitle className="small"><b>{(start as Moment).format("MMM Do")}</b></CardSubtitle>
-			<CardSubtitle className="small">{(start as Moment).format(formatString)} - {(end as Moment).format(formatString)}</CardSubtitle>
+			<CardSubtitle className="small">{(start as Moment).format("h:mm a")} - {(end as Moment).format("h:mm a")}</CardSubtitle>
 			<CardSubtitle className="small">{name}</CardSubtitle>
 			{interviewersElement}
 			<br/>
 		</React.Fragment>
 	)
 }
-
-const formatString = "h:mm a";
 
 ScheduleView.defaultProps = {
 	schedules: [],
