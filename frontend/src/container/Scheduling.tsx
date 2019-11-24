@@ -1,5 +1,13 @@
 import React, {useContext, useEffect, useState} from "react";
-import {Button, Card, CardBody, CardHeader, CardText, Col, Container, Modal, Row} from "reactstrap";
+import {
+	Button,
+	Col,
+	Container,
+	Modal,
+	ModalBody,
+	ModalFooter, ModalHeader,
+	Row
+} from "reactstrap";
 import CandidateList from "../component/CandidateList";
 import adapter from "../services/Adapter";
 import Context from "../services/Context";
@@ -168,13 +176,13 @@ const Scheduling: React.FC = () => {
 				}
 			</Container>
 			<Modal isOpen={modalOpen}>
-				<Card>
-					<CardHeader>Booked</CardHeader>
-					<CardBody>
-						<CardText>You have successfully scheduled the candidate. All respective parties will have received invites.</CardText>
-						<Button className="mt-4" color="primary" onClick={closeModal}>Okay</Button>
-					</CardBody>
-				</Card>
+				<ModalHeader>Booked</ModalHeader>
+				<ModalBody>
+					You have successfully scheduled the candidate. All respective parties will have received invites.
+				</ModalBody>
+				<ModalFooter>
+					<Button color="primary" onClick={closeModal}>Okay</Button>
+				</ModalFooter>
 			</Modal>
 		</React.Fragment>
 	);
