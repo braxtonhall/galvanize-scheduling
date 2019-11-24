@@ -134,7 +134,7 @@ export default class MSGraphController {
 	
 	static async bookSchedule(token: string, schedule: interfaces.ISchedule): Promise<interfaces.ISchedule> {
     	const client: Client = this.getClient(token);
-    	const promises = schedule.meetings.map(m => {
+    	const promises: Promise<interfaces.IMeeting>[] = schedule.meetings.map(m => {
 			return client
 				.api(`/me/events`)
 				.post({
