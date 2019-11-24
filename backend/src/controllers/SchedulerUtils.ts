@@ -15,6 +15,7 @@ const gaussianIsh = (x, b) => Math.max(0, Math.exp(-Math.pow(x - b, 2) / 8));
 const arrayCopy = a => [...a];
 const objectCopy = o => ({...o});
 const isWorkingHour = date => (date.getDay() >= 1 && date.getDay() <= 5 && date.getHours() >= 8 && date.getHours() <= 17);
+const createSlot = (a,b) => ({start: a, end: b});
 
 function tookHuman(start: number): string {
 	const milliseconds = Date.now() - start;
@@ -113,7 +114,7 @@ export function clipNonWorkingHours(availability: interfaces.IAvailability): int
 			end: end.toISOString()
 		});
 	}
-	return filtered_availability;
+	return availability;
 }
 
 function findOverlappingTime(...avail: interfaces.IAvailability[]): interfaces.IAvailability {
@@ -219,11 +220,28 @@ function buildGroups(preferences: PreferenceAvail[]): PreferenceAvail[][] {
 }
 
 function removeOverlap(availability: interfaces.IAvailability, meetings: interfaces.IMeeting[]): interfaces.IAvailability {
-	/** @kwangsoo: delete all meetings from the avail. For example
+	/** delete all meetings from the avail. For example
 	 * input:  avail = [{start: 1000, end: 1400}], meetings = [{start: 1100, end: 1200}]
 	 * output: avail = [{start: 1000, end: 1100}, {start: 1200, end: 1400}]
 	 */
-	return availability; // TODO implement stub
+	let new_availability = [];
+	for (let m of meetings) {
+		for (let a of availability) {
+			if (m.end < a.start || a.end < m.start) { // if is a or m has no relation
+				new_availability.push(createSlot(a.start, a.end));
+			} else if (a.start < m.start && m.end < a.end) { // if a is between m
+				new_availability.push(createSlot(a.start, m.start));
+				new_availability.push(createSlot(m.end, a.end));
+			} else if (a.start >= m.start && m.end < a.end) { // if a is after m and ends later than m
+				new_availability.push(createSlot(m.end, a.end));
+			} else if (a.start < m.start && m.end >= a.end) { // if a is before m and ends before m
+				new_availability.push(createSlot(a.start, m.start));
+			}
+		}
+		availability = new_availability;
+		new_availability = [];
+	}
+	return availability;
 }
 
 function makeOneSchedule(candidate: interfaces.ICandidate, rooms: RoomAvail[], groups: PreferenceAvail[][], roomStart): CandidateSchedule {
