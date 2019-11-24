@@ -364,7 +364,6 @@ function makeOneSchedule(candidate: interfaces.ICandidate, rooms: RoomAvail[], g
 		}
 	}
 	meetings.sort((a, b) => a.start < b.start ? -1 : 1);
-	Log.trace(`Returning schedule that had ${numChangeOvers} change overs and ${numUnscheduled} unscheduled interviewers`);
 	return {schedule: {candidate, meetings}, numChangeOvers, numUnscheduled};
 }
 
