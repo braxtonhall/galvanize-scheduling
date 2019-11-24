@@ -9,6 +9,7 @@ const documents: [string, string][] = [
 	["Business Requirements Document", "documents/business_requirements_document.pdf"],
 	["Project Plan", "documents/project_plan.pdf"],
 	["Terms of Reference", "documents/terms_of_reference.pdf"],
+	["Test Plan", "documents/test_plan.pdf"],
 	["Development Documentation", "documents/development_documentation.md"],
 ];
 
