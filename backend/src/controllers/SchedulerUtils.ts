@@ -79,7 +79,6 @@ export function concatenateMoments(availability: interfaces.IAvailability): inte
 }
 
 export function clipNonWorkingHours(availability: interfaces.IAvailability, workingHours = DEFAULT_WORKING_HOURS): interfaces.IAvailability {
-	// TODO trim off any availability times outside of working hours
 	let workingDay = workingHours.daysOfWeek.map(w => WEEKDAYS[w]);
 	let dates = new Set();
 
@@ -94,11 +93,11 @@ export function clipNonWorkingHours(availability: interfaces.IAvailability, work
 		}
 		// add initial date to set
 		if (workingDay.includes(startTime.getDay())) {
-			dates.add(`${startTime.getFullYear()}-${startTime.getMonth()+1}-${startTime.getDate()}`)
+			dates.add(`${startTime.getFullYear()}-${("0" + (startTime.getMonth()+1)).slice(-2)}-${("0" + startTime.getDate()).slice(-2)}`)
 		}
 		// add end date to set -> if end time is in there -> set does not add
 		if (workingDay.includes(endTime.getDay())) {
-			dates.add(`${endTime.getFullYear()}-${endTime.getMonth()+1}-${endTime.getDate()}`)
+			dates.add(`${endTime.getFullYear()}-${("0" + (endTime.getMonth()+1)).slice(-2)}-${("0" + endTime.getDate()).slice(-2)}`)
 		}
 	}
 
