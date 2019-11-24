@@ -2,6 +2,7 @@ import {createTestToken, configGroupName} from "./TestUtils";
 import CandidateTests from "./candidate.spec";
 import AdminTests from "./admin.spec";
 import ScheduleTests from "./schedule.spec";
+import EventTests from "./event.spec";
 
 describe("Adapter Integration Tests", () => {
     const args = {
@@ -20,7 +21,8 @@ describe("Adapter Integration Tests", () => {
         args.groupName = configGroupName;
     });
 
-    // describe("Candidate Lifecycle", CandidateTests(args));
-    // describe("Administration", AdminTests(args));
+    describe("Candidate Lifecycle", CandidateTests(args));
+    describe("Administration", AdminTests(args));
     describe("Schedule Generation", ScheduleTests(args));
+    describe("Event Creation and Deletion", EventTests(args));
 });

@@ -55,8 +55,6 @@ const CandidateTests = args => () => {
         });
     });
 
-    // isValidCandidateID is unused
-
     context("getCandidates, getCandidateById", () => {
         it("should fail on invalid authentication", async () => {
             const {success} = await adapter.getCandidates(that.INVALID_TOKEN);
