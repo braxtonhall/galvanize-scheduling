@@ -126,6 +126,7 @@ const Scheduling: React.FC = () => {
 								candidates={candidates}
 								selected={selectedCandidate}
 								actions={[{text: "Select", color: "primary", onClick: selectCandidate}]}
+								noCandidatesMessage="There are no candidates that are eligible for scheduling."
 							/>
 						</Fade>
 					</Col>
