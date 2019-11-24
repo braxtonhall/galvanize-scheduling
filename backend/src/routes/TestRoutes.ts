@@ -13,6 +13,14 @@ if (!config.get(ConfigKey.production)) {
 			if (secret === config.get(ConfigKey.testSecretKey)) {
 				Log.warn("WARNING: A new authorization is being saved. TEST ONLY code.");
 				await AuthController.getInstance().saveAuth(token);
+				Config.getInstance().set(
+					ConfigKey.msEmailEndpoint,
+					"/users/test-integration@ph14solutions.onmicrosoft.com/sendMail"
+				);
+				Config.getInstance().set(
+					ConfigKey.msScheduleEndpoint,
+					"/users/test-integration@ph14solutions.onmicrosoft.com/calendar/getSchedule"
+				);
 				res.sendStatus(200)
 			} else {
 				res.sendStatus(401);

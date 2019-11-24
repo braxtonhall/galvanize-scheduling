@@ -19,14 +19,6 @@ describe("Adapter Integration Tests", () => {
     before(async () => {
         args.token = await createTestToken();
         args.groupName = configGroupName;
-        Config.getInstance().set(
-            ConfigKey.msEmailEndpoint,
-            "/users/test-integration@ph14solutions.onmicrosoft.com/sendMail"
-        );
-        Config.getInstance().set(
-            ConfigKey.msScheduleEndpoint,
-            "/users/test-integration@ph14solutions.onmicrosoft.com/calendar/getSchedule"
-        );
     });
 
     describe("Candidate Lifecycle", CandidateTests(args));
