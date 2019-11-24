@@ -112,7 +112,7 @@ export function clipNonWorkingHours(availability: interfaces.IAvailability): int
 			end: end.toISOString()
 		});
 	}
-	return filtered_availability;
+	return availability;
 }
 
 function findOverlappingTime(...avail: interfaces.IAvailability[]): interfaces.IAvailability {

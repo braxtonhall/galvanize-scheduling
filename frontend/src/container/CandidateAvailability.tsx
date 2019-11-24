@@ -82,51 +82,62 @@ const CandidateAvailability: React.FC = (props) => {
 		<Container>
 			{
 				candidate &&
-					candidate.schedule ?
-						<Fade bottom>
-							<Card className="mt-4">
-								<CardHeader>Candidate Schedule</CardHeader>
-								<CardBody>
-									{candidate.firstName && <CardTitle><h5>Hello {candidate.firstName},</h5></CardTitle>}
-									<CardText>You have been booked for an interview. Please see the following information...</CardText>
-									<Row>
-										{candidate.schedule.map(createScheduleCard)}
-									</Row>
-								</CardBody>
-							</Card>
-						</Fade>
-					:
-						<Fade bottom>
-							<Card className="mt-4">
-								<CardHeader>Candidate Availability</CardHeader>
-								<CardBody>
-									{candidate.firstName && <CardTitle><h5>Hello {candidate.firstName},</h5></CardTitle>}
-									{!submitted ?
-										<React.Fragment>
-											<CardSubtitle>
-												Please submit your available schedule so we can book a time with our interviewers.
-											</CardSubtitle>
-											<hr/>
-											<AvailableTimes
-												onChange={onChange}
-												height="50vh"
-												initialSelections={mapAvailabilityToInitial(candidate.availability)}
-											/>
-											<Button className="mt-3" onClick={submitAvailability} color="primary" disabled={availability.length < 1}>
-												Submit Availability
-											</Button>
-										</React.Fragment> :
-										<CardText>Thank you for submitting your availability, you may now close this page.</CardText>
-									}
-								</CardBody>
-								{
-									candidate.availability && !submitted &&
-									<CardFooter>
-										You have already submitted an availability! by submitting another, you will override your previous entry.
-									</CardFooter>
-								}
-							</Card>
-						</Fade>
+					<React.Fragment>
+						{
+							candidate.schedule ?
+								<Fade bottom>
+									<Card className="mt-4">
+										<CardHeader>Candidate Schedule</CardHeader>
+										<CardBody>
+											{candidate.firstName &&
+											<CardTitle><h5>Hello {candidate.firstName},</h5></CardTitle>}
+											<CardText>You have been booked for an interview. Please see the following
+												information...</CardText>
+											<Row>
+												{candidate.schedule.map(createScheduleCard)}
+											</Row>
+										</CardBody>
+									</Card>
+								</Fade>
+								:
+								<Fade bottom>
+									<Card className="mt-4">
+										<CardHeader>Candidate Availability</CardHeader>
+										<CardBody>
+											{candidate.firstName &&
+											<CardTitle><h5>Hello {candidate.firstName},</h5></CardTitle>}
+											{!submitted ?
+												<React.Fragment>
+													<CardSubtitle>
+														Please submit your available schedule so we can book a time with
+														our interviewers.
+													</CardSubtitle>
+													<hr/>
+													<AvailableTimes
+														onChange={onChange}
+														height="50vh"
+														initialSelections={mapAvailabilityToInitial(candidate.availability)}
+													/>
+													<Button className="mt-3" onClick={submitAvailability}
+															color="primary" disabled={availability.length < 1}>
+														Submit Availability
+													</Button>
+												</React.Fragment> :
+												<CardText>Thank you for submitting your availability, you may now close
+													this page.</CardText>
+											}
+										</CardBody>
+										{
+											candidate.availability && !submitted &&
+											<CardFooter>
+												You have already submitted an availability! by submitting another, you
+												will override your previous entry.
+											</CardFooter>
+										}
+									</Card>
+								</Fade>
+						}
+					</React.Fragment>
 			}
 		</Container>
 	);
