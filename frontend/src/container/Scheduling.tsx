@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from "react";
-import {Col, Container, Row} from "reactstrap";
+import {Button, Card, CardBody, CardHeader, CardText, Col, Container, Modal, Row} from "reactstrap";
 import CandidateList from "../component/CandidateList";
 import adapter from "../services/Adapter";
 import Context from "../services/Context";
@@ -22,9 +22,15 @@ const Scheduling: React.FC = () => {
 	const [selectedCandidate, updateSelectedCandidate] = useState<ICandidate>();
 	const [schedules, updateSchedules] = useState<ISchedule[]>();
 	const [selectedSchedule, updateSelectedSchedule] = useState<ISchedule>();
+	const [modalOpen, updateModalOpen] = useState(false);
 
 	useEffect(() => {refreshCandidates().then()}, []);
 	useEffect(() => {selectedCandidate && refreshInterviewers().then()}, [JSON.stringify(selectedCandidate)]);
+
+	async function closeModal() {
+		updateModalOpen(false);
+		await refreshCandidates();
+	}
 
 	function selectSchedule(schedule) {
 		updateSelectedSchedule(schedule);
@@ -39,8 +45,8 @@ const Scheduling: React.FC = () => {
 			updateSchedules(undefined);
 			updateSelectedCandidate(undefined);
 			updateSelectedSchedule(undefined);
-			await refreshCandidates();
-			setTimeout(endLoadingProcess, 500);
+			endLoadingProcess();
+			updateModalOpen(true);
 		} else if (error) {
 			endLoadingProcess({error});
 		} else {
@@ -105,63 +111,74 @@ const Scheduling: React.FC = () => {
 	}
 
 	return (
-		<Container className="mb-4">
-			<Row>
-				<Col md={12}>
-					<Fade left>
-						<CandidateList
-							candidates={candidates}
-							selected={selectedCandidate}
-							actions={[{text: "Select", color: "primary", onClick: selectCandidate}]}
-						/>
-					</Fade>
-				</Col>
-				{ selectedCandidate &&
-					<Col md={12}>
-						<Fade right>
-							<InterviewSelection
-								value={interviewerValue}
-								onChange={updateInterviewerValue}
-								actions={[{text: "Generate Schedules", onClick: refreshSchedules}]}
-								group={interviewerGroup}
-								onChangeGroup={updateInterviewerGroup}
-								refresh={refreshInterviewers}
-							/>
-						</Fade>
-					</Col>
-				}
-				{
-					schedules &&
+		<React.Fragment>
+			<Container className="mb-4">
+				<Row>
 					<Col md={12}>
 						<Fade left>
-							<ScheduleView
-								schedules={schedules}
-								onSelect={selectSchedule}
+							<CandidateList
+								candidates={candidates}
+								selected={selectedCandidate}
+								actions={[{text: "Select", color: "primary", onClick: selectCandidate}]}
 							/>
 						</Fade>
 					</Col>
-				}
+					{ selectedCandidate &&
+						<Col md={12}>
+							<Fade right>
+								<InterviewSelection
+									value={interviewerValue}
+									onChange={updateInterviewerValue}
+									actions={[{text: "Generate Schedules", onClick: refreshSchedules}]}
+									group={interviewerGroup}
+									onChangeGroup={updateInterviewerGroup}
+									refresh={refreshInterviewers}
+								/>
+							</Fade>
+						</Col>
+					}
+					{
+						schedules &&
+						<Col md={12}>
+							<Fade left>
+								<ScheduleView
+									schedules={schedules}
+									onSelect={selectSchedule}
+								/>
+							</Fade>
+						</Col>
+					}
+					{
+						selectedSchedule &&
+						<Col md={12}>
+							<Fade right>
+								<ScheduleActions
+									schedule={selectedSchedule}
+									actions={[{text: "Schedule & Send Emails", onClick: confirmSchedule}]}
+								/>
+							</Fade>
+						</Col>
+					}
+				</Row>
 				{
-					selectedSchedule &&
-					<Col md={12}>
-						<Fade right>
-							<ScheduleActions
-								schedule={selectedSchedule}
-								actions={[{text: "Schedule & Send Emails", onClick: confirmSchedule}]}
-							/>
-						</Fade>
-					</Col>
+					!selectedSchedule &&
+						<React.Fragment>
+							<br/>
+								<div className="p-5"/>
+							<br/>
+						</React.Fragment>
 				}
-			</Row>
-			{
-				!selectedSchedule &&
-					<React.Fragment>
-						<br/>
-							<div className="p-5"/>
-						<br/>
-					</React.Fragment>
-			}
-		</Container>
+			</Container>
+			<Modal isOpen={modalOpen}>
+				<Card>
+					<CardHeader>Booked</CardHeader>
+					<CardBody>
+						<CardText>You have successfully scheduled the candidate. All respective parties will have received invites.</CardText>
+						<Button className="mt-4" color="primary" onClick={closeModal}>Okay</Button>
+					</CardBody>
+				</Card>
+			</Modal>
+		</React.Fragment>
 	);
 };
 
