@@ -29,11 +29,13 @@ const CandidateMenu: React.FC = () => {
 	const [selectedCandidate, updateSelectedCandidate] = useState<ICandidate>();
 	const [title, updateTitle] = useState<string>();
 	const [deleteCandidateSelected, updateDeleteCandidateSelected] = useState<ICandidate>();
+	const [cancelMeetingsCandidate, updateCancelMeetingsCandidate] = useState<ICandidate>();
 	const [description, updateDescription] = useState<string>();
 	const [buttons, updateButtons] = useState<Array<{text: string, onClick: (candidate: ICandidate) => (void | Promise<void>)}>>();
 	const actions: Array<{text: string, color: string, onClick: (candidate: ICandidate) => (void | Promise<void>), disabled?: (candidate: ICandidate) => boolean}> = [
 		{text: "Select", onClick: selectCandidate, color: "primary"},
 		{text: "Send Availability", onClick: sendAvailabilityEmail, color: "primary", disabled: (c) => c.schedule !== undefined},
+		{text: "Cancel Meetings", onClick: selectCancelMeetings, color: "danger", disabled: (c) => c.schedule === undefined},
 		{text: "Delete", onClick: selectDeleteCandidate, color: "danger"},
 	];
 
@@ -48,6 +50,10 @@ const CandidateMenu: React.FC = () => {
 
 	function selectDeleteCandidate(candidate: ICandidate): void {
 		updateDeleteCandidateSelected(candidate);
+	}
+
+	function selectCancelMeetings(candidate: ICandidate): void {
+		updateCancelMeetingsCandidate(candidate);
 	}
 
 	async function sendAvailabilityEmail(candidate: ICandidate): Promise<void> {
@@ -84,6 +90,22 @@ const CandidateMenu: React.FC = () => {
 	}
 
 	// API calls
+	async function cancelMeetings(): Promise<void> {
+		startLoadingProcess();
+		// incase context is loss, prevents double pressing
+		const temp: ICandidate = {...deleteCandidateSelected};
+		updateDeleteCandidateSelected(undefined);
+		const {success, error} = await adapter.cancelSchedule(token, temp);
+		if (success) {
+			await refreshCandidates();
+			endLoadingProcess();
+		} else if (error) {
+			endLoadingProcess({error});
+		} else {
+			endLoadingProcess({error: "There was an error cancelling the meetings."})
+		}
+	}
+
 	async function deleteCandidate(): Promise<void> {
 		startLoadingProcess();
 		// incase context is loss, prevents double pressing
@@ -188,11 +210,21 @@ const CandidateMenu: React.FC = () => {
 			<Modal className="overflow-auto" isOpen={deleteCandidateSelected !== undefined} toggle={() => updateDeleteCandidateSelected(undefined)}>
 				<ModalHeader>Delete Candidate</ModalHeader>
 				<ModalBody>
-					Are you sure you want to delete this candidate?
+					Are you sure you want to delete this candidate? This will not cancel outlook events.
 				</ModalBody>
 				<ModalFooter>
 					<Button className="m-2" color="danger" onClick={deleteCandidate}>Yes, delete the Candidate.</Button>
 					<Button className="m-2" color="primary" onClick={() => updateDeleteCandidateSelected(undefined)}>Cancel</Button>
+				</ModalFooter>
+			</Modal>
+			<Modal className="overflow-auto" isOpen={cancelMeetingsCandidate !== undefined} toggle={() => updateCancelMeetingsCandidate(undefined)}>
+				<ModalHeader>Cancel Meetings</ModalHeader>
+				<ModalBody>
+					Are you sure you want to cancel the meetings for this candidate?
+				</ModalBody>
+				<ModalFooter>
+					<Button className="m-2" color="danger" onClick={cancelMeetings}>Yes, cancel the meetings.</Button>
+					<Button className="m-2" color="primary" onClick={() => updateCancelMeetingsCandidate(undefined)}>Cancel</Button>
 				</ModalFooter>
 			</Modal>
 		</Container>
