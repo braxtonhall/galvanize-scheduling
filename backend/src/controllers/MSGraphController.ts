@@ -138,7 +138,7 @@ export default class MSGraphController {
 			return client
 				.api(`/me/events`)
 				.post({
-					"subject": `Interview with ${schedule.candidate.firstName}`,
+					"subject": `Interview with ${schedule.candidate.firstName ? schedule.candidate.firstName : schedule.candidate.email}`,
 					"body": {
 						"contentType": "HTML",
 						"content": `Be ready to join ${schedule.candidate.firstName} in an interview for ${schedule.candidate.position ? schedule.candidate.position : "Galvanize"}.`
