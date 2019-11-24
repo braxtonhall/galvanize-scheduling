@@ -1,8 +1,7 @@
 import React from "react";
-import {ButtonGroup, Table} from 'reactstrap';
+import {ButtonGroup, CardText, Table} from 'reactstrap';
 import {Button, Card, CardBody, CardHeader} from "reactstrap";
 import {interfaces} from "adapter";
-import {Link} from "react-router-dom";
 
 type ICandidate = interfaces.ICandidate;
 
@@ -10,11 +9,12 @@ interface IProps {
 	candidates?: ICandidate[],
 	actions?: Array<{ text: string, color: string, onClick: (candidate: ICandidate) => (void | Promise<void>), disabled?: (candidate: ICandidate) => boolean }>
 	selected?: ICandidate,
+	noCandidatesMessage?: string,
 }
 
 const CandidateList: React.FC<IProps> = (props: IProps) => {
 
-	const {candidates, actions, selected} = props;
+	const {candidates, actions, selected, noCandidatesMessage} = props;
 
 	function makeRow(candidate: ICandidate, index: number): JSX.Element {
 		const {id, email, phoneNumber, firstName, lastName, position, schedule} = candidate;
@@ -26,6 +26,10 @@ const CandidateList: React.FC<IProps> = (props: IProps) => {
 			}
 
 			const _disabled = disabled ? disabled(candidate) : false;
+
+			if (_disabled) {
+				return null;
+			}
 
 			return (
 				<Button onClick={onClickWrapper} size="sm" color={color} key={"candidate_button_" + k} disabled={_disabled}>{text}</Button>)
@@ -54,24 +58,28 @@ const CandidateList: React.FC<IProps> = (props: IProps) => {
 		<Card className="mt-4">
 			<CardHeader>Candidates List</CardHeader>
 			<CardBody>
-				<div className="table-responsive">
-					<Table hover>
-						<thead>
-						<tr>
-							<th>Email</th>
-							<th>Phone Number</th>
-							<th>First Name</th>
-							<th>Last Name</th>
-							<th>Position</th>
-							<th>Candidate URL</th>
-							<th>Actions</th>
-						</tr>
-						</thead>
-						<tbody>
-						{candidates.map(makeRow)}
-						</tbody>
-					</Table>
-				</div>
+				{candidates.length > 0 ?
+					<div className="table-responsive">
+						<Table hover>
+							<thead>
+							<tr>
+								<th>Email</th>
+								<th>Phone Number</th>
+								<th>First Name</th>
+								<th>Last Name</th>
+								<th>Position</th>
+								<th>Candidate URL</th>
+								<th>Actions</th>
+							</tr>
+							</thead>
+							<tbody>
+							{candidates.map(makeRow)}
+							</tbody>
+						</Table>
+					</div>
+				 :
+					<CardText>{noCandidatesMessage}</CardText>
+				}
 			</CardBody>
 		</Card>
 	)
@@ -88,6 +96,7 @@ function emptyEntry(i: string): string {
 CandidateList.defaultProps = {
 	candidates: [],
 	actions: [],
+	noCandidatesMessage: "There are currently no candidates.",
 };
 
 export default CandidateList
