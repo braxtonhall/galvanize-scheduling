@@ -1,6 +1,7 @@
 import {Config, ConfigKey} from "../Config";
 import {app} from "../index";
 import AuthController from "../controllers/AuthController";
+import Log from "../Log";
 
 const config = Config.getInstance();
 
@@ -10,7 +11,7 @@ if (!config.get(ConfigKey.production)) {
 		const token = req.body.token;
 		try {
 			if (secret === config.get(ConfigKey.testSecretKey)) {
-				console.warn("WARNING: A new authorization is being saved. TEST ONLY code.");
+				Log.warn("WARNING: A new authorization is being saved. TEST ONLY code.");
 				await AuthController.getInstance().saveAuth(token);
 				res.sendStatus(200)
 			} else {

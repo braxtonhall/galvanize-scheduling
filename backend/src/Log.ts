@@ -1,5 +1,3 @@
-import {Config, ConfigKey} from "./Config";
-
 enum LogLevel {
 	TRACE,
 	INFO,
@@ -10,7 +8,7 @@ enum LogLevel {
 
 let LOG_LEVEL: LogLevel;
 
-switch ((Config.getInstance().get(ConfigKey.logLevel) || "").toUpperCase()) {
+switch ((process.env.LOG_LEVEL || "").toUpperCase()) {
 	case "TRACE":
 		LOG_LEVEL = LogLevel.TRACE;
 		break;
