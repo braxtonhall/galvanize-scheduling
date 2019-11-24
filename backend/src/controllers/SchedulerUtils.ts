@@ -33,11 +33,11 @@ const DEFAULT_WORKING_HOURS = {
 };
 
 const WEEKDAYS = {
-	monday: 0,
-	tuesday: 1,
-	wednesday: 2,
-	thursday: 3,
-	friday: 4
+	monday: 1,
+	tuesday: 2,
+	wednesday: 3,
+	thursday: 4,
+	friday: 5
 };
 
 function tookHuman(start: number): string {
@@ -92,11 +92,11 @@ export function clipNonWorkingHours(availability: interfaces.IAvailability, work
 		if (startTime.toISOString() > endTime.toISOString()) {
 			continue;
 		}
-		// add initial time to set
+		// add initial date to set
 		if (workingDay.includes(startTime.getDay())) {
 			dates.add(`${startTime.getFullYear()}-${startTime.getMonth()+1}-${startTime.getDate()}`)
 		}
-		// add end time to set -> if end time is in there -> set does not add
+		// add end date to set -> if end time is in there -> set does not add
 		if (workingDay.includes(endTime.getDay())) {
 			dates.add(`${endTime.getFullYear()}-${endTime.getMonth()+1}-${endTime.getDate()}`)
 		}
@@ -106,16 +106,14 @@ export function clipNonWorkingHours(availability: interfaces.IAvailability, work
 	// create array of times
 	for (let date of dates) {
 		let start = new Date(`${date}T${workingHours.startTime}`);
-		start.setHours(start.getHours() + 8);
 		let end = new Date(`${date}T${workingHours.endTime}`);
-		end.setHours(end.getHours() + 8);
 		availableSlots.push({
 			start: start.toISOString(),
 			end: end.toISOString()
 		})
 	}
 	// find and return overlapping times
-	return findOverlappingTime([...availability, ...availableSlots]);
+	return findOverlap(availability, availableSlots);
 }
 
 function findOverlappingTime(...avail: interfaces.IAvailability[]): interfaces.IAvailability {
@@ -282,8 +280,9 @@ function makeOneSchedule(candidate: interfaces.ICandidate, rooms: RoomAvail[], g
 					// while there are members in the group
 					while (preferenceIndex < group.length) {
 						// if can't schedule around beginning of timeslot
-						if (findOverlappingTime([timeslot], ...group.slice(preferenceIndex).map(p => p.availability))[0].start !== timeslot.start &&
-							room.room.capacity > group.length - groupIndex
+						const overlap = findOverlappingTime([timeslot], ...group.slice(preferenceIndex).map(p => p.availability));
+						if (overlap.length === 0 || overlap[0].start !== timeslot.start ||
+							room.room.capacity < group.length - groupIndex + 1
 						) {
 							// kick someone out of the group
 							preferenceIndex++;
