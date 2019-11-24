@@ -39,6 +39,16 @@ const createTestToken = async () => {
             {"token": msToken},
             {headers: {"token": testSecretKey, "Content-Type": "application/json"}}
         );
+        await axios.post(
+            "http://localhost:8080/setconfig",
+            {"key": "emailEndpoint", "value": "/users/test-integration@ph14solutions.onmicrosoft.com/sendMail"},
+            {headers: {"token": testSecretKey, "Content-Type": "application/json"}}
+        );
+        await axios.post(
+            "http://localhost:8080/setconfig",
+            {"key": "getScheduleEndpoint", "value": "/users/test-integration@ph14solutions.onmicrosoft.com/calendar/getSchedule"},
+            {headers: {"token": testSecretKey, "Content-Type": "application/json"}}
+        );
         return msToken;
     } catch (error) {
         if (error.response && error.response.status === 401) {

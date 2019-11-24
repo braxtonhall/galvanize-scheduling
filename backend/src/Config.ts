@@ -67,8 +67,10 @@ export class Config {
 				[ConfigKey.msOAuthMetaData]: 		  process.env.OAUTH_ID_METADATA,
 				[ConfigKey.msOAuthAuthorizeEndpoint]: process.env.OAUTH_AUTHORIZE_ENDPOINT,
 				[ConfigKey.msOAuthTokenEndpoint]: 	  process.env.OAUTH_TOKEN_ENDPOINT,
-				[ConfigKey.msEmailEndpoint]:		  process.env.EMAIL_ENDPOINT,
-				[ConfigKey.msScheduleEndpoint]:		  process.env.GET_SCHEDULE_ENDPOINT,
+				// These two config options are hardcoded because they should always be these values
+				//    unless they are being overridden by the tests
+				[ConfigKey.msEmailEndpoint]:		  "/me/sendMail",
+				[ConfigKey.msScheduleEndpoint]:		  "/me/calendar/getSchedule",
 				
 				// Internal
 				[ConfigKey.interviewerGroupName]: process.env.INTERVIEWER_GROUP_NAME,

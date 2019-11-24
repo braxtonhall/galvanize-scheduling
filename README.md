@@ -3,6 +3,7 @@
 Created by pH14 Solutions for Galvanize and UBC's CPSC 319 2019W1.
 
 pH14 Solutions consists of:
+
 - Andrea Tamez
 - Braxton Hall
 - Cindy Hsu
@@ -10,11 +11,155 @@ pH14 Solutions consists of:
 - Kwangsoo Yeo
 - Masahiro Toyomura
 
+## Using the Interview Scheduler
+
+### Website Walkthrough
+
+### API
+**Endpoints**
+****
+All authorized routes require the request header `token`, which should be set to the authenticated token provided by the login process.
+
+- **_Candidates_**
+  - **`GET    /resource/candidate`**
+	  - The request body should be JSON object that contains the field `id` paired with the id of the candidate to be fetched.
+	  - If successful, response status will be set to `200`.
+		  - If the request was authenticated, an `ICandidate` will be returned.
+		  - If the request was not authenticated but there was a Candidate matching that ID in the system, an `ICandidate` will be returned, but all fields will be trimmed except for `firstName`, `availability` and `schedule`.
+	  - Else, response status will be set to `404`.
+  - **`GET    /resource/candidates`**
+	 - If successful, response status will be set to `200`, and a JSON array of every `ICandidate` in the system will be returned.
+	 - If the user is not authenticated, response status will be set to `401`.
+	 - If unsuccessful for any other reason, response status will be set to `400`.
+  - **`POST   /resource/candidate`**
+ 	 - Saves an `ICandidate` to the database. The request body data should be set to the `ICandidate` to be saved. The `email` field is required and must be a valid email string. If no `id` field is present, one will be generated. The `id` will be a minimum six character hash of an atomic counter in the database concatenated with a 32 character random string.
+ 	 - If successful, the response status will be set to `200`, and the response will contain the `ICandidate` that was saved to the database.
+ 	 - If the user is not authenticated, response status will be set to `401`.
+ 	 - If unsuccessful for any other reason, response status will be set to `400`.
+   - **`DELETE /resource/candidate`**
+     - The request body should be JSON object that contains the field `id` paired with the id of the candidate to be deleted from the database.
+     - If successful, the responds with `200 true`.
+ 	 - If the user is not authenticated, response status will be set to `401`.
+ 	 - If unsuccessful for any other reason, response status will be set to `400`.
+- **_Rooms_**
+  - **`GET    /resource/rooms`**
+  	 - If successful, response status will be set to `200`, and a JSON array of `IRoom` objects representing every room registered with Galvanize's Enterprise account will be returned. The field `eligible` will be set to `true` if the primary key of the room was saved in the database, and `false` otherwise. The `eligible` field marks whether or not a room will be considered in the scheduling process.
+	 - If the user is not authenticated, response status will be set to `401`.
+	 - If unsuccessful for any other reason, response status will be set to `400`.
+  - **`POST   /resource/room`** 
+  	 - Saves the primary key of an `IRoom` to the database. The request body data should be set to the `IRoom` whose key is to be saved. This decides the eligibility of the room in the scheduling process. The `id` field is required.
+ 	 - If successful, the response status will be set to `200`, and the response will contain the `ICandidate` that was saved to the database.
+ 	 - If the user is not authenticated, response status will be set to `401`.
+ 	 - If unsuccessful for any other reason, response status will be set to `400`.
+  - **`DELETE /resource/room`**
+     - The request body should be JSON object that contains the field `id` paired with the id of the room whose key is to be deleted from the database. This decides the eligibility of the room in the scheduling process.
+     - If successful, the responds with `200 true`.
+ 	 - If the user is not authenticated, response status will be set to `401`.
+ 	 - If unsuccessful for any other reason, response status will be set to `400`.
+- **_Interviewers_**
+  - **`GET    /resource/interviewers`**
+	  - If successful, response status will be set to `200`, and a JSON array of `IInterviewer` objects representing every employee registered with Galvanize's Enterprise account in the group denoted by `groupName` will be returned. `groupName` is to be set in the request query, specifies which group in Outlook to retrieve members from. `groupName` is not set, the system will default to its environment's `INTERVIEWER_GROUP_NAME`, described further below and in `.env.sample`.
+	  - If the user is not authenticated, response status will be set to `401`.
+ 	 - If unsuccessful for any other reason, response status will be set to `400`.
+- **_Schedules_**
+  - **`GET    /resource/schedules`**
+	 - Calculates viable schedules and returns them. The query should be set to a valid `IGetSchedulesOptions` object. There may be cycles and chains in the `preferences` array, as the system will attempt to group everyone in the cycle/chain together into one interview. However, having mismatched minutes within a cycle/chain may lead to undefined behaviour.
+  	 - If successful, response status will be set to `200`, and a JSON array of up to three `ISchedule` objects will be returned.
+  	 	 - The calendars and individual working hours of every room and interviewer are compared with the availability of the supplied `ICandidate`.
+  	 	 - Every room marked `eligible` is then scored by their averave overlap with interviewers' schedules, their largest timeslot length, their capacity, and their average timeslot length.
+  	 	 - Rooms are then selected in the order of their scores at the privous step and are filled up with iterviews back to back if possible, and a break is inserted every four hours of consecutive interviews.
+  	 	 - Ten schedules are generated with slight variation in inputs and parameters. Then the schedule with the fewest room switches, the schedule with the most interviewers actually places, and the schedule that does the best across both categories are all returned (if any viable schedules were found at all).
+  	 - If the user is not authenticated, response status will be set to `401`.
+ 	 - If unsuccessful for any other reason, response status will be set to `400`.
+  - **`POST   /resource/schedule`**
+	  - Saves the provided `ISchedule` timeslots to the `ICandidate`, emails the candidate, alerting them that the schedule has been made, and books an events for every meeting with each interviewer and room on the Outlook Enterprise account.
+	  - The request body should be set to the `ISchedule` to save.
+	  - If successful, the response status will be set to `200`.
+ 	 - If the user is not authenticated, response status will be set to `401`.
+ 	 - If unsuccessful for any other reason, response status will be set to `400`.
+  - **`DELETE /resource/schedule`**
+     - Cancels the specified candidate's schedule. An email is sent to the candidate, alerting them of the cancellation, and every event with the candidate on the Outlook Enterprise account is cancelled.
+     - The request body should be JSON object that contains the field `id` paired with the id of the candidate whose schedule is to be cancelled.
+     - If successful, the response status will be set to `200`.
+ 	 - If the user is not authenticated, response status will be set to `401`.
+ 	 - If unsuccessful for any other reason, response status will be set to `400`.
+- **_Availability_**
+  - **`POST   /submitavailability`**
+  - **`POST   /sendavailability`**
+- **_Authorization_**
+  - **`GET    /login`**
+  - **`POST   /authenticate`**
+  - **`GET    /logout`**
+- **_Misc_**
+  - **`GET    /health`**
+  - **`POST   /saveauth`**
+
+**Types**
+****
+```typescript
+interface ICandidate {
+	email: string;
+	id?: string;
+	phoneNumber?: string;
+	firstName?: string;
+	lastName?: string;
+	position?: string;
+	notes?: string;
+	availability?: ITimeslot[];
+	schedule?: ITimeslot[];
+}
+
+interface IRoom {
+	id: string;
+	name: string,
+	eligible: boolean;
+	email: string;
+	capacity: number;
+}
+
+interface IInterviewer {
+	id: string;
+	email: string;
+	firstName: string;
+	lastName: string;
+}
+
+interface ISchedule {
+	candidate: ICandidate;
+	meetings: IMeeting[];
+}
+
+interface IGetSchedulesOptions {
+	preferences: IPreference[];
+	candidate: ICandidate;
+}
+
+interface IPreference {
+	interviewer: IInterviewer;
+	preference?: IInterviewer;
+	minutes: number;
+}
+
+interface ITimeslot {
+	start: string; // ISO formatted time
+	end: string;   // ISO formatted time
+	note?: string;
+	// note may include a room number for the ICandidate schedule
+}
+
+interface IMeeting extends ITimeslot {
+	interviewers: IInterviewer[];
+	room: IRoom;
+}
+```
+
 ## Configuration
 
 ### Outlook Setup
 
-Ensure you have added a your employees who are candidates for conducting an interview to the Group `Interviewers`.
+Ensure you have added a your employees who are candidates for conducting an interview together in an Office group. The recommended group name is `Interviewers`.
+
+### Environment
 
 ## Deployment
 
@@ -52,7 +197,6 @@ In Webstorm, create an attachment run configuration with `localhost`on port `922
 to run tests:
 `npm run test:backend`
 #### Integration Tests
-- Complete the fields marked with `#change` in your `.env` file, using values associated with the app in your test instance of Active Directory (found in the admin portal)
 - If you already have an instance of the backend running: `npm run test:adapter`
 - If you would like to do startup + teardown: `npm run test:integration`. You may have to stop existing containers first (`npm run stop-backend`).
 

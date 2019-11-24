@@ -20,7 +20,7 @@ app.get(nodeAdapter.urls.CANDIDATES, async (req, res) => {
 			res.sendStatus(401);
 		}
 	} catch(e) {
-		res.status(e.statusCode).send(e.message);
+		res.status(400).send(e.message);
 	}
 });
 
@@ -65,7 +65,7 @@ app.get(nodeAdapter.urls.ROOMS, async (req, res) => {
 			res.sendStatus(401);
 		}
 	} catch(e) {
-		res.status(e.statusCode).send(e.message);
+		res.status(400).send(e.message);
 	}
 });
 
@@ -110,7 +110,7 @@ app.get(nodeAdapter.urls.INTERVIEWERS, async (req, res) => {
 			res.sendStatus(401);
 		}
 	} catch(e) {
-		res.status(e.statusCode).send(e.message);
+		res.status(400).send(e.message);
 	}
 });
 
