@@ -177,7 +177,7 @@ export default class MSGraphController {
 		const client: Client = this.getClient(token);
     	return Promise.all(events.map(e => {
 			return client
-				.api(`/me/events/${""}`)
+				.api(`/me/events/${e}`)
 				.delete();
 		}))
 	}
