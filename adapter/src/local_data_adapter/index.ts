@@ -30,13 +30,6 @@ const adapter: IAPIAdapter = {
 		}
 		return {success: true, data: tokens.has(token)};
 	},
-	async saveToken(token: string): Promise<IAPIResponse<boolean>> {
-		await wait();
-		if (!checkToken(token)) {
-			return {success: false, error: tokenErrorMessage}
-		}
-		return {success: true, data: tokens.has(token)};
-	},
 	async confirmSchedule(token: string, schedule: ISchedule): Promise<IAPIResponse> {
 		await wait();
 		if (!checkToken(token)) {
@@ -94,10 +87,6 @@ const adapter: IAPIAdapter = {
 		await wait();
 		return {success: true, data: true};
 	},
-	async isValidCandidateID(candidateID: string): Promise<IAPIResponse<boolean>> {
-		await wait();
-		return {success: true, data: candidates.has(candidateID)};
-	},
 	async logout(token: string): Promise<IAPIResponse> {
 		await wait();
 		tokens.delete(token);
@@ -152,9 +141,6 @@ const adapter: IAPIAdapter = {
 		}
 		rooms.set(room.id, cloneDeep(room));
 		return {success: true}
-	},
-	getTokenFromURL(url: string): string {
-		return "";
 	},
 	loginRedirectURL(): string {
 		return "";

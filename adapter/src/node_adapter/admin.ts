@@ -3,6 +3,7 @@ import {fullURLs} from "./urls";
 import axios from "axios";
 import {ICandidate, IGetSchedulesOptions, IInterviewer, IRoom, ISchedule} from "../interfaces";
 import CandidateOps from "./candidate"
+import moment from "moment";
 
 export default {
     getCandidates: async(token: string) : Promise<IAPIResponse<ICandidate[]>> => {
@@ -78,10 +79,30 @@ export default {
     },
     getSchedules: async(token: string, options: IGetSchedulesOptions) : Promise<IAPIResponse<ISchedule[]>> => {
         try {
-            const {status, data} = await axios.get(fullURLs.GET_SCHEDULES, {headers: {token, "Content-Type": "application/json"}, params: options});
+            const {status, data} = await axios.get(fullURLs.SCHEDULES, {headers: {token, "Content-Type": "application/json"}, params: options});
+            for (let i = 0; i < data.length; i++) {
+                data[i].meetings = data[i].meetings.map(m => ({...m, start: moment(m.start), end: moment(m.end)}));
+            }
             return {success: status === 200, data};
-        } catch {
+        } catch (error) {
+            console.log("big err", error);
             return {success: false};
         }
     },
+    confirmSchedule: async(token: string, schedule: ISchedule): Promise<IAPIResponse> => {
+        try {
+            const {status, data} = await axios.post(fullURLs.SCHEDULE, {data: schedule}, {headers: {token, "Content-Type": "application/json"}});
+            return {success: status === 200, data};
+        } catch {
+            return {success: false}
+        }
+    },
+    cancelSchedule: async(token: string, candidate: ICandidate): Promise<IAPIResponse> => {
+        try {
+            const {status} = await axios.delete(fullURLs.SCHEDULE, {data: {id: candidate.id}, headers: {token, "Content-Type": "application/json"}});
+            return {success: status === 200};
+        } catch (e) {
+            return {success: false}
+        }
+    }
 }

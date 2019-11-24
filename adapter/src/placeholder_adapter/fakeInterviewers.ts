@@ -36,14 +36,14 @@ export const fakeSchedules: ISchedule[] = [
 		meetings: [
 			{
 				interviewers: [fakeInterviewers[0], fakeInterviewers[1]],
-				startTime: moment().startOf("day").add(10, "hour"),
-				endTime: moment().startOf("day").add(11, "hour"),
+				start: moment().startOf("day").add(10, "hour"),
+				end: moment().startOf("day").add(11, "hour"),
 				room: fakeRooms[0],
 			},
 			{
 				interviewers: [fakeInterviewers[2]],
-				startTime: moment().startOf("day").add(11, "hour"),
-				endTime: moment().startOf("day").add(11.5, "hour"),
+				start: moment().startOf("day").add(11, "hour"),
+				end: moment().startOf("day").add(11.5, "hour"),
 				room: fakeRooms[1],
 			},
 		]
@@ -53,8 +53,8 @@ export const fakeSchedules: ISchedule[] = [
 		meetings: [
 			{
 				interviewers: [fakeInterviewers[0], fakeInterviewers[1]],
-				startTime: moment().startOf("day").add(13.5, "hour"),
-				endTime: moment().startOf("day").add(14.5, "hour"),
+				start: moment().startOf("day").add(13.5, "hour"),
+				end: moment().startOf("day").add(14.5, "hour"),
 				room: fakeRooms[2],
 			},
 		]

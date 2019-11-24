@@ -3,12 +3,9 @@ import 'isomorphic-fetch';
 import {interfaces} from "adapter";
 import {Config, ConfigKey} from "../Config";
 import {clipNonWorkingHours, concatenateMoments} from "./SchedulerUtils";
-import {IScheduleAvailabilities} from "./Common";
+import {IScheduleAvailabilities, Preference} from "./Common";
 
 export default class MSGraphController {
-	private static readonly HOUR_REGEX = /(?<=T)[0-9]{2}(?=:)/;
-	private static readonly MINUTE_REGEX = /(?<=:)[0-9]{2}(?=:)/;
-
     private static getClient(token: string): Client {
         return Client.init({
             authProvider: (done) => {
@@ -67,48 +64,50 @@ export default class MSGraphController {
     	token: string,
     	candidate: interfaces.ICandidate,
 		rooms: Array<interfaces.IRoom>,
-		interviewers: Array<interfaces.IInterviewer>
+		interviewers: Array<Preference>
 	): Promise<IScheduleAvailabilities> {
     	try {
     		let email_type = {};
 			let availability_map = new Map<string, interfaces.IAvailability>();
-			let object_map = new Map<string, interfaces.IResource>();
+			let object_map = new Map<string, any>();
 			const request_array = rooms.map(r => {
 				email_type[r.email] = 'room';
 				object_map.set(r.email, r);
 				availability_map.set(r.email, []);
 				return r.email;
 			}).concat(interviewers.map(i => {
-				email_type[i.email] = 'interviewer';
-				availability_map.set(i.email, []);
-				object_map.set(i.email, i);
-				return i.email;
+				email_type[i.interviewer.email] = 'interviewer';
+				availability_map.set(i.interviewer.email, []);
+				object_map.set(i.interviewer.email, i);
+				return i.interviewer.email;
 			}));
 
 
-			for (let timeslot of clipNonWorkingHours(candidate.availability)) {
-				const availabilities = await this.getSchedule(token, this.scheduleRequest(
-					request_array,
-					// @ts-ignore
-					timeslot
-				));
+			for (let timeslot of candidate.availability) {
+				let floor = Math.floor(request_array.length / 20);
+				for (let i = 0; i < floor+1; i++) {
+					const availabilities = await this.getSchedule(token, this.scheduleRequest(
+						request_array.slice((i * 20), ((i + 1) * 20)),
+						// @ts-ignore
+						timeslot
+					));
+					for (let availability of availabilities) {
+						let date = new Date(timeslot.start.toString());
 
-				for (let availability of availabilities) {
-					let date = new Date(timeslot.start.toString());
-
-					for (let i = 0; i < availability.availabilityView.length; i++) {
-						let time: interfaces.IAvailability = {
-							// @ts-ignore
-							start: this.buildDate(date, 0),
-							end: this.buildDate(date)
-						};
-						if (availability.availabilityView.charAt(i) === '0') {
-							availability_map.set(
-								availability.scheduleId,
-								// @ts-ignore
-								[...availability_map.get(availability.scheduleId), time]
-							);
+						for (let i = 0; i < availability.availabilityView.length; i++) {
+							let time: interfaces.ITimeslot = {
+								start: this.buildDate(date, 0),
+								end: this.buildDate(date)
+							};
+							if (availability.availabilityView.charAt(i) === '0') {
+							   availability_map.get(availability.scheduleId).push(time);
+							}
 						}
+
+						availability_map.set(
+							availability.scheduleId,
+							clipNonWorkingHours(concatenateMoments(availability_map.get(availability.scheduleId)), availability.workingHours)
+						)
 					}
 				}
 			}
@@ -121,10 +120,9 @@ export default class MSGraphController {
 			for (let email of request_array) {
 				scheduleAvailabilities[`${email_type[email]}s`] = [...scheduleAvailabilities[`${email_type[email]}s`], {
 					[email_type[email]]: object_map.get(email),
-					availability: concatenateMoments(availability_map.get(email))
+					availability: availability_map.get(email)
 				}]
 			}
-
 			
 			return scheduleAvailabilities;
 
@@ -132,6 +130,57 @@ export default class MSGraphController {
     		console.log(e);
     		throw new Error(e);
 		}
+	}
+	
+	static async bookSchedule(token: string, schedule: interfaces.ISchedule): Promise<interfaces.ISchedule> {
+    	const client: Client = this.getClient(token);
+    	const promises: Promise<interfaces.IMeeting>[] = schedule.meetings.map(m => {
+			return client
+				.api(`/me/events`)
+				.post({
+					"subject": `Interview with ${schedule.candidate.firstName ? schedule.candidate.firstName : schedule.candidate.email}`,
+					"body": {
+						"contentType": "HTML",
+						"content": `Be ready ${schedule.candidate.firstName ? `to join ${schedule.candidate.firstName} in` : "for"} an interview for ${schedule.candidate.position ? schedule.candidate.position : "Galvanize"}.`
+					},
+					"start": {
+						"dateTime": typeof m.start === "string" ? m.start : m.start.toISOString(),
+						"timeZone": "UTC"
+					},
+					"end": {
+						"dateTime": typeof m.end === "string" ? m.end : m.end.toISOString(),
+						"timeZone": "UTC"
+					},
+					"location":{
+						"displayName": m.room.name
+					},
+					"attendees": m.interviewers.map(i => ({
+						"emailAddress": {
+							"address": i.email,
+							"name": `${i.firstName} ${i.lastName}`
+						},
+						"type": "required"
+					})).concat([{
+						"emailAddress": {
+							"address": m.room.email,
+							"name": m.room.name
+						},
+						"type": "required"
+					}])
+				})
+				.then(e => ({...m, id: e.id}));
+		});
+		schedule.meetings = await Promise.all(promises);
+		return schedule;
+	}
+	
+	static async deleteSchedule(token: string, events: string[]) {
+		const client: Client = this.getClient(token);
+    	return Promise.all(events.map(e => {
+			return client
+				.api(`/me/events/${e}`)
+				.delete();
+		}))
 	}
 
 	static scheduleRequest(request: Array<string>, timeslot: {start: string, end: string}, availabilityViewInterval: number = 15) {
@@ -154,9 +203,10 @@ export default class MSGraphController {
 		return startDate.toISOString();
 	}
 
-	static async sendAvailabilityEmail(token: string, content: any): Promise<any> {
+	static async sendEmail(token: string, content: any): Promise<string> {
         return (await (this.getClient(token))
             .api(Config.getInstance().get(ConfigKey.msEmailEndpoint))
             .post(content));
     }
 }
+

@@ -19,6 +19,7 @@ export interface ICandidate extends IResource {
 	position?: string,
 	notes?: string,
 	availability?: IAvailability
+	schedule?: IAvailability
 }
 
 export interface IInterviewer extends IResource {
@@ -27,19 +28,24 @@ export interface IInterviewer extends IResource {
 	lastName: string,
 }
 
-export interface ISchedule {
+export interface ISchedule extends IResource {
 	candidate: ICandidate
 	meetings: IMeeting[]
 }
 
-export interface IMeeting {
+export interface ITimeslot {
+	start: Moment | string;
+	end: Moment | string;
+	note?: string;
+	id?: string;
+}
+
+export interface IMeeting extends ITimeslot {
 	interviewers: IInterviewer[],
-	startTime: Moment,
-	endTime: Moment,
 	room: IRoom
 }
 
-export type IAvailability = Array<{start: Moment | string, end: Moment | string}>
+export type IAvailability = Array<ITimeslot>
 
 export interface IGetSchedulesOptions {
 	preferences: Array<{interviewer: IInterviewer, preference?: IInterviewer, minutes: number}>;
