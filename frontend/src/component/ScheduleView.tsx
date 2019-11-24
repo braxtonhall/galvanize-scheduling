@@ -26,7 +26,6 @@ const ScheduleView: React.FC<IProps> = (props: IProps) => {
 				<CardTitle><h5>Option #{index + 1}</h5></CardTitle>
 				{schedule.meetings.map(createMeeting)}
 				<Button onClick={select} color="primary">Select</Button>
-				{index !== schedules.length - 1 && <hr/>}
 			</Col>
 		)
 	}

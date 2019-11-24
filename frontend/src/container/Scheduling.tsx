@@ -15,7 +15,7 @@ type IInterviewer = interfaces.IInterviewer;
 
 const Scheduling: React.FC = () => {
 
-	const {token, updateContext, startLoadingProcess, endLoadingProcess} = useContext(Context);
+	const {token, scrollToBottom, startLoadingProcess, endLoadingProcess} = useContext(Context);
 	const [candidates, updateCandidates] = useState<ICandidate[]>([]);
 	const [interviewerValue, updateInterviewerValue] = useState<InterviewSelectionValue>();
 	const [interviewerGroup, updateInterviewerGroup] = useState<string>(process.env.REACT_APP_DEFAULT_GROUP);
@@ -26,6 +26,11 @@ const Scheduling: React.FC = () => {
 	useEffect(() => {refreshCandidates().then()}, []);
 	useEffect(() => {selectedCandidate && refreshInterviewers().then()}, [JSON.stringify(selectedCandidate)]);
 
+	function selectSchedule(schedule) {
+		updateSelectedSchedule(schedule);
+		setTimeout(scrollToBottom, 200);
+	}
+
 	async function confirmSchedule(schedule): Promise<void> {
 		startLoadingProcess();
 		const {success, error} = await adapter.confirmSchedule(token, schedule);
@@ -35,7 +40,7 @@ const Scheduling: React.FC = () => {
 			updateSelectedCandidate(undefined);
 			updateSelectedSchedule(undefined);
 			await refreshCandidates();
-			setTimeout(endLoadingProcess, 200);
+			setTimeout(endLoadingProcess, 500);
 		} else if (error) {
 			endLoadingProcess({error});
 		} else {
@@ -69,7 +74,7 @@ const Scheduling: React.FC = () => {
 				} as any
 			});
 			updateInterviewerValue(value);
-			endLoadingProcess()
+			endLoadingProcess();
 		} else if (error) {
 			endLoadingProcess({error});
 		} else {
@@ -84,8 +89,10 @@ const Scheduling: React.FC = () => {
 			candidate: selectedCandidate,
 		});
 		if (success) {
+			updateSelectedSchedule(undefined);
 			updateSchedules(data);
 			endLoadingProcess();
+			scrollToBottom();
 		} else if (error) {
 			endLoadingProcess({error});
 		} else {
@@ -129,7 +136,7 @@ const Scheduling: React.FC = () => {
 						<Fade left>
 							<ScheduleView
 								schedules={schedules}
-								onSelect={updateSelectedSchedule}
+								onSelect={selectSchedule}
 							/>
 						</Fade>
 					</Col>

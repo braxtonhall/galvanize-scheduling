@@ -1,4 +1,4 @@
-import React, { useState, createContext } from "react";
+import React, {useState, createContext, useRef} from "react";
 import App from "../App";
 import {interfaces} from "adapter";
 
@@ -9,6 +9,7 @@ export interface IContext {
 	updateContext: (context: Partial<IContext>) => void
 	startLoadingProcess: (context?: Partial<IContext>) => void
 	endLoadingProcess: (context?: Partial<IContext>) => void
+	scrollToBottom: () => void;
 }
 
 const Context = createContext<IContext>({
@@ -16,6 +17,7 @@ const Context = createContext<IContext>({
 	updateContext: () => {},
 	startLoadingProcess: () => {},
 	endLoadingProcess: () => {},
+	scrollToBottom: () => {},
 });
 
 export const ContextProvider = Context.Provider;
@@ -24,11 +26,14 @@ export default Context;
 
 export const Root: React.FC = () => {
 
+	const bottom = useRef(null);
+
 	const [context, updateContext] = useState<IContext>({
 		operationsLoading: 0,
 		updateContext: () => {},
 		startLoadingProcess: () => {},
 		endLoadingProcess: () => {},
+		scrollToBottom: () => {},
 	});
 
 	const newFunc = (c: Partial<IContext>): void => {
@@ -52,14 +57,20 @@ export const Root: React.FC = () => {
 		});
 	};
 
+	const scrollToBottom = () => {
+		bottom.current.scrollIntoView({behavior: "smooth"})
+	};
+
 	return (
 		<ContextProvider value={{
 			...context,
 			updateContext: newFunc,
 			startLoadingProcess,
-			endLoadingProcess
+			endLoadingProcess,
+			scrollToBottom
 		}}>
 			<App/>
+			<div ref={bottom} />
 		</ContextProvider>
 	)
 };
