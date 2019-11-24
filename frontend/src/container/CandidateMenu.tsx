@@ -94,7 +94,7 @@ const CandidateMenu: React.FC = () => {
 		startLoadingProcess();
 		// incase context is loss, prevents double pressing
 		const temp: ICandidate = {...cancelMeetingsCandidate};
-		updateDeleteCandidateSelected(undefined);
+		updateCancelMeetingsCandidate(undefined);
 		const {success, error} = await adapter.cancelSchedule(token, temp);
 		if (success) {
 			await refreshCandidates();
