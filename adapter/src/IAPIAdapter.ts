@@ -17,6 +17,7 @@ export default interface IAPIAdapter {
 	sendAvailabilityEmail(token: string, candidate: ICandidate): Promise<IAPIResponse>;
 	getSchedules(token: string, options: IGetSchedulesOptions): Promise<IAPIResponse<ISchedule[]>>;
 	confirmSchedule(token: string, schedule: ISchedule): Promise<IAPIResponse>;
+	cancelSchedule(token: string, candidate: ICandidate): Promise<IAPIResponse>;
 	getCandidates(token: string): Promise<IAPIResponse<ICandidate[]>>;
 	deleteCandidate(token: string, candidate: ICandidate): Promise<IAPIResponse>;
 	updateCandidate(token: string, candidate: ICandidate): Promise<IAPIResponse>;

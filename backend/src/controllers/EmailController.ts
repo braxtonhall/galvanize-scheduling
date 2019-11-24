@@ -38,6 +38,16 @@ const createScheduleContent = (schedule: interfaces.ISchedule): string => {
                <p>The Galvanize Hiring Team</p>`;
 };
 
+const createCancellationContent = (candidate: interfaces.ICandidate): string => {
+    let header = buildHeader(candidate);
+    return `<h4>${header}</h4>
+               <p>Due to unfortunate circumstances, we have had to reschedule your upcoming interviews at Galvanize.</p>
+               <p>Be on the lookout for another email containing your updated schedule.</p>
+               <br>
+               <p>Regards,</p>
+               <p>The Galvanize Hiring Team</p>`;
+};
+
 const createEmail = (email: IEmail) => {
     return {
         message: {
@@ -65,6 +75,15 @@ const sendScheduleEmail = (token: string, schedule: interfaces.ISchedule) => {
         subject: 'Your schedule for an interview with Galvanize',
         content: createScheduleContent(schedule),
         recipients: [schedule.candidate.email]
+    };
+    return MSGraphController.sendEmail(token, createEmail(email));
+};
+
+export const sendCancellationEmail = (token: string, candidate: interfaces.ICandidate) => {
+    const email = {
+        subject: 'Interview rescheduling notice',
+        content: createCancellationContent(candidate),
+        recipients: [candidate.email]
     };
     return MSGraphController.sendEmail(token, createEmail(email));
 };

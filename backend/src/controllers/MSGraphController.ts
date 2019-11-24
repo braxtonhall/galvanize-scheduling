@@ -132,7 +132,7 @@ export default class MSGraphController {
 		}
 	}
 	
-	static async bookSchedule(token: string, schedule: interfaces.ISchedule): Promise<string[]> {
+	static async bookSchedule(token: string, schedule: interfaces.ISchedule): Promise<interfaces.ISchedule> {
     	const client: Client = this.getClient(token);
     	const promises = schedule.meetings.map(m => {
 			return client
@@ -141,7 +141,7 @@ export default class MSGraphController {
 					"subject": `Interview with ${schedule.candidate.firstName ? schedule.candidate.firstName : schedule.candidate.email}`,
 					"body": {
 						"contentType": "HTML",
-						"content": `Be ready to join ${schedule.candidate.firstName} in an interview for ${schedule.candidate.position ? schedule.candidate.position : "Galvanize"}.`
+						"content": `Be ready ${schedule.candidate.firstName ? `to join ${schedule.candidate.firstName} in` : "for"} an interview for ${schedule.candidate.position ? schedule.candidate.position : "Galvanize"}.`
 					},
 					"start": {
 						"dateTime": typeof m.start === "string" ? m.start : m.start.toISOString(),
@@ -168,16 +168,17 @@ export default class MSGraphController {
 						"type": "required"
 					}])
 				})
-				.then(e => e.id);
+				.then(e => ({...m, id: e.id}));
 		});
-    	return Promise.all(promises);
+		schedule.meetings = await Promise.all(promises);
+		return schedule;
 	}
 	
 	static async deleteSchedule(token: string, events: string[]) {
 		const client: Client = this.getClient(token);
     	return Promise.all(events.map(e => {
 			return client
-				.api(`/me/events/${""}`)
+				.api(`/me/events/${e}`)
 				.delete();
 		}))
 	}
