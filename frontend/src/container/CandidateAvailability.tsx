@@ -31,6 +31,7 @@ const CandidateAvailability: React.FC = (props) => {
 	const [candidate, updateCandidate] = useState<ICandidate>();
 	const [availability, updateAvailability] = useState<IAvailability>([]);
 	const [submitted, updateSubmitted] = useState<boolean>(false);
+	const [hasBefore, updateHasBefore] = useState(false);
 
 	useEffect(() => {
 		if (!candidateID) {
@@ -50,10 +51,14 @@ const CandidateAvailability: React.FC = (props) => {
 	}, [candidateID]);
 
 	function onChange(data: Array<{ start: Date, end: Date }>) {
-		updateAvailability(data.map(({start, end}) => ({
+		const d = data.map(({start, end}) => ({
 			start: moment(start),
 			end: moment(end),
-		})));
+		}));
+		const now = moment.now();
+		const _d = d.filter((d) => {return d.start.isAfter(now)});
+		updateHasBefore(d.length !== _d.length);
+		updateAvailability(_d);
 	}
 
 	async function submitAvailability(): Promise<void> {
@@ -118,6 +123,7 @@ const CandidateAvailability: React.FC = (props) => {
 														height="50vh"
 														initialSelections={mapAvailabilityToInitial(candidate.availability)}
 													/>
+													{hasBefore && <Fade><p className="text-danger small mt-3">You currently have times selected in the past, these will not be submitted.</p></Fade>}
 													<Button className="mt-3" onClick={submitAvailability}
 															color="primary" disabled={availability.length < 1}>
 														Submit Availability
