@@ -1,4 +1,5 @@
 import * as dotenv from 'dotenv';
+import Log from "./Log";
 dotenv.config({path: "../.env"});
 
 
@@ -89,13 +90,13 @@ export class Config {
 		if (this.config[key] !== null && this.config[key] !== undefined) {
 			return this.config[key];
 		} else {
-			console.warn(`Config Key "${key}" was not set, yet accessed.`);
+			Log.warn(`Config Key "${key}" was not set, yet accessed.`);
 			return null;
 		}
 	}
 	
 	public set(key: ConfigKey, value: any): void {
-		console.warn(`WARNING: Config setting ${key} to ${value}. ` +
+		Log.warn(`WARNING: Config setting ${key} to ${value}. ` +
 			`This should NOT occur in production. TEST ONLY`);
 		this.config[key] = value;
 	}
