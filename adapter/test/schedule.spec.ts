@@ -11,7 +11,6 @@ const ScheduleTests = args => !args.verifyTestAccounts ? () => {} : () => {
     const that = args;
     let candidateBase: ICandidate = {
         email: "test-integration@ph14solutions.onmicrosoft.com",
-        scheduled: false,
         firstName: "Test",
         lastName: "Scheduling",
         notes: "This is a test account"
@@ -75,7 +74,7 @@ const ScheduleTests = args => !args.verifyTestAccounts ? () => {} : () => {
 
     before(async () => await Promise.all([defineCandidates(), generatePreferences(), toggleRooms()]));
 
-    context("getSchedules", () => { /*
+    context("getSchedules", () => {/*
         it("should fail on invalid authentication", async () => {
             const options: IGetSchedulesOptions = {preferences: [], candidate: emptyAvailCandidate};
             const {success} = await adapter.getSchedules(that.INVALID_TOKEN, options);
@@ -109,28 +108,27 @@ const ScheduleTests = args => !args.verifyTestAccounts ? () => {} : () => {
             expect(data).to.be.an('array').that.is.empty;
         });
 
-        it("should succeed emptily when scheduling a candidate who hasn't submitted availabilities yet", async () => {
+        it("should fail when scheduling a candidate who hasn't submitted availabilities yet", async () => {
            const {data: freshCandidate} = await adapter.createCandidate(that.token, candidateBase);
            const options: IGetSchedulesOptions = {preferences: simpleInterviews, candidate: freshCandidate};
-           const {success, data} = await adapter.getSchedules(that.token, options);
-            expect(success).to.be.true;
-            expect(data).to.be.an('array').that.is.not.empty;
+           const {success} = await adapter.getSchedules(that.token, options);
+            expect(success).to.be.false;
         });
 
-        it("should succeed emptily when given no interviewers", async () => {
+        it("should fail when given no interviewers to get schedules of", async () => {
             const options: IGetSchedulesOptions = {preferences: [], candidate: fullAvailCandidate};
-            const {success, data} = await adapter.getSchedules(that.token, options);
-            expect(success).to.be.true;
-            expect(data).to.be.an('array').that.is.not.empty;
+            const {success} = await adapter.getSchedules(that.token, options);
+            expect(success).to.be.false;
         });
-*/
+        */
         it("should return schedules that do not conflict with the interviewers'", async () => {
             const options: IGetSchedulesOptions = {preferences: simpleInterviews, candidate: fullAvailCandidate};
             const {success, data} = await adapter.getSchedules(that.token, options);
             expect(success).to.be.true;
-            expect(data).to.be.an('array').that.is.length(2);
+            expect(data).to.be.an('array');
+            expect(data.find(sched => sched.meetings.length === 2)).to.exist;
         });
-/*
+
         it("should return schedules that fit both the interviewers' and candidates'", async () => {
             const options: IGetSchedulesOptions = {preferences: simpleInterviews, candidate: partialAvailCandidate};
             const {success, data} = await adapter.getSchedules(that.token, options);
@@ -177,7 +175,7 @@ const ScheduleTests = args => !args.verifyTestAccounts ? () => {} : () => {
             expect(success).to.be.true;
             expect(data).to.be.an('array').that.is.length(1);
             // TODO inspect contents of data, should be 30 min
-        });*/
+        });
     });
 
     context("confirmSchedules", async () => {

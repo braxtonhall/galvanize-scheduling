@@ -23,6 +23,7 @@ export enum ConfigKey {
 	msOAuthAuthorizeEndpoint = "oAuthAuthorizeEndpoint",
 	msOAuthTokenEndpoint = "oAuthTokenEndpoint",
 	msEmailEndpoint = "emailEndpoint",
+	msScheduleEndpoint = "getScheduleEndpoint",
 	
 	// Internal
 	interviewerGroupName = "interviewerGroupName",
@@ -67,6 +68,7 @@ export class Config {
 				[ConfigKey.msOAuthAuthorizeEndpoint]: process.env.OAUTH_AUTHORIZE_ENDPOINT,
 				[ConfigKey.msOAuthTokenEndpoint]: 	  process.env.OAUTH_TOKEN_ENDPOINT,
 				[ConfigKey.msEmailEndpoint]:		  process.env.EMAIL_ENDPOINT,
+				[ConfigKey.msScheduleEndpoint]:		  process.env.GET_SCHEDULE_ENDPOINT,
 				
 				// Internal
 				[ConfigKey.interviewerGroupName]: process.env.INTERVIEWER_GROUP_NAME,

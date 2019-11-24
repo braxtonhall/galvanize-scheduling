@@ -12,7 +12,6 @@ const CandidateTests = args => () => {
 
     const candidateBase: ICandidate = {
         email: "test-integration@ph14solutions.onmicrosoft.com",
-        scheduled: false,
         phoneNumber: "17781234567",
         firstName: "Test",
         lastName: "Doe"

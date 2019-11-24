@@ -152,13 +152,18 @@ app.get(nodeAdapter.urls.SCHEDULES, async (req, res) => {
 				preferences: req.query.preferences.map(p => JSON.parse(p)),
 				candidate: JSON.parse(req.query.candidate)
 			};
+			const interviewers = [];
+			for (const p of options.preferences) {
+				if (interviewers.includes(p.interviewer.email))
+					throw new Error("Interviewers should only have a maximum of one preference designation.");
+				interviewers.push(p.interviewer.email);
+			}
 			const data: any[] = await resourceFacade.list(token, ResourceKind.Schedule, options);
 			res.status(200).send(data);
 		} else {
 			res.sendStatus(401);
 		}
 	} catch(e) {
-		console.log(e);
 		res.status(400).send(e.message);
 	}
 });

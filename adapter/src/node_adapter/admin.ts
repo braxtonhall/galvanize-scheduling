@@ -84,8 +84,7 @@ export default {
                 data[i].meetings = data[i].meetings.map(m => ({...m, start: moment(m.start), end: moment(m.end)}));
             }
             return {success: status === 200, data};
-        } catch (error) {
-            console.log("big err", error);
+        } catch {
             return {success: false};
         }
     },

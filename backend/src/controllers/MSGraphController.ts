@@ -56,7 +56,7 @@ export default class MSGraphController {
 
 	static async getSchedule(token: string, request) {
 		return (await (this.getClient(token))
-			.api('/me/calendar/getSchedule')
+			.api(Config.getInstance().get(ConfigKey.msScheduleEndpoint))
 			.post(request)).value;
 	}
 
@@ -127,7 +127,6 @@ export default class MSGraphController {
 			return scheduleAvailabilities;
 
 		} catch(e) {
-    		console.log(e);
     		throw new Error(e);
 		}
 	}
