@@ -50,7 +50,7 @@ const ScheduleTests = args => !args.verifyTestAccounts ? () => {} : () => {
 
     const generatePreferences = async () => {
         const {data: interviewers} = await adapter.getInterviewers(that.token, that.groupName);
-        [i0, i1, i2] = interviewers.slice(6, 10); // modify to choose different test interviewers
+        [i0, i1, i2] = interviewers.slice(3, 7); // modify to choose different test interviewers
         simpleInterviews = [makePreferenceItem(i0, 30), makePreferenceItem(i1, 45)];
         pairedInterviews = [
             makePreferenceItem(i0, 45, i1),
