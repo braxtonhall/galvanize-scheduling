@@ -15,7 +15,7 @@ type IInterviewer = interfaces.IInterviewer;
 
 const Scheduling: React.FC = () => {
 
-	const {token, scrollToBottom, startLoadingProcess, endLoadingProcess} = useContext(Context);
+	const {token, startLoadingProcess, endLoadingProcess} = useContext(Context);
 	const [candidates, updateCandidates] = useState<ICandidate[]>([]);
 	const [interviewerValue, updateInterviewerValue] = useState<InterviewSelectionValue>();
 	const [interviewerGroup, updateInterviewerGroup] = useState<string>(process.env.REACT_APP_DEFAULT_GROUP);
@@ -34,7 +34,6 @@ const Scheduling: React.FC = () => {
 
 	function selectSchedule(schedule) {
 		updateSelectedSchedule(schedule);
-		// setTimeout(scrollToBottom, 200);
 	}
 
 	async function confirmSchedule(schedule): Promise<void> {
@@ -98,7 +97,6 @@ const Scheduling: React.FC = () => {
 			updateSelectedSchedule(undefined);
 			updateSchedules(data);
 			endLoadingProcess();
-			// scrollToBottom();
 		} else if (error) {
 			endLoadingProcess({error});
 		} else {
