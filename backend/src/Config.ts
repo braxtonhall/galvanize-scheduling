@@ -79,9 +79,8 @@ export class Config {
 				[ConfigKey.production]: typeof process.env.PRODUCTION === "string" &&
 				process.env.PRODUCTION.toLowerCase() === 'true',
 			};
-			// TODO check for testing scenario and change some of these props
 		} catch (err) {
-			// TODO
+			Log.error("Config setup error -", err);
 		}
 	}
 

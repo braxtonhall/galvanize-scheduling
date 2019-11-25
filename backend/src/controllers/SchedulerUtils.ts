@@ -143,12 +143,12 @@ function findAverageOverlapSum(avail: interfaces.IAvailability, testAvails: inte
 		.reduce((m, n) => m + n, 0) / testAvails.length;
 }
 
-function scoreRoom(room: interfaces.IAvailability, interviewers: interfaces.IAvailability[], numRooms: number, capacity: number): number {
+function scoreRoom(room: interfaces.IAvailability, interviewers: interfaces.IAvailability[], numRooms: number, capacity: number, biggestGroup: number): number {
 	// THIS IS THE HEART OF THIS WHOLE ALGORITHM! THE NUMBERS ARE BETA AND SUBJECT TO CHANGE!
 	
 	// Capacity (the higher, the more can fit in a room at once, but too high and it's a waste of space.
 	// 		Peak starts at 4, increase with more interviewers)
-	const capacityScore = gaussianIsh(capacity, (interviewers.length / 10) + 4);
+	const capacityScore = gaussianIsh(capacity, biggestGroup);
 	// Average overlapping time (important because the higher overlap, the more interviewers can fit in that room)
 	const averageOverlapScore = findAverageOverlapSum(room, interviewers) / interviewers.length;
 	// The biggest slot (important because we want to fit as many interviewers as possible back to back)
@@ -159,11 +159,11 @@ function scoreRoom(room: interfaces.IAvailability, interviewers: interfaces.IAva
 	return 100 * capacityScore + averageOverlapScore / 5000 + biggestSlotScore / 20000 + averageSlotScore / 10000;
 }
 
-function rankRooms(scheduleAvailabilities: IScheduleAvailabilities): RoomAvail[] {
+function rankRooms(scheduleAvailabilities: IScheduleAvailabilities, biggestGroup): RoomAvail[] {
 	const interviewerAvails = scheduleAvailabilities.interviewers.map(i => i.availability);
 	const rooms = scheduleAvailabilities.rooms;
 	return rooms
-		.map(r => ({...r, score: scoreRoom(r.availability, interviewerAvails, rooms.length, r.room.capacity)}))
+		.map(r => ({...r, score: scoreRoom(r.availability, interviewerAvails, rooms.length, r.room.capacity, biggestGroup)}))
 		.sort((r, l) =>  l.score - r.score)
 		.map(r => ({room: r.room, availability: r.availability.sort((a, b) =>  took(b.start, b.end) - took(a.start, a.end))}));
 }
@@ -171,8 +171,9 @@ function rankRooms(scheduleAvailabilities: IScheduleAvailabilities): RoomAvail[]
 export function generateSchedules(candidate: interfaces.ICandidate, scheduleAvailabilities: IScheduleAvailabilities): interfaces.ISchedule[] {
 	const start = Date.now();
 	Log.trace("SchedulerUtils::generateSchedules(..) - Starting");
-	const sortedRooms = rankRooms(scheduleAvailabilities);
 	const groupedInterviewers = buildGroups(scheduleAvailabilities.interviewers);
+	const biggestGroup = Math.max(...groupedInterviewers.map(g => g.length));
+	const sortedRooms = rankRooms(scheduleAvailabilities, biggestGroup);
 	const schedules: CandidateSchedule[] = [];
 	for (let i = 0; i < 9; i++) {
 		const s: CandidateSchedule = makeOneSchedule(candidate, arrayCopy(sortedRooms), arrayCopy(groupedInterviewers), i);

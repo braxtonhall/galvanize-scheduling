@@ -88,11 +88,15 @@ All authorized routes require the request header `token`, which should be set to
   - **`POST   /sendavailability`**
 - **_Authorization_**
   - **`GET    /login`**
+	  - Initiates login process with Microsoft via a redirect. At the end of the 
   - **`POST   /authenticate`**
+	  - Checks whether or not the provided authorization token is active in the database. The token expires after 30 minutes.
   - **`GET    /logout`**
+	  - Delete the provided authorization token from the database.
 - **_Misc_**
   - **`GET    /health`**
   - **`POST   /saveauth`**
+  - **`POST   /setconfig`**
 
 **Types**
 ****
