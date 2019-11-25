@@ -36,7 +36,7 @@ The Galvanize Interview Scheduler consists of six pages.
 	- Click `Select` on your desired schedule to bring up the Actions pane.
 		- This view contains all the details of the Schedule for review.
 	- Click `Schedule & Send Emails` to book the meetings with the Interviewers on Outlook, add the event to the room's calendar, add and save the meetings to the Candidate for viewing on the `Submission` page, and send an email to the Candidate alerting them of the completion of scheduling.
-6. **About**. That page is likely where you're reading this! Click a document to read more about the making of this project, or an author to view their GitHub profile.
+6. **About**. That page is likely where you're reading this! Click a document to read more about the making of this project, or an author to view their GitHub profile. You may view the prior documents for this project as well as look over this exact document.
 
 On any page, click `Logout` when you're finished working.
 
@@ -116,7 +116,7 @@ All authorized routes require the request header `token`, which should be set to
  	 - If the user is not authenticated, response status will be set to `401`.
  	 - If unsuccessful for any other reason, response status will be set to `400`.
   - **`POST   /submitavailability`**
-	  - The request body should be JSON object that contains the field `id` paired with the id of the candidate that will be updated, as well as the field `availability` that contains a JSON array of `ITimeslots`. If these timeslots contain fields other thatn `start` and `end`, these excess fields will be clipped and not saved. All `start` times must be before `end` times.
+	  - The request body should be JSON object that contains the field `id` paired with the `id` of the candidate that will be updated, as well as the field `availability` that contains a JSON array of `ITimeslots`. If these timeslots contain fields other thatn `start` and `end`, these excess fields will be clipped and not saved. All `start` times must be before `end` times.
 	  - If successful, the response status will be set to `200`.
  	 - If the `id` of the candidate is not found, response status will be set to `404`.
  	 - If unsuccessful for any other reason, response status will be set to `400`.
@@ -222,14 +222,14 @@ The Interview Scheduler queries for data from your Microsoft Office Enterprise a
 2. Ensure you have added a your employees who are candidates for conducting an interview together in an Office group. The recommended group name is `Interviewers`. Any group can be retrieved as "Interviewers," however the system will default to `Interviewers`. To change this default, refer to the Environment section below.
 
 3. Give all administrators of the system the requisite permissions in your Azure Portal.
-	1. Navigate to Home > Users > User > Assigned Roles
+	1. Navigate to Home > Users > **User** > Assigned Roles
 	2. Set the users' permissions. In order for them to effectively leverage the system, they must have permission to manage enterprise apps, view other users' schedules, and edit other users' schedules.
-	3. As well, you must Grant admin consent for each user.
-	4. Navigate to Home > Azure Active Directory > App Registrations > Applicaton > API Permissions
+	3. As well, you must grant admin consent for each user.
+	4. Navigate to Home > Azure Active Directory > App Registrations > **Applicaton** > API Permissions
 	5. Grant Admin Consent for Application, and have the user login.
 
 4. Register an app on Azure. Afterward, edit the application's authentication permissions to allow for Microsoft redirects to and from the application.
-	1. Navigate to Home > Azure Active Directory > App Registrations > Applicaton > Authentication
+	1. Navigate to Home > Azure Active Directory > App Registrations > **Applicaton** > Authentication
 	2. Register the following addressed
 		- `<UI_URL>`
 		- `<UI_URL>/candidates`
@@ -237,7 +237,7 @@ The Interview Scheduler queries for data from your Microsoft Office Enterprise a
 		- `<SERVER_URL>/callback`
 
 5. Under your Enterprise [Azure portal's](https://portal.azure.com) OAuth scope page, open the needed Microsoft Graph API permissions.
-	1. Navigate to Home > Azure Active Directory > App registrations > App name > View API permissions
+	1. Navigate to Home > Azure Active Directory > App registrations > **App name** > View API permissions
 	2. Turn on the following permissions
 	  - Calendars.ReadWrite.Shared **Delegated**
 	  - Directory.Read.All **Application**
