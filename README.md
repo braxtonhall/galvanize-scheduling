@@ -191,8 +191,11 @@ The Interview Scheduler queries for data from your Microsoft Office Enterprise a
 	- Turn on "Automatically process even invitations and cancellations."
 	- Remove "Limit event duration."
 	- Open "Scheduling permissions."
-	- More information can be found [here if logged in as the resource](https://outlook.office365.com/mail/options/calendar/resourceScheduling) and [here](https://kb.wisc.edu/office365/40547#permissions).
+	
+	More information can be found [here if logged in as the resource](https://outlook.office365.com/mail/options/calendar/resourceScheduling) and [here](https://kb.wisc.edu/office365/40547#permissions).
+	
 2. Ensure you have added a your employees who are candidates for conducting an interview together in an Office group. The recommended group name is `Interviewers`. Any group can be retrieved as "Interviewers," however the system will default to `Interviewers`. To change this default, refer to the Environment section below.
+
 3. Under your Enterprise [Azure portal's](https://portal.azure.com) OAuth scope page, open the needed Microsoft Graph API permissions.
 	1. Navigate to Home > Azure Active Directory > App registrations > App name > View API permissions
 	2. Turn on the following permissions
@@ -238,9 +241,10 @@ The development process requires installation of several dependencies. This incl
 ### Configuring Your Environment
 Environment variables are used to manage the configuration of the project's micro services.
 
-- Create a `.env` file and put it in the root directory of the project.
+- Create a `.env` file and put it in the root directory of the project. (`touch .env`)
   - This file should **never** be committed to version control.
-- Copy `.env.sample` to the new `.env` file and modify as necessary.
+- Copy `.env.sample` to the new `.env` file. (`cat .env.sample > .env`)
+- Modify as necessary to your environment.
   - `.env.sample` includes further documentation for each environment variable.
 
 ### Debugging the Backend
@@ -252,18 +256,23 @@ You can remotely connect to your local backend service through `chrome://inspect
 In Webstorm, create an attachment run configuration with `localhost`on port `9229`. This is the default Node inspection port. Add breakpoints and hit debug, the program should now pause when the breakpoint is hit by any external calls.
 
 ### Updating Dependencies
-- `sh install_dependencies`
+Simply run `sh install_dependencies.sh`. This will update the dependencies of the `adapter`, `frontend`, and `backend` packages.
 
 ### Testing
-#### Unit Tests
-to run tests:
+
+**Unit Tests**
+
+To run unit tests of the backend, from the root directory run
 `npm run test:backend`
-#### Integration Tests
+
+**Integration Tests**
+
 - If you already have an instance of the backend running: `npm run test:adapter`
 - If you would like to do startup + teardown: `npm run test:integration`. You may have to stop existing containers first (`npm run stop-backend`).
 
 Note for devs: `test:integration` does not re-build the image.
 
-##### Customizing the Test Suites
+**Customizing the Test Suites**
+
 There are some flags in `integration.spec.ts` that turn certain tests on and off. Some rely the specific integration with the ph14solutions active directory.
 Using a different directory to run tests against would require updating those tests, or you can disable them by setting the flags to false.
