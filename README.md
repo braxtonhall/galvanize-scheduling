@@ -185,9 +185,34 @@ interface IMeeting extends ITimeslot {
 
 ### Outlook Setup
 
-Ensure you have added a your employees who are candidates for conducting an interview together in an Office group. The recommended group name is `Interviewers`.
+The Interview Scheduler queries for data from your Microsoft Office Enterprise account regularly to ensure that it does not store anything that's stale. In order for this to work, some small steps need to be taken to ensure your Enterprise account is ready.
+
+1. Ensure that the rooms in your office are registered as Resources on your Enterprise platform. An administrator can register them [here](https://admin.microsoft.com/Adminportal/Home#/ResourceMailbox). As well, for each room, under Resource Scheduling,
+	- Turn on "Automatically process even invitations and cancellations."
+	- Remove "Limit event duration."
+	- Open "Scheduling permissions."
+	- More information can be found [here if logged in as the resource](https://outlook.office365.com/mail/options/calendar/resourceScheduling) and [here](https://kb.wisc.edu/office365/40547#permissions).
+2. Ensure you have added a your employees who are candidates for conducting an interview together in an Office group. The recommended group name is `Interviewers`. Any group can be retrieved as "Interviewers," however the system will default to `Interviewers`. To change this default, refer to the Environment section below.
+3. Under your Enterprise [Azure portal's](https://portal.azure.com) OAuth scope page, open the needed Microsoft Graph API permissions.
+	1. Navigate to Home > Azure Active Directory > App registrations > App name > View API permissions
+	2. Turn on the following permissions
+	  - Calendars.ReadWrite.Shared **Delegated**
+	  - Directory.Read.All **Application**
+	  - Group.Read.All **Application**
+	  - Group.Selected **Application**
+	  - Mail.Send **Application**
+	  - Place.Read.All **Application**
+	  - User.Read.All **Application**
 
 ### Environment
+
+The application relies on several environment variables for further configuration. These environment variables are further detailed under the Development header, and described individually in the `.env.sample`, included in the project directory.
+
+Some evironment variables of note are described here.
+
+- **`INTERVIEWER_GROUP_NAME`**
+- **`PRODUCTION`**
+- **`TEST_SECRET_KEY`**
 
 ## Deployment
 
@@ -195,6 +220,7 @@ Ensure you have added a your employees who are candidates for conducting an inte
 
 ### First Time Installation
 The development process requires installation of several dependencies. This includes:
+
 - `Node` (and `npm`). Both the frontend and backend systems run in Node, and npm is used to manage dependencies. 
 - `Docker`. Used to automatically deploy dummy containers during the testing process.
 - `amazon/dynamodb-local`. This image is used to mock the database.
@@ -232,4 +258,4 @@ Note for devs: `test:integration` does not re-build the image.
 
 ##### Customizing the Test Suites
 There are some flags in `integration.spec.ts` that turn certain tests on and off. Some rely the specific integration with the ph14solutions active directory.
-Using a different directory to run tests against would require updating those tests, or you can disabling them by setting the flags to false.
+Using a different directory to run tests against would require updating those tests, or you can disable them by setting the flags to false.
