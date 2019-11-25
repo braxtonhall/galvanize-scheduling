@@ -248,7 +248,7 @@ export default class MSGraphController {
      * @param {number} availabilityViewInterval - Interval to get the schedules on. DEFAULT = 15
      * @returns The request for getting a schedule.
      */
-	static scheduleRequest(request: Array<string>, timeslot: {start: string, end: string}, availabilityViewInterval: number = 15) {
+	private static scheduleRequest(request: Array<string>, timeslot: {start: string, end: string}, availabilityViewInterval: number = 15) {
     	return {
 			schedules: request,
 			startTime: {
@@ -268,7 +268,7 @@ export default class MSGraphController {
      * @param {Date} startDate - The date to create a range
      * @param {Offset} offset - The offset of each time slot(end - start). DEFAULT = 15
      */
-	static buildDate(startDate: Date, offset: number = 15) {
+	private static buildDate(startDate: Date, offset: number = 15) {
 		startDate.setMinutes(startDate.getMinutes() + offset);
 		return startDate.toISOString();
 	}

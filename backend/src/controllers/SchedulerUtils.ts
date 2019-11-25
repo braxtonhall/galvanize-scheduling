@@ -87,9 +87,9 @@ export function concatenateMoments(availability: interfaces.IAvailability): inte
 /**
  * Removes all the times in a given availability that are out of working hours.
  * @param {IAvailability} availability - The time slots to be clipped.
- * @param workingHours - Working hours of an interviewers. DEFAUlT = DEFAULT_WORKING_HOURS
+ * @param workingHours - Working hours of an interviewers. DEFAULT = DEFAULT_WORKING_HOURS
  * @returns {IAvailability} the new availability that is ranged between working hours.
- * @see findOverlap
+ * @see findAvailabilityIntersection
  */
 export function clipNonWorkingHours(availability: interfaces.IAvailability, workingHours = DEFAULT_WORKING_HOURS): interfaces.IAvailability {
 	let workingDay = workingHours.daysOfWeek.map(w => WEEKDAYS[w]);
@@ -124,17 +124,17 @@ export function clipNonWorkingHours(availability: interfaces.IAvailability, work
 		})
 	}
 	// find and return overlapping times
-	return findOverlap(availability, availableSlots);
+	return findAvailabilityIntersection(availability, availableSlots);
 }
 
 /**
  * Given a list of availabilities, find their overlapping time slots
  * @param {Array<IAvailability>} avail - List of availabilities
  * @returns {IAvailability} One availabilities with time slots that overlap
- * @see findOverlap
+ * @see findAvailabilityIntersection
  */
-function findOverlappingTime(...avail: interfaces.IAvailability[]): interfaces.IAvailability {
-	return avail.length > 0 ? avail.slice(1).reduce(findOverlap, avail[0]) : [];
+function findOverlappingTimeslots(...avail: interfaces.IAvailability[]): interfaces.IAvailability {
+	return avail.length > 0 ? avail.slice(1).reduce(findAvailabilityIntersection, avail[0]) : [];
 }
 
 /**
@@ -143,7 +143,7 @@ function findOverlappingTime(...avail: interfaces.IAvailability[]): interfaces.I
  * @param {IAvailability} availB - The second availability
  * @returns A new availability with time slots that overlap.
  */
-function findOverlap(availA: interfaces.IAvailability, availB: interfaces.IAvailability): interfaces.IAvailability {
+function findAvailabilityIntersection(availA: interfaces.IAvailability, availB: interfaces.IAvailability): interfaces.IAvailability {
 	let overlap = [];
 	for (let timeA of availA) {
 		for (let timeB of availB) {
@@ -164,7 +164,7 @@ function findOverlap(availA: interfaces.IAvailability, availB: interfaces.IAvail
 
 function findAverageOverlapSum(avail: interfaces.IAvailability, testAvails: interfaces.IAvailability[]): number {
 	return testAvails
-		.map(a => sumAvailability(findOverlappingTime(avail, a)))
+		.map(a => sumAvailability(findOverlappingTimeslots(avail, a)))
 		.reduce((m, n) => m + n, 0) / testAvails.length;
 }
 
@@ -249,6 +249,11 @@ export function generateSchedules(candidate: interfaces.ICandidate, scheduleAvai
 	return output.map(s => s.schedule);
 }
 
+/**
+ * Groups together PreferenceAvails into an array of groups of PreferenceAvails
+ * Using the preferences of each interviewer, turns every cycle/chain into a group
+ * @param preferences
+ */
 function buildGroups(preferences: PreferenceAvail[]): PreferenceAvail[][] {
 	const groups: {members: Set<string>, data: PreferenceAvail[]}[] = [];
 	preferences.forEach((preference) => {
@@ -307,6 +312,22 @@ function removeOverlap(availability: interfaces.IAvailability, meetings: interfa
 	return availability;
 }
 
+/**
+ * Builds a schedule if possible given rooms, a candidate, and interviewers
+ * Attempts to fill rooms one at a time in the ranking, filling all its timeslots.
+ * Picks a timeslot based on how long it is, and fills it up with interviewers,
+ * 		removing them one at a time if there is a scheduling conflict
+ * Picks successive timeslots by finding nearby times first
+ * If a run of meetings goes on for over four hours, a break is inserted
+ * @param candidate {ICandidate} - The candidate who is to be scheduled,
+ * 		and whose availability is to be taken into consideration
+ * @param rooms {Array<RoomAvail>} - A sorted list of of rooms, paired with their availability
+ * 		Sorted by their ranking from rankRooms.
+ * @param groups {Array<Array<PreferenceAvail>>} - Interviewers grouped by buildGroups, paired with availability
+ * @param roomStart {number} - The index in the rooms array to begin the algorithm at
+ * @see rankRooms
+ * @see buildGroups
+ */
 function makeOneSchedule(candidate: interfaces.ICandidate, rooms: RoomAvail[], groups: PreferenceAvail[][], roomStart): CandidateSchedule {
 	groups = shuffle(groups);
 	let roomIndex = 0, numUnscheduled = 0, numChangeOvers = 0, meetings: interfaces.IMeeting[] = [];
@@ -343,7 +364,7 @@ function makeOneSchedule(candidate: interfaces.ICandidate, rooms: RoomAvail[], g
 					// while there are members in the group
 					while (preferenceIndex < group.length) {
 						// if can't schedule around beginning of timeslot
-						const overlap = findOverlappingTime([timeslot], ...group.slice(preferenceIndex).map(p => p.availability));
+						const overlap = findOverlappingTimeslots([timeslot], ...group.slice(preferenceIndex).map(p => p.availability));
 						if (overlap.length !== 0 &&
 							(overlap[0].start === timeslot.start || meetingRun === 0) &&
 							room.room.capacity > group.length - preferenceIndex &&

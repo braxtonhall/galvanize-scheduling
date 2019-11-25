@@ -74,7 +74,7 @@ export abstract class RoomController implements IResourceController {
 		if (!(typeof object["name"] === "string" && object["name"] !== "")) {
 			throw new Error("Room must contain a name");
 		}
-		const {id, name, eligible} = object;
-		return {id, name, eligible};
+		const {id, name, eligible, email, capacity} = object;
+		return {id, name, eligible, email, capacity};
 	}
 }
