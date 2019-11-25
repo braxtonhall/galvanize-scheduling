@@ -17,7 +17,8 @@ pH14 Solutions consists of:
 
 ### API
 **Endpoints**
-****
+
+-
 All authorized routes require the request header `token`, which should be set to the authenticated token provided by the login process.
 
 - **_Candidates_**
@@ -123,7 +124,8 @@ All authorized routes require the request header `token`, which should be set to
  	 - If unsuccessful for any other reason, response status will be set to `400`.
 
 **Types**
-****
+
+-
 ```typescript
 interface ICandidate {
 	email: string;
@@ -226,6 +228,20 @@ Some evironment variables of note are described here.
 	- This variable has no default value.
 
 ## Deployment
+
+To deploy, create Docker images for the frontend and the backend, and host them on your cloud services platform of choice.
+
+From the project root directory,
+
+- `docker image build -f Dockerfile_frontend -t glvnzschedui .`
+- `docker image build -f Dockerfile_backend -t glvnzschedserver .`
+
+To save these images to files to be used on other machines,
+
+- `docker save glvnzschedui:latest | gzip > glvnzschedui.tar.gz`
+- `docker save glvnzschedserver:latest | gzip > glvnzschedserver.tar.gz`
+
+More information on hosting Docker images on AWS can be found [here](https://aws.amazon.com/getting-started/tutorials/deploy-docker-containers/).
 
 ## Development
 
