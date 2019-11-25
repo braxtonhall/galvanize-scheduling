@@ -78,9 +78,10 @@ const AdminTests = args => () => {
             const {success: s1} = await adapter.toggleEligibility(that.token, fakeRoom);
             expect(s1).to.be.true;
 
-            const fakeRoom2 = mockRoom("Aperture Science Test Chambers 001", false);
-            const {success: s2} = await adapter.toggleEligibility(that.token, fakeRoom2);
-            expect(s2).to.be.true;
+            // NOTE: Nov.24 2019 -  This test was removed as we now ensure in Graph to save
+            // const fakeRoom2 = mockRoom("Aperture Science Test Chambers 001", false);
+            // const {success: s2} = await adapter.toggleEligibility(that.token, fakeRoom2);
+            // expect(s2).to.be.true;
         });
 
         if (that.verifyTestAccounts) {

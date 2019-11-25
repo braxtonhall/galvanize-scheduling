@@ -94,7 +94,7 @@ export class Config {
 	}
 	
 	public set(key: ConfigKey, value: any): void {
-		Log.warn(`WARNING: Config setting ${key} to ${value}. ` +
+		Log.warn(`WARNING: Config setting "${key}" to "${value}". ` +
 			`This should NOT occur in production. TEST ONLY`);
 		this.config[key] = value;
 	}
