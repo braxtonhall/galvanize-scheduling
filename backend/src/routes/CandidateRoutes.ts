@@ -60,7 +60,7 @@ app.post(nodeAdapter.urls.UPDATE_AVAILABILITY, async (req, res) => {
 			await resourceFacade.create(token, candidate, ResourceKind.Candidate);
 			res.sendStatus(200);
 		} else {
-			res.sendStatus(401);
+			res.sendStatus(404);
 		}
 	} catch (e) {
 		res.status(400).send(e);

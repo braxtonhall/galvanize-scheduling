@@ -20,7 +20,7 @@ export const MOCK_CANDIDATES: ReadonlyArray<ICandidate> = [
 		firstName: "Braxton",
 		lastName: "Hall",
 		position: "Musical Programmer",
-		notes: "Very talented at being creative with different mediums."
+		notes: "Very talented at being creative with different mediums.😬你好"
 	},
 	{
 		id: "3",
@@ -33,7 +33,7 @@ export const MOCK_CANDIDATES: ReadonlyArray<ICandidate> = [
 	},
 ];
 
-export const MOCK_ROOMS: ReadonlyArray<IRoom> = [ // TODO what are we even storing?
+export const MOCK_ROOMS: ReadonlyArray<IRoom> = [
 	{
 		name: "1",
 		eligible: true,

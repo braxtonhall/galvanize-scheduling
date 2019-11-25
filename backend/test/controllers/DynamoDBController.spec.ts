@@ -99,15 +99,10 @@ describe("DynamoDBController", () => {
 	
 	it("Should create multiple unique candidate IDs", async () => {
 		// @ts-ignore
-		let output = await dbc.getCandidateId();
+		let output = await dbc.createCandidateID();
 		expect(output).to.deep.equal("1");
 		// @ts-ignore
-		output = await dbc.getCandidateId();
+		output = await dbc.createCandidateID();
 		expect(output).to.deep.equal("2");
 	});
-	
-	// it("Should create a new candidate and give it an ID", async () => { // TODO
-	// 	const output = await dbc.createCandidate({...MOCK_CANDIDATES, id: undefined});
-	// 	expect(output).to.deep.equal({...MOCK_CANDIDATES, id: "3"});
-	// });
 });

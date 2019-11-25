@@ -94,6 +94,7 @@ export function concatenateMoments(availability: interfaces.IAvailability): inte
 export function clipNonWorkingHours(availability: interfaces.IAvailability, workingHours = DEFAULT_WORKING_HOURS): interfaces.IAvailability {
 	let workingDay = workingHours.daysOfWeek.map(w => WEEKDAYS[w]);
 	let dates = new Set();
+	const timezone = workingHours && workingHours.timeZone && workingHours.timeZone.name ? ` (${workingHours.timeZone.name})` : "";
 
 	const now = new Date().toISOString();
 	let end: string = availability.reduce((acc, t) => acc > t.end ? acc : t.end, now) as string;
@@ -115,8 +116,8 @@ export function clipNonWorkingHours(availability: interfaces.IAvailability, work
 	let availableSlots = [];
 	// create array of times
 	for (let date of dates) {
-		let start = new Date(`${date}T${workingHours.startTime}`);
-		let end = new Date(`${date}T${workingHours.endTime}`);
+		let start = new Date(`${date} ${workingHours.startTime}${timezone}`);
+		let end = new Date(`${date} ${workingHours.endTime}${timezone}`);
 		availableSlots.push({
 			start: start.toISOString(),
 			end: end.toISOString()
