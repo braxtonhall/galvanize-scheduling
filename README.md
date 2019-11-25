@@ -239,13 +239,13 @@ The Interview Scheduler queries for data from your Microsoft Office Enterprise a
 5. Under your Enterprise [Azure portal's](https://portal.azure.com) OAuth scope page, open the needed Microsoft Graph API permissions.
 	1. Navigate to Home > Azure Active Directory > App registrations > **App name** > View API permissions
 	2. Turn on the following permissions
-	  - Calendars.ReadWrite.Shared **Delegated**
-	  - Directory.Read.All **Application**
-	  - Group.Read.All **Application**
-	  - Group.Selected **Application**
-	  - Mail.Send **Application**
-	  - Place.Read.All **Application**
-	  - User.Read.All **Application**
+	   - Calendars.ReadWrite.Shared **Delegated**
+	   - Directory.Read.All **Application**
+	   - Group.Read.All **Application**
+	   - Group.Selected **Application**
+	   - Mail.Send **Application**
+	   - Place.Read.All **Application**
+	   - User.Read.All **Application**
 
 ### Environment
 
