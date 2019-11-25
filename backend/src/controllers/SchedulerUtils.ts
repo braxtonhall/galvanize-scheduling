@@ -57,6 +57,7 @@ export function concatenateMoments(availability: interfaces.IAvailability): inte
 	if (availability.some(m => typeof m.start !== "string" || typeof m.end !== "string")) {
 		throw new Error("Cannot concatenate non-string Moments");
 	}
+	availability = arrayCopy(availability);
 	const output = [];
 	const getMatch = (a, b) => Math.abs(took(a.end as string, b.start as string)) < 1000 * 60;
 	while (availability.length > 0) {
@@ -81,24 +82,21 @@ export function concatenateMoments(availability: interfaces.IAvailability): inte
 export function clipNonWorkingHours(availability: interfaces.IAvailability, workingHours = DEFAULT_WORKING_HOURS): interfaces.IAvailability {
 	let workingDay = workingHours.daysOfWeek.map(w => WEEKDAYS[w]);
 	let dates = new Set();
+	
+	let end: string = availability.reduce((acc, t) => acc > t.end ? acc : t.end, new Date().toISOString()) as string;
+	let start: string = availability.reduce((acc, t) => acc < t.start ? acc : t.start, end) as string;
 
-	for (let time of availability) {
-		let now = new Date();
-		// earlier date now or start?
-		let startTime = (time.start > now.toISOString()) ? new Date(time.start.toString()) : now;
-		let endTime = new Date(time.end.toString());
-		// if start > end continue;
-		if (startTime.toISOString() > endTime.toISOString()) {
-			continue;
-		}
-		// add initial date to set
+	while (start < end) {
+		const startTime = new Date(start);
 		if (workingDay.includes(startTime.getDay())) {
 			dates.add(`${startTime.getFullYear()}-${("0" + (startTime.getMonth()+1)).slice(-2)}-${("0" + startTime.getDate()).slice(-2)}`)
 		}
-		// add end date to set -> if end time is in there -> set does not add
-		if (workingDay.includes(endTime.getDay())) {
-			dates.add(`${endTime.getFullYear()}-${("0" + (endTime.getMonth()+1)).slice(-2)}-${("0" + endTime.getDate()).slice(-2)}`)
-		}
+		startTime.setDate(startTime.getDate() + 1);
+		start = startTime.toISOString()
+	}
+	const endTime = new Date(end);
+	if (workingDay.includes(endTime.getDay())) {
+		dates.add(`${endTime.getFullYear()}-${("0" + (endTime.getMonth()+1)).slice(-2)}-${("0" + endTime.getDate()).slice(-2)}`)
 	}
 
 	let availableSlots = [];
