@@ -14,11 +14,35 @@ pH14 Solutions consists of:
 ## Using the Interview Scheduler
 
 ### Website Walkthrough
+The Galvanize Interview Scheduler consists of six pages.
+
+1. **Login**. Clicking the `Login` button will redirect you to Microsoft's login process. On completion, if you are an Administrator on the Enterprise Account, you will be redirected to the Candidates page.
+2. **Candidates**. This is the main landing page of the portal. It lists every Candidate in the system.
+	- Click `New Candidate` to bring up a form for entering Candidate data. On submission they will be added as a row on the main table. The only required field for submission is `Email`.
+	- Each row represents on saved Candidate.
+		- `Candidate URL` will open a new tab in your browser (the `Submission` page) with the Candidate's availability form or booked schedule.
+		- `Select` will reopen the Candidate creation form for that Candidate, allowing you to edit their fields.
+		- `Send Availability` appears on Candidates who do not yet have a booked interview schedule. This will email the Candidate with a link to the `Submission` page.
+		- `Cancel Meetings` appears on Candidates who already have booked meetings. This will cancel all meeting events on your Outlook Enterprise platform with the Candidate, and send the Candidate an email notifying them of the cancellation.
+3. **Submission**. This page is used for sending availabilities for Candidates, or viewing their interview schedule. It is accessible by a user of the system from the `Candidate` page (so the adminitrator can update the availability directly), or via direct link through an email (so a Candidate can submit their own availability). If a Candidate already has a schedule, this page will instead show their currently booked schedule for reference for either the Candidate or administrator.
+4. **Rooms**. This page displays all rooms registered with your Outlook Enterprise account. Set a room to `eligible` to have it considered in the scheduling process.
+5. **Scheduling**. This page is for creating and booking Interviews with Candidates. The table includes a list of every Candidate who has already submitted an availability.
+	- Click `Select` on a Candidate to bring up the Interviewers pane. This is a list of all Interviewers in the Interviewers group on your Outlook Enterprise account.
+		- Enter a custom Outlook group name and click `Refresh` to bring up a list of Interviewers in that Outlook group.
+	- For each Interviewer, select their `Preference` from the drop down menu to group them with another Interviewer in the interviewing process.
+	- For each Interviewer, select the number of minutes needed for their Interview under `Time Needed`. If this value is set to `0`, they will not be considered in the scheduling process.
+	- Click `Generate Schedules` to see up to three generated schedules on the Schedules pane.
+		- This is a list of possible schedules, each one taking into account the availability of the Candidate, the working hours of each interviewer, and the availability of the room.
+	- Click `Select` on your desired schedule to bring up the Actions pane.
+		- This view contains all the details of the Schedule for review.
+	- Click `Schedule & Send Emails` to book the meetings with the Interviewers on Outlook, add the event to the room's calendar, add and save the meetings to the Candidate for viewing on the `Submission` page, and send an email to the Candidate alerting them of the completion of scheduling.
+6. **About**. That page is likely where you're reading this! Click a document to read more about the making of this project, or an author to view their GitHub profile.
+
+On any page, click `Logout` when you're finished working.
 
 ### API
 **Endpoints**
 
--
 All authorized routes require the request header `token`, which should be set to the authenticated token provided by the login process.
 
 - **_Candidates_**
@@ -73,7 +97,7 @@ All authorized routes require the request header `token`, which should be set to
   	 - If the user is not authenticated, response status will be set to `401`.
  	 - If unsuccessful for any other reason, response status will be set to `400`.
   - **`POST   /resource/schedule`**
-	  - Saves the provided `ISchedule` timeslots to the `ICandidate`, emails the candidate, alerting them that the schedule has been made, and books an events for every meeting with each interviewer and room on the Outlook Enterprise account.
+	  - Saves the provided `ISchedule` timeslots to the `ICandidate`, emails the candidate, alerting them that the schedule has been made, and books an events for every meeting with each interviewer and room on the Outlook Enterprise account. This will not work on Candidates that already have a schedule.
 	  - The request body should be set to the `ISchedule` to save.
 	  - If successful, the response status will be set to `200`.
  	 - If the user is not authenticated, response status will be set to `401`.
@@ -125,7 +149,6 @@ All authorized routes require the request header `token`, which should be set to
 
 **Types**
 
--
 ```typescript
 interface ICandidate {
 	email: string;
@@ -190,15 +213,27 @@ interface IMeeting extends ITimeslot {
 The Interview Scheduler queries for data from your Microsoft Office Enterprise account regularly to ensure that it does not store anything that's stale. In order for this to work, some small steps need to be taken to ensure your Enterprise account is ready.
 
 1. Ensure that the rooms in your office are registered as Resources on your Enterprise platform. An administrator can register them [here](https://admin.microsoft.com/Adminportal/Home#/ResourceMailbox). As well, for each room, under Resource Scheduling,
-	- Turn on "Automatically process even invitations and cancellations."
-	- Remove "Limit event duration."
-	- Open "Scheduling permissions."
+	1. Turn on "Automatically process even invitations and cancellations."
+	2. Remove "Limit event duration."
+	3. Open "Scheduling permissions."
 	
 	More information can be found [here if logged in as the resource](https://outlook.office365.com/mail/options/calendar/resourceScheduling) and [here](https://kb.wisc.edu/office365/40547#permissions).
 	
 2. Ensure you have added a your employees who are candidates for conducting an interview together in an Office group. The recommended group name is `Interviewers`. Any group can be retrieved as "Interviewers," however the system will default to `Interviewers`. To change this default, refer to the Environment section below.
 
-3. Under your Enterprise [Azure portal's](https://portal.azure.com) OAuth scope page, open the needed Microsoft Graph API permissions.
+3. Give all administrators of the system the requisite permissions in your Azure Portal.
+	1. Navigate to Home > Users > User > Assigned Roles
+	2. Set the users' permissions. In order for them to effectively leverage the system, they must have permission to manage enterprise apps, view other users' schedules, and edit other users' schedules.
+
+4. Register an app on Azure. Afterward, edit the application's authentication permissions to allow for Microsoft redirects to and from the application.
+	1. Navigate to Home > Azure Active Directory > App Registrations > Applicaton > Authentication
+	2. Register the following addressed
+		- `<UI_URL>`
+		- `<UI_URL>/candidates`
+		- `<SERVER_URL>`
+		- `<SERVER_URL>/callback`
+
+5. Under your Enterprise [Azure portal's](https://portal.azure.com) OAuth scope page, open the needed Microsoft Graph API permissions.
 	1. Navigate to Home > Azure Active Directory > App registrations > App name > View API permissions
 	2. Turn on the following permissions
 	  - Calendars.ReadWrite.Shared **Delegated**
@@ -272,7 +307,7 @@ You can remotely connect to your local backend service through `chrome://inspect
 In Webstorm, create an attachment run configuration with `localhost`on port `9229`. This is the default Node inspection port. Add breakpoints and hit debug, the program should now pause when the breakpoint is hit by any external calls.
 
 ### Updating Dependencies
-Simply run `sh install_dependencies.sh`. This will update the dependencies of the `adapter`, `frontend`, and `backend` packages.
+Simply run `sh install_dependencies.sh` from the root directory of the project. This will update the dependencies of the `adapter`, `frontend`, and `backend` packages.
 
 ### Testing
 

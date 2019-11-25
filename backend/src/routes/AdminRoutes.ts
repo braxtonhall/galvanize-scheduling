@@ -4,7 +4,7 @@ import {IResourceFacade, ResourceFacade} from "../controllers/ResourceFacade";
 import {ResourceKind} from "../controllers/Common";
 import {IResource} from "adapter/dist/interfaces";
 import AuthController from "../controllers/AuthController";
-import {sendAvailabilityEmail, sendScheduleEmail, sendCancellationEmail} from "../controllers/EmailController";
+import {sendAvailabilityEmail, sendCancellationEmail, sendScheduleEmail} from "../controllers/EmailController";
 import MSGraphController from "../controllers/MSGraphController";
 
 const resourceFacade: IResourceFacade = new ResourceFacade();
@@ -183,6 +183,9 @@ app.post(nodeAdapter.urls.SCHEDULE, async (req, res) => {
 	let schedule: interfaces.ISchedule = req.body.data;
 	try {
 		if (await AuthController.getInstance().checkAuth(token)) {
+			if (!!(await resourceFacade.get(token, schedule.candidate.id, ResourceKind.Candidate) as interfaces.ICandidate).schedule) {
+				throw new Error("Cannot schedule an already scheduled Candidate");
+			}
 			schedule = await MSGraphController.bookSchedule(token, schedule);
 			await resourceFacade.create(token, schedule, ResourceKind.Schedule);
 			await sendScheduleEmail(token, schedule);
