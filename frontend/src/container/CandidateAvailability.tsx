@@ -78,7 +78,7 @@ const CandidateAvailability: React.FC = (props) => {
 				<CardSubtitle><u>Meeting #{i + 1}</u></CardSubtitle>
 				<CardSubtitle className="small"><b>{(timeSlot.start as Moment).format("MMM Do")}</b></CardSubtitle>
 				<CardSubtitle className="small">{(timeSlot.start as Moment).format("h:mm a")} - {(timeSlot.end as Moment).format("h:mm a")}</CardSubtitle>
-				{timeSlot.note && <CardSubtitle className="small">{timeSlot.note}</CardSubtitle>}
+				{timeSlot.note && timeSlot.note.split(";").map(n => <CardSubtitle className="small">{n}</CardSubtitle>)}
 			</Col>
 		)
 	}
