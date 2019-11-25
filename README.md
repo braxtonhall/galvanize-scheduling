@@ -224,6 +224,9 @@ The Interview Scheduler queries for data from your Microsoft Office Enterprise a
 3. Give all administrators of the system the requisite permissions in your Azure Portal.
 	1. Navigate to Home > Users > User > Assigned Roles
 	2. Set the users' permissions. In order for them to effectively leverage the system, they must have permission to manage enterprise apps, view other users' schedules, and edit other users' schedules.
+	3. As well, you must Grant admin consent for each user.
+	4. Navigate to Home > Azure Active Directory > App Registrations > Applicaton > API Permissions
+	5. Grant Admin Consent for Application, and have the user login.
 
 4. Register an app on Azure. Afterward, edit the application's authentication permissions to allow for Microsoft redirects to and from the application.
 	1. Navigate to Home > Azure Active Directory > App Registrations > Applicaton > Authentication
