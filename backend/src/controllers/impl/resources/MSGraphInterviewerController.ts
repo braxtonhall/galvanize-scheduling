@@ -2,28 +2,34 @@ import {InterviewerController} from "../../ResourceControllers";
 import { interfaces } from "adapter";
 import MSGraphController from "../../MSGraphController";
 import {Config, ConfigKey} from "../../../Config";
+import Log from "../../../Log";
 type IInterviewer = interfaces.IInterviewer;
 
 export default class MSGraphInterviewerController extends InterviewerController {
 
 	public async list(token: string,  groupName?: string): Promise<IInterviewer[]> {
-		groupName = typeof groupName === "string" ? groupName :
-			Config.getInstance().get(ConfigKey.interviewerGroupName);
-		const groups = await MSGraphController.getGroups(token);
+		try {
+			groupName = typeof groupName === "string" ? groupName :
+				Config.getInstance().get(ConfigKey.interviewerGroupName);
+			const groups = await MSGraphController.getGroups(token);
 
-		let id;
-		for (let group of groups.value) {
-			if (group.displayName === groupName) {
-				id = group.id;
-				break;
+			let id;
+			for (let group of groups.value) {
+				if (group.displayName === groupName) {
+					id = group.id;
+					break;
+				}
 			}
-		}
 
-		if (!id) {
-			return [];
+			if (!id) {
+				return [];
+			}
+
+			return await MSGraphController.getInterviewers(token, id);
+		} catch (err) {
+			Log.error("There was an error in retrieving the interviewers", groupName, "from Graph:", err);
+			throw new Error("Can't get Interviewers (" + groupName + ") from MSGraph");
 		}
-		// TODO wrap in try catch
-		return await MSGraphController.getInterviewers(token, id);
 	}
 
 	public async create(token: string, resource: IInterviewer): Promise<IInterviewer> {

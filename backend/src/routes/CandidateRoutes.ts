@@ -12,7 +12,7 @@ app.get(nodeAdapter.urls.EXISTS_CANDIDATE, async (req, res) => {
 		const output: boolean = await resourceFacade.exists(id, ResourceKind.Candidate);
 		res.status(200).send(output);
 	} catch(e) {
-		res.status(e.statusCode).send(e.message);
+		res.status(400).send(e.message);
 	}
 });
 
@@ -28,7 +28,7 @@ app.get(nodeAdapter.urls.CANDIDATE, async (req, res) => {
 		}
 		res.status(200).send(data);
 	} catch(e) {
-		res.status(500).send(e);
+		res.status(404).send(e);
 	}
 });
 
@@ -60,7 +60,7 @@ app.post(nodeAdapter.urls.UPDATE_AVAILABILITY, async (req, res) => {
 			await resourceFacade.create(token, candidate, ResourceKind.Candidate);
 			res.sendStatus(200);
 		} else {
-			res.sendStatus(401);
+			res.sendStatus(404);
 		}
 	} catch (e) {
 		res.status(400).send(e);

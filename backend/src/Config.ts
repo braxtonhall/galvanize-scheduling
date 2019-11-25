@@ -66,8 +66,10 @@ export class Config {
 				[ConfigKey.msOAuthMetaData]: 		  process.env.OAUTH_ID_METADATA,
 				[ConfigKey.msOAuthAuthorizeEndpoint]: process.env.OAUTH_AUTHORIZE_ENDPOINT,
 				[ConfigKey.msOAuthTokenEndpoint]: 	  process.env.OAUTH_TOKEN_ENDPOINT,
-				[ConfigKey.msEmailEndpoint]:		  process.env.EMAIL_ENDPOINT,
-				[ConfigKey.msScheduleEndpoint]:		  process.env.GET_SCHEDULE_ENDPOINT,
+				// These two config options are hardcoded because they should always be these values
+				//    unless they are being overridden by the tests
+				[ConfigKey.msEmailEndpoint]:		  "/me/sendMail",
+				[ConfigKey.msScheduleEndpoint]:		  "/me/calendar/getSchedule",
 				
 				// Internal
 				[ConfigKey.interviewerGroupName]: process.env.INTERVIEWER_GROUP_NAME,
@@ -77,9 +79,8 @@ export class Config {
 				[ConfigKey.production]: typeof process.env.PRODUCTION === "string" &&
 				process.env.PRODUCTION.toLowerCase() === 'true',
 			};
-			// TODO check for testing scenario and change some of these props
 		} catch (err) {
-			// TODO
+			Log.error("Config setup error -", err);
 		}
 	}
 
@@ -93,7 +94,7 @@ export class Config {
 	}
 	
 	public set(key: ConfigKey, value: any): void {
-		Log.warn(`WARNING: Config setting ${key} to ${value}. ` +
+		Log.warn(`WARNING: Config setting "${key}" to "${value}". ` +
 			`This should NOT occur in production. TEST ONLY`);
 		this.config[key] = value;
 	}

@@ -50,7 +50,7 @@ export class DynamoDBController implements IDynamoDBController {
 			],
 			ProvisionedThroughput: {
 				ReadCapacityUnits: 10,
-				WriteCapacityUnits: 10 // TODO
+				WriteCapacityUnits: 10
 			}
 		},
 		{
@@ -63,7 +63,7 @@ export class DynamoDBController implements IDynamoDBController {
 			],
 			ProvisionedThroughput: {
 				ReadCapacityUnits: 10,
-				WriteCapacityUnits: 10 // TODO what are these numbers?
+				WriteCapacityUnits: 10
 			}
 		},
 		{
@@ -76,7 +76,7 @@ export class DynamoDBController implements IDynamoDBController {
 			],
 			ProvisionedThroughput: {
 				ReadCapacityUnits: 10,
-				WriteCapacityUnits: 10 // TODO
+				WriteCapacityUnits: 10
 			}
 		},
 		{
@@ -89,7 +89,7 @@ export class DynamoDBController implements IDynamoDBController {
 			],
 			ProvisionedThroughput: {
 				ReadCapacityUnits: 10,
-				WriteCapacityUnits: 10 // TODO
+				WriteCapacityUnits: 10
 			}
 		}
 	];

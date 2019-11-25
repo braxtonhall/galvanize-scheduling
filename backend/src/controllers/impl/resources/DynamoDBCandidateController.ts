@@ -32,7 +32,7 @@ export default class DynamoDBCandidateController extends CandidateController {
 
 	public async delete(token: string, id: string): Promise<boolean> {
 		await this.dbc.deleteCandidate(id);
-		return true; // TODO more guards?
+		return true;
 	}
 	
 	public async exists(id: string): Promise<boolean> {
