@@ -82,9 +82,10 @@ export function concatenateMoments(availability: interfaces.IAvailability): inte
 export function clipNonWorkingHours(availability: interfaces.IAvailability, workingHours = DEFAULT_WORKING_HOURS): interfaces.IAvailability {
 	let workingDay = workingHours.daysOfWeek.map(w => WEEKDAYS[w]);
 	let dates = new Set();
-	
-	let end: string = availability.reduce((acc, t) => acc > t.end ? acc : t.end, new Date().toISOString()) as string;
-	let start: string = availability.reduce((acc, t) => acc < t.start ? acc : t.start, end) as string;
+
+	const now = new Date().toISOString();
+	let end: string = availability.reduce((acc, t) => acc > t.end ? acc : t.end, now) as string;
+	let start: string = availability.filter(t => t.start > now).reduce((acc, t) => acc < t.start ? acc : t.start, end) as string;
 
 	while (start < end) {
 		const startTime = new Date(start);
