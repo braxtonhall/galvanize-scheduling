@@ -1,69 +1,43 @@
-import React, {useState, useContext} from 'react';
+import React, {useContext} from 'react';
 import {
 	Card,
-	CardSubtitle,
 	CardBody,
-	Input,
 	Button,
 	Container,
 	Row,
 	Col,
 	CardHeader,
-	Label,
+	CardText,
 } from "reactstrap"
+import Fade from "react-reveal/Fade"
 import adapter from "../services/Adapter";
-import Context from '../services/Context';
-import createOnChange from "../services/createOnChange";
-import { RouteComponentProps } from 'react-router';
-import { Redirect } from 'react-router-dom';
+import Context from "../services/Context";
 
-const Login: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
-	const {updateContext, startLoadingProcess, endLoadingProcess} = useContext(Context);
+const Login: React.FC = () => {
+	const {startLoadingProcess, endLoadingProcess} = useContext(Context);
 
-	const [password, updatePassword] = useState("");
-	const [email, updateEmail] = useState("");
-	const [redirect, updateRedirect] = useState(false);
-
-	const onChangePassword = createOnChange(updatePassword);
-	const onChangeEmail = createOnChange(updateEmail);
-
-	if (redirect) {
-		return <Redirect to="/candidates"/>
-	}
-
-	async function login() {
+	async function login(e: React.FormEvent) {
 		startLoadingProcess();
-		const {success, data, error} = await adapter.login(email, password);
-
-		if (error) {
-			endLoadingProcess({error});
-			return;
-		}
-
-		if (success) {
-			endLoadingProcess({token: data});
-			updateRedirect(true);
-			return;
-		}
-
-		endLoadingProcess({error: "There was an error logging in. Your username/password may not be valid."});
+		e.preventDefault();
+		console.log(adapter.loginRedirectURL());
+		window.location.href = adapter.loginRedirectURL();
+		setTimeout(endLoadingProcess, 10000);
 	}
 
 	return (
 		<Container>
 			<Row>
-				<Col sm="12" md={{size: 6, offset: 3}}>
-					<Card className="mt-4">
-						<CardHeader>Login</CardHeader>
-						<CardBody>
-							<CardSubtitle>Please input your email and password that is used by your official Galvanize email address.</CardSubtitle>
-							<Label className="mt-4">Email</Label>
-							<Input type="email" placeholder="enter email" onChange={onChangeEmail} value={email}/>
-							<Label className="mt-2">Password</Label>
-							<Input type="password" placeholder="enter password" onChange={onChangePassword} value={password}/>
-							<Button className="mt-4" color="primary" onClick={login}>Login</Button>
-						</CardBody>
-					</Card>
+				<Col sm="12" lg={{size: 6, offset: 3}} md={{size: 8, offset: 2}}>
+					<Fade bottom>
+						<Card className="mt-4">
+							<CardHeader>Login</CardHeader>
+							<CardBody>
+								<CardText>In order to login into the Galvanize scheduling software, you need to authenticate with the Microsoft server for Galvanize. Please use your credentials you use to login with your outlook.</CardText>
+								{process.env.NODE_ENV === "development" && <CardText>On the development version you may use <b>admin@ph14solutions.onmicrosoft.com</b> and <b>Galvanize319</b>.</CardText>}
+								<Button className="mt-4" color="primary" onClick={login}>Login</Button>
+							</CardBody>
+						</Card>
+					</Fade>
 				</Col>
 			</Row>
 		</Container>

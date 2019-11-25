@@ -1,51 +1,55 @@
 import {Moment} from "moment";
 
-export interface IHiringManager {
+export interface IResource {
 	id?: string,
 }
 
-export interface IHumanResource {
-	id?: string,
-}
-
-export interface IRoom {
-	id?: string,
+export interface IRoom extends IResource {
 	name: string,
+	eligible?: boolean,
+	email?: string,
+	capacity?: number,
 }
 
-export interface ICandidate {
-	id?: string,
+export interface ICandidate extends IResource {
 	email: string,
-	phoneNumber: string,
-	firstName: string,
-	lastName: string,
-	position: string,
-	notes: string,
-	availability?: IAvailability,
+	phoneNumber?: string,
+	firstName?: string,
+	lastName?: string,
+	position?: string,
+	notes?: string,
+	availability?: IAvailability
+	schedule?: IAvailability
 }
 
-export interface IInterviewer {
-	id?: string,
+export interface IInterviewer extends IResource {
+	email: string,
 	firstName: string,
 	lastName: string,
 }
 
-export interface ISchedule {
+export interface ISchedule extends IResource {
 	candidate: ICandidate
 	meetings: IMeeting[]
 }
 
-export interface IMeeting {
+export interface ITimeslot {
+	start: Moment | string;
+	end: Moment | string;
+	note?: string;
+	id?: string;
+}
+
+export interface IMeeting extends ITimeslot {
 	interviewers: IInterviewer[],
-	startTime: Moment,
-	endTime: Moment,
 	room: IRoom
 }
 
-export type IAvailability = Array<{start: Moment, end: Moment}>
+export type IAvailability = Array<ITimeslot>
 
 export interface IGetSchedulesOptions {
-
+	preferences: Array<{interviewer: IInterviewer, preference?: IInterviewer, minutes: number}>;
+	candidate: ICandidate;
 }
 
 export enum Role {

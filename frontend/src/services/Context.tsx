@@ -1,6 +1,6 @@
-import React, { useState, createContext } from "react";
+import React, {useState, createContext, useRef} from "react";
 import App from "../App";
-import {interfaces} from "adapter";
+import adapter from "../services/Adapter";
 
 export interface IContext {
 	token?: string,
@@ -9,6 +9,8 @@ export interface IContext {
 	updateContext: (context: Partial<IContext>) => void
 	startLoadingProcess: (context?: Partial<IContext>) => void
 	endLoadingProcess: (context?: Partial<IContext>) => void
+	scrollToBottom: () => void;
+	authenticateAndLogout: () => void;
 }
 
 const Context = createContext<IContext>({
@@ -16,6 +18,8 @@ const Context = createContext<IContext>({
 	updateContext: () => {},
 	startLoadingProcess: () => {},
 	endLoadingProcess: () => {},
+	scrollToBottom: () => {},
+	authenticateAndLogout: () => {},
 });
 
 export const ContextProvider = Context.Provider;
@@ -24,11 +28,15 @@ export default Context;
 
 export const Root: React.FC = () => {
 
+	const bottom = useRef(null);
+
 	const [context, updateContext] = useState<IContext>({
 		operationsLoading: 0,
 		updateContext: () => {},
 		startLoadingProcess: () => {},
 		endLoadingProcess: () => {},
+		scrollToBottom: () => {},
+		authenticateAndLogout: () => {},
 	});
 
 	const newFunc = (c: Partial<IContext>): void => {
@@ -52,14 +60,35 @@ export const Root: React.FC = () => {
 		});
 	};
 
+	const scrollToBottom = () => {
+		bottom.current.scrollIntoView({behavior: "smooth"})
+	};
+
+	const authenticateAndLogout = () => {
+		if (context.token) {
+			adapter.checkToken(context.token)
+				.then(({data, success}) => {
+					if (!data) {
+						newFunc( {
+							error: "Your session has expired, please login in again.",
+							token: undefined,
+						})
+					}
+				});
+		}
+	};
+
 	return (
 		<ContextProvider value={{
 			...context,
 			updateContext: newFunc,
 			startLoadingProcess,
-			endLoadingProcess
+			endLoadingProcess,
+			scrollToBottom,
+			authenticateAndLogout
 		}}>
 			<App/>
+			<div ref={bottom} />
 		</ContextProvider>
 	)
 };

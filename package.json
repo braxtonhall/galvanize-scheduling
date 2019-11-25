@@ -8,16 +8,18 @@
     "detatch": "docker-compose up -d",
     "stop": "docker-compose down",
     "restart": "docker-compose build && docker-compose up -d",
-
     "build-frontend": "docker-compose build frontend",
     "detatch-frontend": "docker-compose up -d frontend",
     "stop-frontend": "docker-compose down frontend",
     "restart-frontend": "docker-compose build frontend && docker-compose up -d frontend",
-
     "build-backend": "docker-compose build backend",
     "watch-backend": "docker-compose up backend",
-    "detatch-backend": "docker-compose up -d backend",
-    "stop-backend": "docker-compose down backend",
-    "restart-backend": "docker-compose build backend && docker-compose up -d backend"
+    "detatch-backend": "docker-compose up -d backend db",
+    "debug-backend": "docker-compose -f docker-compose.debug.yml up -d backend db",
+    "stop-backend": "docker-compose down",
+    "restart-backend": "docker-compose build backend && npm run detatch-backend",
+    "test:backend": "npm --prefix ./backend run test",
+    "test:adapter": "npm --prefix ./adapter run test",
+    "test:integration": "npm run debug-backend && npm run test:adapter && npm run stop-backend"
   }
 }
