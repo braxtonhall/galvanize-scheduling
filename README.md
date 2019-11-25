@@ -65,7 +65,7 @@ All authorized routes require the request header `token`, which should be set to
   - **`GET    /resource/schedules`**
 	 - Calculates viable schedules and returns them. The query should be set to a valid `IGetSchedulesOptions` object. There may be cycles and chains in the `preferences` array, as the system will attempt to group everyone in the cycle/chain together into one interview. However, having mismatched minutes within a cycle/chain may lead to undefined behaviour.
   	 - If successful, response status will be set to `200`, and a JSON array of up to three `ISchedule` objects will be returned.
-  	 	 - The calendars and individual working hours of every room and interviewer are compared with the availability of the supplied `ICandidate`.
+  	 	 - The calendars, timezones, and individual working hours of every room and interviewer are compared with the availability of the supplied `ICandidate`.
   	 	 - Every room marked `eligible` is then scored by their averave overlap with interviewers' schedules, their largest timeslot length, their capacity, and their average timeslot length.
   	 	 - Rooms are then selected in the order of their scores at the privous step and are filled up with iterviews back to back if possible, and a break is inserted every four hours of consecutive interviews.
   	 	 - Ten schedules are generated with slight variation in inputs and parameters. Then the schedule with the fewest room switches, the schedule with the most interviewers actually places, and the schedule that does the best across both categories are all returned (if any viable schedules were found at all).
@@ -211,8 +211,16 @@ The application relies on several environment variables for further configuratio
 Some evironment variables of note are described here.
 
 - **`INTERVIEWER_GROUP_NAME`**
+	- This controls the default name of the group whose members will be retrieved from Outlook when attempting to retrieve all interviewers.
+	- If this variable is not set, the system will default it to `Interviewer`.
+- **`OAUTH_SCOPES`**
+	- This gives the backend permissions to interface with Microsoft Graph. They should match the OAuth scopes described above in Outlook Setup.
 - **`PRODUCTION`**
+	- If this evironment variable is set to `false`, two endpoints in the system backend will be opened that allow for editing the environment of the backend remotely if a secret key is provided. This is of course only to be used by local testing.
+	- If this variable is not set, the system will default it to `true`.
 - **`TEST_SECRET_KEY`**
+	- This variable allows you to set a password that for using the two test endpoints in the system backend that allow for editing the environment of the backend remotely. These endpoints are only opened by the `PRODUCTION` variable described above.
+	- This variable has no default value.
 
 ## Deployment
 
