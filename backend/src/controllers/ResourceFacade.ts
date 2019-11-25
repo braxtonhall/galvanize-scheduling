@@ -12,25 +12,73 @@ type IInterviewer = interfaces.IInterviewer;
 type IRoom = interfaces.IRoom;
 type ISchedule = interfaces.ISchedule;
 
+/**
+ * Interface IResourceFacade
+ */
 export interface IResourceFacade {
+	/**
+	 * List all the resources related to the type of resource.
+	 * @param {string} token - The token needed for requests.
+	 * @param {ResourceKind} kind - The type of resource.
+	 * @param options - Optional addional options for the request.
+	 * @returns {Promise<Array<IResource>>} The list of resources related to the kind.
+	 */
 	list(token: string, kind: ResourceKind, options?: any): Promise<interfaces.IResource[]>;
+	/**
+	 * Create a resource.
+	 * @param {string} token - The token needed for requests.
+	 * @param {IResource} resource - The resource to create.
+	 * @param {ResourceKind} kind - The type of resource.
+	 * @returns {Promise<Array<IResource>>} The resource created.
+	 */
 	create(token: string, resource: interfaces.IResource, kind: ResourceKind): Promise<interfaces.IResource>;
+	/**
+	 * Deletes a resource.
+	 * @param {string} token - The token needed for requests.
+	 * @param {string} id - the id of the resource to delete.
+	 * @param {ResourceKind} kind - The type of resource.
+	 * @returns {Promise<Array<boolean>>} If deleted successfully or failed.
+	 */
 	delete(token: string, id: string, kind: ResourceKind): Promise<boolean>;
+	/**
+	 * Checks if resource exists
+	 * @param {string} id - The token needed for requests.
+	 * @param {ResourceKind} kind - The type of resource.
+	 * @returns {Promise<Array<boolean>>} True if exists false if not.
+	 */
 	exists(id: string, kind: ResourceKind): Promise<boolean>;
+	/**
+	 * Gets a resource.
+	 * @param {string} token - The token needed for requests.
+	 * @param {string} id - The id of the resource.
+	 * @param {ResourceKind} kind - The type of resource.
+	 * @returns {Promise<Array<IResource>>} The resource created.
+	 */
 	get(token: string, id: string, kind: ResourceKind): Promise<interfaces.IResource>;
 }
 
+/**
+ * Class representing the facade for resources in the system.
+ * This feature the main 5 actions for a resource type: list, create, delete, exists, and get.
+ * @implements IResourceFacade
+ */
 export class ResourceFacade implements IResourceFacade {
 	private readonly cc: CandidateController;
 	private readonly ic: InterviewerController;
 	private readonly rc: RoomController;
 
+	/**
+	 * @constructor
+	 */
 	constructor() {
 		this.cc = ControllerBuilder.getCandidateController();
 		this.ic = ControllerBuilder.getInterviewerController();
 		this.rc = ControllerBuilder.getRoomController();
 	}
 
+	/**
+	 * @see IResourceFacade.list
+	 */
 	public list(token: string, kind: ResourceKind, options?: any): Promise<IResource[]> {
 		switch (kind) {
 			case ResourceKind.Candidate:
@@ -46,6 +94,9 @@ export class ResourceFacade implements IResourceFacade {
 		}
 	}
 
+	/**
+	 * @see IResourceFacade.create
+	 */
 	public create(token: string, resource: IResource, kind: ResourceKind): Promise<IResource> {
 		switch (kind) {
 			case ResourceKind.Candidate:
@@ -61,6 +112,9 @@ export class ResourceFacade implements IResourceFacade {
 		}
 	}
 
+	/**
+	 * @see IResourceFacade.delete
+	 */
 	public delete(token: string, id: string, kind: ResourceKind): Promise<boolean> {
 		switch (kind) {
 			case ResourceKind.Candidate:
@@ -76,6 +130,9 @@ export class ResourceFacade implements IResourceFacade {
 		}
 	}
 
+	/**
+	 * @see IResourceFacade.exists
+	 */
 	public exists(id: string, kind: ResourceKind): Promise<boolean> {
 		switch (kind) {
 			case ResourceKind.Candidate:
@@ -89,6 +146,9 @@ export class ResourceFacade implements IResourceFacade {
 		}
 	}
 
+	/**
+	 * @see IResourceFacade.get
+	 */
 	public get(token: string, id: string, kind: ResourceKind): Promise<IResource> {
 		switch (kind) {
 			case ResourceKind.Candidate:

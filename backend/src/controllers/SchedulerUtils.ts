@@ -53,6 +53,11 @@ function tookHuman(start: number): string {
 	}
 }
 
+/**
+ * Groups together all time slots that are consequence of others.
+ * @param {IAvailability} availability - The time slots of a given availability.
+ * @returns {IAvailability} Containing new time slots that are grouped together.
+ */
 export function concatenateMoments(availability: interfaces.IAvailability): interfaces.IAvailability {
 	if (availability.some(m => typeof m.start !== "string" || typeof m.end !== "string")) {
 		throw new Error("Cannot concatenate non-string Moments");
@@ -79,6 +84,13 @@ export function concatenateMoments(availability: interfaces.IAvailability): inte
 	return output;
 }
 
+/**
+ * Removes all the times in a given availability that are out of working hours.
+ * @param {IAvailability} availability - The time slots to be clipped.
+ * @param workingHours - Working hours of an interviewers. DEFAUlT = DEFAULT_WORKING_HOURS
+ * @returns {IAvailability} the new availability that is ranged between working hours.
+ * @see findOverlap
+ */
 export function clipNonWorkingHours(availability: interfaces.IAvailability, workingHours = DEFAULT_WORKING_HOURS): interfaces.IAvailability {
 	let workingDay = workingHours.daysOfWeek.map(w => WEEKDAYS[w]);
 	let dates = new Set();
@@ -115,10 +127,22 @@ export function clipNonWorkingHours(availability: interfaces.IAvailability, work
 	return findOverlap(availability, availableSlots);
 }
 
+/**
+ * Given a list of availabilities, find their overlapping time slots
+ * @param {Array<IAvailability>} avail - List of availabilities
+ * @returns {IAvailability} One availabilities with time slots that overlap
+ * @see findOverlap
+ */
 function findOverlappingTime(...avail: interfaces.IAvailability[]): interfaces.IAvailability {
 	return avail.length > 0 ? avail.slice(1).reduce(findOverlap, avail[0]) : [];
 }
 
+/**
+ * Given two availabilities find the overlapping times
+ * @param {IAvailability} availA - The first availability.
+ * @param {IAvailability} availB - The second availability
+ * @returns A new availability with time slots that overlap.
+ */
 function findOverlap(availA: interfaces.IAvailability, availB: interfaces.IAvailability): interfaces.IAvailability {
 	let overlap = [];
 	for (let timeA of availA) {
@@ -252,6 +276,12 @@ function buildGroups(preferences: PreferenceAvail[]): PreferenceAvail[][] {
 	return groups.map(g => g.data);
 }
 
+/**
+ * Remove or cut time slots in availability that are not part of meetings.
+ * @param {IAvailability} availability - Availabilities to map
+ * @param {Array<IMeeting>} meetings - Meetings to be compared with.
+ * @returns {IAvailability} A new List of time slots that availabilities overlap with meetings.
+ */
 function removeOverlap(availability: interfaces.IAvailability, meetings: interfaces.IMeeting[]): interfaces.IAvailability {
 	/** delete all meetings from the avail. For example
 	 * input:  avail = [{start: 1000, end: 1400}], meetings = [{start: 1100, end: 1200}]

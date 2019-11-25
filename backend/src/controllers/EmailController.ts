@@ -61,6 +61,13 @@ const createEmail = (email: IEmail) => {
     }
 };
 
+/**
+ * Following functions to send and cancel emails.
+ * @param {string} token - The token needed for requests
+ * @param {ICandidate} candidate - The candidate to send the email to
+ * @returns {Promise} whether sending the email succeeded or failed.
+ * @see MSGraphController.sendEmail
+ */
 const sendAvailabilityEmail = (token, candidate: interfaces.ICandidate) => {
     const email = {
         subject: 'Your availability for an interview with Galvanize',
