@@ -264,6 +264,12 @@ Some evironment variables of note are described here.
 - **`TEST_SECRET_KEY`**
 	- This variable allows you to set a password that for using the two test endpoints in the system backend that allow for editing the environment of the backend remotely. These endpoints are only opened by the `PRODUCTION` variable described above.
 	- This variable has no default value.
+- **`OAUTH_APP_ID`**
+	- This is the identifying string for the application that Azure uses to open its endpoints to the Interview Scheduler.
+	- In Azure, navigate to Home > Active Directory > App Registrations > **Application** > Application (client) ID
+- **`OAUTH_APP_PASSWORD`**
+	- This is paired with the `OAUTH_APP_ID` to indentify the Interview Scheduler.
+	- In Azure, navigate to Home > Active Directory > App Registrations > **Application** > Certificates & secrets > New client secret
 
 ## Deployment
 
