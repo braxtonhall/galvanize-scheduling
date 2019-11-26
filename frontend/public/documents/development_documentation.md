@@ -237,15 +237,15 @@ The Interview Scheduler queries for data from your Microsoft Office Enterprise a
 		- `<SERVER_URL>/callback`
 
 5. Under your Enterprise [Azure portal's](https://portal.azure.com) OAuth scope page, open the needed Microsoft Graph API permissions.
-	1. Navigate to Home > Azure Active Directory > App registrations > **App name** > View API permissions
+	1. Navigate to Home > Azure Active Directory > App Registrations > **Applicaton** > View API permissions
 	2. Turn on the following permissions
-	  - Calendars.ReadWrite.Shared **Delegated**
-	  - Directory.Read.All **Application**
-	  - Group.Read.All **Application**
-	  - Group.Selected **Application**
-	  - Mail.Send **Application**
-	  - Place.Read.All **Application**
-	  - User.Read.All **Application**
+	   - Calendars.ReadWrite.Shared **Delegated**
+	   - Directory.Read.All **Application**
+	   - Group.Read.All **Application**
+	   - Group.Selected **Application**
+	   - Mail.Send **Application**
+	   - Place.Read.All **Application**
+	   - User.Read.All **Application**
 
 ### Environment
 
@@ -264,6 +264,12 @@ Some evironment variables of note are described here.
 - **`TEST_SECRET_KEY`**
 	- This variable allows you to set a password that for using the two test endpoints in the system backend that allow for editing the environment of the backend remotely. These endpoints are only opened by the `PRODUCTION` variable described above.
 	- This variable has no default value.
+- **`OAUTH_APP_ID`**
+	- This is the identifying string for the application that Azure uses to open its endpoints to the Interview Scheduler.
+	- In Azure, navigate to Home > Active Directory > App Registrations > **Application** > Application (client) ID
+- **`OAUTH_APP_PASSWORD`**
+	- This is paired with the `OAUTH_APP_ID` to indentify the Interview Scheduler.
+	- In Azure, navigate to Home > Active Directory > App Registrations > **Application** > Certificates & secrets > New client secret
 
 ## Deployment
 
@@ -286,7 +292,7 @@ More information on hosting Docker images on AWS can be found [here](https://aws
 ### First Time Installation
 The development process requires installation of several dependencies. This includes:
 
-- `Node` (and `npm`). Both the frontend and backend systems run in Node, and npm is used to manage dependencies. 
+- `Node v10.16.3` (and `npm`). Both the frontend and backend systems run in Node, and npm is used to manage dependencies. 
 - `Docker`. Used to automatically deploy dummy containers during the testing process.
 - `amazon/dynamodb-local`. This image is used to mock the database.
  - To install this, run `docker pull amazon/dynamodb-local`. This needs to done only once.
