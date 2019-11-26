@@ -286,7 +286,7 @@ More information on hosting Docker images on AWS can be found [here](https://aws
 ### First Time Installation
 The development process requires installation of several dependencies. This includes:
 
-- `Node` (and `npm`). Both the frontend and backend systems run in Node, and npm is used to manage dependencies. 
+- `Node v10.16.3` (and `npm`). Both the frontend and backend systems run in Node, and npm is used to manage dependencies. 
 - `Docker`. Used to automatically deploy dummy containers during the testing process.
 - `amazon/dynamodb-local`. This image is used to mock the database.
  - To install this, run `docker pull amazon/dynamodb-local`. This needs to done only once.
