@@ -1,6 +1,7 @@
 import { interfaces } from "adapter";
 import {IScheduleAvailabilities, Preference} from "./Common";
 import Log, {trace} from "../Log";
+import isEqual from "lodash/isEqual";
 
 type PreferenceAvail = {interviewer: Preference, availability: interfaces.IAvailability};
 type CandidateSchedule = {schedule: interfaces.ISchedule, numChangeOvers: number, numUnscheduled: number};
@@ -228,21 +229,33 @@ export function generateSchedules(candidate: interfaces.ICandidate, scheduleAvai
 			const unsched = a.numUnscheduled - b.numUnscheduled;
 			return unsched === 0 ? a.numChangeOvers - b.numChangeOvers : unsched;
 		});
-		if (schedules[0] === output[0]) {
-			output.push(schedules[1]);
-		} else {
-			output.push(schedules[0]);
+		// if (schedules[0] === output[0]) {
+		// 	output.push(schedules[1]);
+		// } else {
+		// 	output.push(schedules[0]);
+		// }
+		for (const schedule of schedules) {
+			if (output.every(s => !isEqual(schedule, s))) {
+				output.push(schedule);
+				break;
+			}
 		}
 	}
 	// Optimize for both
 	if (schedules.length > 2) {
 		schedules.sort((a, b) => (a.numUnscheduled + a.numChangeOvers) - (b.numUnscheduled + b.numChangeOvers));
-		if (!output.includes(schedules[0])) {
-			output.push(schedules[0]);
-		} else if (!output.includes(schedules[1])) {
-			output.push(schedules[1]);
-		} else {
-			output.push(schedules[2]);
+		// if (!output.includes(schedules[0])) {
+		// 	output.push(schedules[0]);
+		// } else if (!output.includes(schedules[1])) {
+		// 	output.push(schedules[1]);
+		// } else {
+		// 	output.push(schedules[2]);
+		// }
+		for (const schedule of schedules) {
+			if (output.every(s => !isEqual(schedule, s))) {
+				output.push(schedule);
+				break;
+			}
 		}
 	}
 	Log.trace(`Returning all schedules. ${schedules.length} schedules were found. All runs + overhead took ${tookHuman(start)}.`);
