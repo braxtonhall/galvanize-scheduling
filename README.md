@@ -286,10 +286,10 @@ To save these images to files to be used on other machines,
 - `docker save glvnzschedserver:latest | gzip > glvnzschedserver.tar.gz`
 
 ### Hosting on AWS
-https://www.book.ph14interviews.com is hosted on a single ECS cluster which comprises of two EC2 instances (representing frontend and backend).
+Our [website](https://www.book.ph14interviews.com) is hosted on a single ECS cluster which comprises of two EC2 instances, representing frontend and backend.
 
 #### Uploading Docker Images
-You can upload docker images to ECR (Amazon's storage repository) through docker tags, so that they can be reference in the tasks:
+You can upload docker images to ECR (Amazon's repositories) through docker tags, so that they can be referenced in tasks:
 
 ```
 ### Configure your AWS access key/secret if this is the first run
@@ -300,14 +300,14 @@ aws configure
 $(aws ecr get-login --no-include-email --region us-east-1)
 
 ### docker tag <image> <tag>, and push to AWS
-docker tag galvanize-scheduling_backend:latest 096743718738.dkr.ecr.us-east-1.amazonaws.com/backend
-docker push 096743718738.dkr.ecr.us-east-1.amazonaws.com/backend
+docker tag galvanize-scheduling_backend:latest 373316253232.dkr.ecr.us-east-1.amazonaws.com/galvanizebackend
+docker push 373316253232.dkr.ecr.us-east-1.amazonaws.com/galvanizebackend
 
-docker tag galvanize-scheduling_frontend:latest 096743718738.dkr.ecr.us-east-1.amazonaws.com/frontend
-docker push 096743718738.dkr.ecr.us-east-1.amazonaws.com/frontend
+docker tag galvanize-scheduling_frontend:latest 373316253232.dkr.ecr.us-east-1.amazonaws.com/galvanizefrontend
+docker push 373316253232.dkr.ecr.us-east-1.amazonaws.com/galvanizefrontend
 ```
 
-You can use the existing docker-compose file to build the images, but the front-end build `args` must be updated to wherever you plan to host before building, so that the redirects map to the correct location instead of localhost:
+You can use the existing docker-compose file to build the images, but the frontend `build args` must be updated to wherever you plan to host before building, so that the redirects go to the correct location instead of `localhost`:
 ```
       args:
         - "SERVER_ADDRESS=https://server.ph14interviews.com"
@@ -341,7 +341,7 @@ aws ecs stop-task --cluster galvanize-cluster --task arn:aws:ecs:us-east-1:3733
 ```
 
 #### HTTPS Support (Installing an SSL Certificate)
-Microsoft requires all callback URLs to be secure, so we added a domain name to the site and used *Amazon Certificate Manager* to generate SSL certificates. Then we used a __load balancer__ to redirect calls for https://server.ph14interviews.com to port 8080 of the EC2 instance running the backend service. `Attributes` were used to make sure tasks ran on the correct EC2 instance, so that the load balancer would hit the right service, and the port openings (managed by __security groups__ on the instance) were correct.
+__Microsoft requires all callback URLs to be secure__, so we added a domain name to the site and used *Amazon Certificate Manager* to generate SSL certificates. Then we used a __load balancer__ to redirect calls for [the server subdomain](https://server.ph14interviews.com) to port 8080 of the EC2 instance running the backend service. `Attributes` were used to make sure tasks ran on the correct EC2 instance, so that the load balancer would hit the right service, and the port openings (managed by __security groups__ on the instance) were correct.
 
 ![Website Certificates](https://i.imgur.com/e5wvgAx.png)
 ![Load Balancers](https://i.imgur.com/IcyN7Is.png)
