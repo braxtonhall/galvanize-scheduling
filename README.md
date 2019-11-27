@@ -286,10 +286,10 @@ To save these images to files to be used on other machines,
 - `docker save glvnzschedserver:latest | gzip > glvnzschedserver.tar.gz`
 
 ### Hosting on AWS
-More information on hosting Docker images on AWS can be found [here](https://aws.amazon.com/getting-started/tutorials/deploy-docker-containers/).
+https://www.book.ph14interviews.com is hosted on a single ECS cluster which comprises of two EC2 instances (representing frontend and backend).
 
 #### Uploading Docker Images
-https://www.book.ph14interviews.com is hosted on a single ECS cluster which comprises of two EC2 instances (representing frontend and backend). You can upload docker images to ECR (Amazon's storage repository) through docker tags, so that they can be reference in the tasks:
+You can upload docker images to ECR (Amazon's storage repository) through docker tags, so that they can be reference in the tasks:
 
 ```
 ### Configure your AWS access key/secret if this is the first run
@@ -348,6 +348,8 @@ Microsoft requires all callback URLs to be secure, so we added a domain name to 
 ![Alias Records](https://i.imgur.com/xIsUfjq.png)
 
 The load balancers have a static __DNS name__ in the description, which you can add to the DNS records of whatever registar your domain name belongs to. This will make (HTTP or HTTPS) calls to the domain name route to the load balancer, and the load balancer will route to the correct ports of the EC2 instances, which your servers should be listening on. The instances will also __not need elastic IPs__, because the load balancer can map to it through resource numbers.
+
+More information on hosting Docker images on AWS can be found [here](https://aws.amazon.com/getting-started/tutorials/deploy-docker-containers/).
 
 ## Development
 
