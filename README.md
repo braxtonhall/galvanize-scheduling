@@ -285,7 +285,69 @@ To save these images to files to be used on other machines,
 - `docker save glvnzschedui:latest | gzip > glvnzschedui.tar.gz`
 - `docker save glvnzschedserver:latest | gzip > glvnzschedserver.tar.gz`
 
+### Hosting on AWS
 More information on hosting Docker images on AWS can be found [here](https://aws.amazon.com/getting-started/tutorials/deploy-docker-containers/).
+
+#### Uploading Docker Images
+https://www.book.ph14interviews.com is hosted on a single ECS cluster which comprises of two EC2 instances (representing frontend and backend). You can upload docker images to ECR (Amazon's storage repository) through docker tags, so that they can be reference in the tasks:
+
+```
+### Configure your AWS access key/secret if this is the first run
+### You must install the aws-cli, available on homebrew
+aws configure
+
+### Authenticate with ECR (expires after a few hours)
+$(aws ecr get-login --no-include-email --region us-east-1)
+
+### docker tag <image> <tag>, and push to AWS
+docker tag galvanize-scheduling_backend:latest 096743718738.dkr.ecr.us-east-1.amazonaws.com/backend
+docker push 096743718738.dkr.ecr.us-east-1.amazonaws.com/backend
+
+docker tag galvanize-scheduling_frontend:latest 096743718738.dkr.ecr.us-east-1.amazonaws.com/frontend
+docker push 096743718738.dkr.ecr.us-east-1.amazonaws.com/frontend
+```
+
+You can use the existing docker-compose file to build the images, but the front-end build `args` must be updated to wherever you plan to host before building, so that the redirects map to the correct location instead of localhost:
+```
+      args:
+        - "SERVER_ADDRESS=https://server.ph14interviews.com"
+        - "PUBLIC_ADDRESS=https://book.ph14interviews.com"
+        - "DEFAULT_GROUP=${INTERVIEWER_GROUP_NAME}"
+```
+
+
+#### Setting up ECS - Task Definitions
+We have one __task definition__ for each service, which pulls the latest image from the ECR repository, applies the correct environment variables/entrypoint commands/mounted volumes/port forwarding, and then runs the image. __Network mode__ can be `host` or `bridge`, depending if you want to remap the server ports to another value. Our services are configured to run on different EC2 instances so that the Microsoft callbacks can be routed more easily. __EC2 instances must be running an ECS compatible AMI (OS image), have the "AmazonEC2ContainerServiceforEC2Role" policy, and belong to the same server region to be detected as part of the cluster.__ Running tasks can be done through the `aws-cli` after they are defined, when the docker images are updated, rebuilt, and pushed to ECR. Alternatively, you can `start` and `stop` tasks through the web console.
+
+For example:
+```
+### Find the ARNs (resource numbers) of the currently running tasks
+~/w/galvanize-scheduling ❯❯❯ aws ecs list-tasks --cluster galvanize-cluster               ✘ 255 develop ✭ ✱
+{
+    "taskArns": [
+        "arn:aws:ecs:us-east-1:373316253232:task/galvanize-cluster/509bd537429f48e3a8982a3e8556dd91",
+        "arn:aws:ecs:us-east-1:373316253232:task/galvanize-cluster/ae11a9ef1ff44a209ebd996d9f03538b"
+    ]
+}
+
+### Stop tasks
+aws ecs stop-task --cluster galvanize-cluster --task arn:aws:ecs:us-east-1:3733
+16253232:task/galvanize-cluster/509bd537429f48e3a8982a3e8556dd91
+{ "task": { ..., "taskDefinitionArn": "arn:aws:ecs:us-east-1:373316253232:task-definition/backend-task:9" } }
+
+### Re-run the task, which will pull the latest image
+~/w/galvanize-scheduling ❯❯❯ aws ecs run-task --cluster galvanize-cluster --task-definition backend-task:9
+{ "tasks": [...] }
+```
+
+#### HTTPS Support (Installing an SSL Certificate)
+Microsoft requires all callback URLs to be secure, so we added a domain name to the site and used *Amazon Certificate Manager* to generate SSL certificates. Then we used a __load balancer__ to redirect calls for https://server.ph14interviews.com to port 8080 of the EC2 instance running the backend service. `Attributes` were used to make sure tasks ran on the correct EC2 instance, so that the load balancer would hit the right service, and the port openings (managed by __security groups__ on the instance) were correct.
+
+![Website Certificates](https://i.imgur.com/e5wvgAx.png)
+![Load Balancers](https://i.imgur.com/IcyN7Is.png)
+![Alias Records](https://i.imgur.com/xIsUfjq.png)
+
+The load balancers have a static __DNS name__ in the description, which you can add to the DNS records of whatever registar your domain name belongs to. This will make (HTTP or HTTPS) calls to the domain name route to the load balancer, and the load balancer will route to the correct ports of the EC2 instances, which your servers should be listening on. The instances will also __not need elastic IPs__, because the load balancer can map to it through resource numbers.
 
 ## Development
 
