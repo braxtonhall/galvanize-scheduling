@@ -191,15 +191,19 @@ export default class MSGraphController {
      * @see https://docs.microsoft.com/en-us/graph/api/user-post-events?view=graph-rest-1.0&tabs=javascript
      */
 	static async bookSchedule(token: string, schedule: interfaces.ISchedule): Promise<interfaces.ISchedule> {
+		const name = schedule.candidate.firstName;
+		const position = schedule.candidate.position;
+		const notes = schedule.candidate.notes;
     	const client: Client = this.getClient(token);
     	const promises: Promise<interfaces.IMeeting>[] = schedule.meetings.map(m => {
 			return client
 				.api(`/me/events`)
 				.post({
-					"subject": `Interview with ${schedule.candidate.firstName ? schedule.candidate.firstName : schedule.candidate.email}`,
+					"subject": `Interview with ${name ? name : schedule.candidate.email}`,
 					"body": {
 						"contentType": "HTML",
-						"content": `Be ready ${schedule.candidate.firstName ? `to join ${schedule.candidate.firstName} in` : "for"} an interview for ${schedule.candidate.position ? schedule.candidate.position : "Galvanize"}.`
+						"content": `<p>Be ready ${name ? `to join ${name} in` : "for"} an interview for ${position ? position : "Galvanize"}!</p>` +
+							`${notes ? `<p>Notes${name ? ` for ${name}` : ""}:</p><p>${notes}</p>` : ""}`,
 					},
 					"start": {
 						"dateTime": typeof m.start === "string" ? m.start : m.start.toISOString(),

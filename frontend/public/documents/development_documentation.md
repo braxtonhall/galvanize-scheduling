@@ -237,15 +237,15 @@ The Interview Scheduler queries for data from your Microsoft Office Enterprise a
 		- `<SERVER_URL>/callback`
 
 5. Under your Enterprise [Azure portal's](https://portal.azure.com) OAuth scope page, open the needed Microsoft Graph API permissions.
-	1. Navigate to Home > Azure Active Directory > App registrations > **App name** > View API permissions
+	1. Navigate to Home > Azure Active Directory > App Registrations > **Applicaton** > View API permissions
 	2. Turn on the following permissions
-	  - Calendars.ReadWrite.Shared **Delegated**
-	  - Directory.Read.All **Application**
-	  - Group.Read.All **Application**
-	  - Group.Selected **Application**
-	  - Mail.Send **Application**
-	  - Place.Read.All **Application**
-	  - User.Read.All **Application**
+	   - Calendars.ReadWrite.Shared **Delegated**
+	   - Directory.Read.All **Application**
+	   - Group.Read.All **Application**
+	   - Group.Selected **Application**
+	   - Mail.Send **Application**
+	   - Place.Read.All **Application**
+	   - User.Read.All **Application**
 
 ### Environment
 
@@ -264,6 +264,12 @@ Some evironment variables of note are described here.
 - **`TEST_SECRET_KEY`**
 	- This variable allows you to set a password that for using the two test endpoints in the system backend that allow for editing the environment of the backend remotely. These endpoints are only opened by the `PRODUCTION` variable described above.
 	- This variable has no default value.
+- **`OAUTH_APP_ID`**
+	- This is the identifying string for the application that Azure uses to open its endpoints to the Interview Scheduler.
+	- In Azure, navigate to Home > Active Directory > App Registrations > **Application** > Application (client) ID
+- **`OAUTH_APP_PASSWORD`**
+	- This is paired with the `OAUTH_APP_ID` to indentify the Interview Scheduler.
+	- In Azure, navigate to Home > Active Directory > App Registrations > **Application** > Certificates & secrets > New client secret
 
 ## Deployment
 
@@ -279,6 +285,70 @@ To save these images to files to be used on other machines,
 - `docker save glvnzschedui:latest | gzip > glvnzschedui.tar.gz`
 - `docker save glvnzschedserver:latest | gzip > glvnzschedserver.tar.gz`
 
+### Hosting on AWS
+Our [website](https://www.book.ph14interviews.com) is hosted on a single ECS cluster which comprises of two EC2 instances, representing frontend and backend.
+
+#### Uploading Docker Images
+You can upload docker images to ECR (Amazon's repositories) through docker tags, so that they can be referenced in tasks:
+
+```
+### Configure your AWS access key/secret if this is the first run
+### You must install the aws-cli, available on homebrew
+aws configure
+
+### Authenticate with ECR (expires after a few hours)
+$(aws ecr get-login --no-include-email --region us-east-1)
+
+### docker tag <image> <tag>, and push to AWS
+docker tag galvanize-scheduling_backend:latest 373316253232.dkr.ecr.us-east-1.amazonaws.com/galvanizebackend
+docker push 373316253232.dkr.ecr.us-east-1.amazonaws.com/galvanizebackend
+
+docker tag galvanize-scheduling_frontend:latest 373316253232.dkr.ecr.us-east-1.amazonaws.com/galvanizefrontend
+docker push 373316253232.dkr.ecr.us-east-1.amazonaws.com/galvanizefrontend
+```
+
+You can use the existing docker-compose file to build the images, but the frontend `build args` must be updated to wherever you plan to host before building, so that the redirects go to the correct location instead of `localhost`:
+```
+      args:
+        - "SERVER_ADDRESS=https://server.ph14interviews.com"
+        - "PUBLIC_ADDRESS=https://book.ph14interviews.com"
+        - "DEFAULT_GROUP=${INTERVIEWER_GROUP_NAME}"
+```
+
+
+#### Setting up ECS - Task Definitions
+We have one __task definition__ for each service, which pulls the latest image from the ECR repository, applies the correct environment variables/entrypoint commands/mounted volumes/port forwarding, and then runs the image. __Network mode__ can be `host` or `bridge`, depending if you want to remap the server ports to another value. Our services are configured to run on different EC2 instances so that the Microsoft callbacks can be routed more easily. __EC2 instances must be running an ECS compatible AMI (OS image), have the "AmazonEC2ContainerServiceforEC2Role" policy, and belong to the same server region to be detected as part of the cluster.__ Running tasks can be done through the `aws-cli` after they are defined, when the docker images are updated, rebuilt, and pushed to ECR. Alternatively, you can `start` and `stop` tasks through the web console.
+
+For example:
+```
+### Find the ARNs (resource numbers) of the currently running tasks
+~/w/galvanize-scheduling ❯❯❯ aws ecs list-tasks --cluster galvanize-cluster               ✘ 255 develop ✭ ✱
+{
+    "taskArns": [
+        "arn:aws:ecs:us-east-1:373316253232:task/galvanize-cluster/509bd537429f48e3a8982a3e8556dd91",
+        "arn:aws:ecs:us-east-1:373316253232:task/galvanize-cluster/ae11a9ef1ff44a209ebd996d9f03538b"
+    ]
+}
+
+### Stop tasks
+aws ecs stop-task --cluster galvanize-cluster --task arn:aws:ecs:us-east-1:3733
+16253232:task/galvanize-cluster/509bd537429f48e3a8982a3e8556dd91
+{ "task": { ..., "taskDefinitionArn": "arn:aws:ecs:us-east-1:373316253232:task-definition/backend-task:9" } }
+
+### Re-run the task, which will pull the latest image
+~/w/galvanize-scheduling ❯❯❯ aws ecs run-task --cluster galvanize-cluster --task-definition backend-task:9
+{ "tasks": [...] }
+```
+
+#### HTTPS Support (Installing an SSL Certificate)
+__Microsoft requires all callback URLs to be secure__, so we added a domain name to the site and used *Amazon Certificate Manager* to generate SSL certificates. Then we used a __load balancer__ to redirect calls for [the server subdomain](https://server.ph14interviews.com) to port 8080 of the EC2 instance running the backend service. `Attributes` were used to make sure tasks ran on the correct EC2 instance, so that the load balancer would hit the right service, and the port openings (managed by __security groups__ on the instance) were correct.
+
+![Website Certificates](https://i.imgur.com/e5wvgAx.png)
+![Load Balancers](https://i.imgur.com/IcyN7Is.png)
+![Alias Records](https://i.imgur.com/xIsUfjq.png)
+
+The load balancers have a static __DNS name__ in the description, which you can add to the DNS records of whatever registar your domain name belongs to. This will make (HTTP or HTTPS) calls to the domain name route to the load balancer, and the load balancer will route to the correct ports of the EC2 instances, which your servers should be listening on. The instances will also __not need elastic IPs__, because the load balancer can map to it through resource numbers.
+
 More information on hosting Docker images on AWS can be found [here](https://aws.amazon.com/getting-started/tutorials/deploy-docker-containers/).
 
 ## Development
@@ -286,7 +356,7 @@ More information on hosting Docker images on AWS can be found [here](https://aws
 ### First Time Installation
 The development process requires installation of several dependencies. This includes:
 
-- `Node` (and `npm`). Both the frontend and backend systems run in Node, and npm is used to manage dependencies. 
+- `Node v10.16.3` (and `npm`). Both the frontend and backend systems run in Node, and npm is used to manage dependencies. 
 - `Docker`. Used to automatically deploy dummy containers during the testing process.
 - `amazon/dynamodb-local`. This image is used to mock the database.
  - To install this, run `docker pull amazon/dynamodb-local`. This needs to done only once.
